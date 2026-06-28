@@ -15,6 +15,7 @@
     height: 100vh;
     overflow: hidden;
     cursor: none;
+    outline: none;
   }
 
   /* 화면 전환 */
@@ -449,7 +450,7 @@
   }
 </style>
 </head>
-<body>
+
 
 <!-- 오프닝 -->
 <div class="screen active" id="screen-opening">
@@ -751,8 +752,13 @@
     }, 8000);
   }
 
+  // 페이지 로드시 포커스 강제 설정
+  document.body.setAttribute('tabindex', '0');
+  document.body.focus();
+  document.addEventListener('click', () => document.body.focus());
+
   // ===== 키보드 (리모콘 시뮬레이션) =====
-  document.addEventListener('keydown', (e) => {
+  window.addEventListener('keydown', (e) => {
     if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(e.key)) e.preventDefault();
     // 팝업
     if (document.getElementById('popup-extra').classList.contains('show')) {
