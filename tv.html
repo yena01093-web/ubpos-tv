@@ -595,8 +595,38 @@
       { name: '탄산음료', desc: '콜라·사이다·환타', price: 3000, emoji: '🥤' },
     ]
   };
-  menus = sampleMenus;
   slides = sampleSlides;
+
+  // Firebase에서 메뉴 로드
+  async function loadMenusFromFirebase() {
+    try {
+      const snap = await getDocs(collection(db, 'menus'));
+      if (!snap.empty) {
+        menus = { 0: [], 1: [], 2: [], 3: [] };
+        snap.forEach(d => {
+          const m = d.data();
+          const cat = m.cat ?? 0;
+          if (menus[cat]) menus[cat].push(m);
+        });
+        // 메뉴 슬라이드도 Firebase 데이터로 업데이트
+        const menuSlides = [];
+        Object.values(menus).flat().slice(0, 3).forEach(m => {
+          menuSlides.push({ type: 'menu', eyebrow: '오늘의 추천', title: m.name, desc: m.desc, price: m.price ? `₩ ${Number(m.price).toLocaleString()}` : '', emoji: m.emoji || '🍽️', distance: '' });
+        });
+        // 관광지 슬라이드는 유지
+        const spotSlides = sampleSlides.filter(s => s.type === 'spot');
+        slides = [...menuSlides, ...spotSlides];
+        renderSlide(0);
+        renderDots();
+      } else {
+        menus = sampleMenus;
+      }
+    } catch(e) {
+      console.log('Firebase 로드 실패, 샘플 사용');
+      menus = sampleMenus;
+    }
+  }
+  loadMenusFromFirebase();
 
   // ===== 화면 전환 =====
   function showScreen(id) {
@@ -723,6 +753,7 @@
 
   // ===== 키보드 (리모콘 시뮬레이션) =====
   document.addEventListener('keydown', (e) => {
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(e.key)) e.preventDefault();
     // 팝업
     if (document.getElementById('popup-extra').classList.contains('show')) {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
