@@ -713,9 +713,56 @@
         <div class="menu-price">₩ ${m.price.toLocaleString()}</div>
       </div>
     `).join('');
+    // 클릭으로 메뉴 선택
+    grid.querySelectorAll('.menu-card').forEach((card, i) => {
+      card.addEventListener('click', () => {
+        const row = Math.floor(i / COLS);
+        const col = i % COLS;
+        menuFocusRow = row;
+        menuFocusCol = col;
+        updateMenuFocus();
+        cart.push(items[i]);
+        updateCart();
+      });
+    });
     updateMenuFocus();
     updateCart();
   }
+
+  // 카테고리 탭 클릭
+  document.querySelectorAll('.cat-tab').forEach((tab, i) => {
+    tab.addEventListener('click', () => {
+      catFocus = i;
+      currentCategory = i;
+      menuFocusRow = 0;
+      menuFocusCol = 0;
+      renderMenus();
+      renderCategories();
+    });
+  });
+
+  // 주문확정 버튼 클릭
+  document.querySelector('.cart-btn').addEventListener('click', submitOrder);
+
+  // 메인화면 OK 버튼 클릭
+  document.querySelector('.bottom-hint').addEventListener('click', () => {
+    if (currentScreen === 'main') showOrder();
+  });
+
+  // 뒤로가기 클릭
+  document.querySelector('.order-back').addEventListener('click', () => {
+    showScreen('main'); startSlideShow();
+  });
+
+  // 팝업 버튼 클릭
+  document.getElementById('popup-yes').addEventListener('click', () => {
+    document.getElementById('popup-extra').classList.remove('show');
+    showOrder();
+  });
+  document.getElementById('popup-no').addEventListener('click', () => {
+    document.getElementById('popup-extra').classList.remove('show');
+    showScreen('main'); startSlideShow();
+  });
 
   function updateMenuFocus() {
     const cards = document.querySelectorAll('.menu-card');
