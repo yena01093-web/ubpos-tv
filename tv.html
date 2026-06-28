@@ -780,17 +780,21 @@
       const rows = Math.ceil(items.length / COLS);
 
       if (e.key === 'ArrowLeft') {
-        if (menuFocusCol > 0) menuFocusCol--;
-        else { catFocus = Math.max(0, catFocus - 1); currentCategory = catFocus; renderMenus(); renderCategories(); return; }
-        updateMenuFocus();
+        if (menuFocusCol > 0) { menuFocusCol--; updateMenuFocus(); }
       }
       if (e.key === 'ArrowRight') {
-        if (menuFocusCol < COLS - 1 && menuFocusRow * COLS + menuFocusCol + 1 < items.length) menuFocusCol++;
-        else { catFocus = Math.min(3, catFocus + 1); currentCategory = catFocus; renderMenus(); renderCategories(); return; }
-        updateMenuFocus();
+        const maxIdx = items.length - 1;
+        const curIdx = menuFocusRow * COLS + menuFocusCol;
+        if (curIdx < maxIdx && menuFocusCol < COLS - 1) { menuFocusCol++; updateMenuFocus(); }
       }
-      if (e.key === 'ArrowUp') { menuFocusRow = Math.max(0, menuFocusRow - 1); updateMenuFocus(); }
-      if (e.key === 'ArrowDown') { menuFocusRow = Math.min(rows - 1, menuFocusRow + 1); updateMenuFocus(); }
+      if (e.key === 'ArrowUp') {
+        if (menuFocusRow > 0) { menuFocusRow--; updateMenuFocus(); }
+        else { catFocus = Math.max(0, catFocus - 1); currentCategory = catFocus; menuFocusRow = 0; menuFocusCol = 0; renderMenus(); renderCategories(); }
+      }
+      if (e.key === 'ArrowDown') {
+        if (menuFocusRow < rows - 1) { menuFocusRow++; updateMenuFocus(); }
+        else { catFocus = Math.min(3, catFocus + 1); currentCategory = catFocus; menuFocusRow = 0; menuFocusCol = 0; renderMenus(); renderCategories(); }
+      }
       if (e.key === 'Enter') {
         const idx = menuFocusRow * COLS + menuFocusCol;
         if (idx < items.length) { cart.push(items[idx]); updateCart(); }
