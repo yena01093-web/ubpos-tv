@@ -310,8 +310,6 @@
     }).join('');
     grid.querySelectorAll('.menu-card').forEach((card,i) => {
       card.addEventListener('click', () => {
-        if (items[i].soldOut) return;
-        cart.push(items[i]); updateCart();
         menuFocusRow=Math.floor(i/COLS); menuFocusCol=i%COLS; updateFocus();
       });
     });
