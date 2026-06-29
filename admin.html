@@ -208,6 +208,26 @@
     </div>
 
     <div class="settings-card" style="grid-column:1/-1;">
+      <h3>메인 화면 배경 이미지</h3>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
+        <div style="flex:1;min-width:260px;">
+          <div class="imgbb-tip">📷 <a href="https://imgbb.com" target="_blank">imgbb.com</a> → 이미지 업로드 → Direct link 복사 → 붙여넣기</div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <input type="text" id="bg-imageUrl" placeholder="https://i.ibb.co/..." oninput="previewBgImg()" style="flex:1;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="save-btn" onclick="saveBgImage()">🖼 배경 저장</button>
+            <button class="room-tool-btn danger" onclick="clearBgImage()">기본으로 초기화</button>
+          </div>
+        </div>
+        <div style="flex:1;min-width:260px;">
+          <div style="font-size:12px;color:#4A6A82;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;">미리보기</div>
+          <div id="bg-preview" style="width:100%;height:140px;border-radius:10px;background:#0F1E35;border:1px solid #1C2E45;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#4A6A82;font-size:13px;">이미지 없음</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card" style="grid-column:1/-1;">
       <h3>오늘의 추천 메뉴</h3>
       <div style="display:flex;gap:20px;flex-wrap:wrap;">
         <div style="flex:1;min-width:220px;">
@@ -345,6 +365,9 @@
       document.getElementById('night-start').value = d.nightStart || '22:00';
       document.getElementById('night-end').value = d.nightEnd || '07:00';
       updateOrderUI(globalOrderOpen);
+      const bg = d.bgImageUrl || '';
+      document.getElementById('bg-imageUrl').value = bg;
+      renderBgPreview(bg);
     }
     const featSnap = await getDoc(doc(db,'settings','featured'));
     if (featSnap.exists()) renderFeaturedPreview(featSnap.data());
@@ -356,10 +379,39 @@
     const nightEnabled = document.getElementById('chk-night-enabled').checked;
     const nightStart = document.getElementById('night-start').value;
     const nightEnd = document.getElementById('night-end').value;
-    await setDoc(doc(db,'settings','global'), { orderOpen, nightEnabled, nightStart, nightEnd, updatedAt: serverTimestamp() }, { merge: true });
+    const bgImageUrl = document.getElementById('bg-imageUrl').value.trim();
+    await setDoc(doc(db,'settings','global'), { orderOpen, nightEnabled, nightStart, nightEnd, bgImageUrl, updatedAt: serverTimestamp() }, { merge: true });
     globalOrderOpen = orderOpen;
     updateOrderUI(orderOpen);
     toast('✅ 설정 저장됨');
+  };
+
+  window.previewBgImg = () => {
+    renderBgPreview(document.getElementById('bg-imageUrl').value.trim());
+  };
+
+  function renderBgPreview(url) {
+    const el = document.getElementById('bg-preview');
+    if (url) {
+      el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='❌ URL 오류'">`;
+    } else {
+      el.innerHTML = '이미지 없음';
+      el.style.background = '#0F1E35';
+    }
+  }
+
+  window.saveBgImage = async () => {
+    const url = document.getElementById('bg-imageUrl').value.trim();
+    await setDoc(doc(db,'settings','global'), { bgImageUrl: url, updatedAt: serverTimestamp() }, { merge: true });
+    renderBgPreview(url);
+    toast(url ? '🖼 배경 이미지 저장됨' : '배경 이미지 해제됨');
+  };
+
+  window.clearBgImage = async () => {
+    document.getElementById('bg-imageUrl').value = '';
+    await setDoc(doc(db,'settings','global'), { bgImageUrl: '', updatedAt: serverTimestamp() }, { merge: true });
+    renderBgPreview('');
+    toast('🔄 기본 배경으로 초기화됨');
   };
 
   // ── Featured ─────────────────────────────────────────
