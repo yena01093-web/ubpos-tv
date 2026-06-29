@@ -6,205 +6,151 @@
 <title>JC Hotel · 프론트데스크</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #070e20;
-    color: #e2e8f0;
-    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-    min-height: 100vh;
-  }
-
-  header {
-    background: #0c1529;
-    border-bottom: 1px solid #1a2030;
-    padding: 16px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .logo { font-size: 18px; font-weight: 700; color: #d4af6e; }
-  .time { font-size: 14px; color: #4a5568; }
-
-  .main { padding: 32px; }
-
-  h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
-
-  .orders { display: flex; flex-direction: column; gap: 12px; }
-
-  .order-card {
-    background: #0c1529;
-    border: 1px solid #1a2d50;
-    border-radius: 12px;
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .order-card.pending { border-left: 4px solid #fb923c; }
-  .order-card.done { border-left: 4px solid #4ade80; opacity: 0.5; }
-
-  .room-badge {
-    background: #1a2030;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #d4af6e;
-    min-width: 80px;
-    text-align: center;
-  }
-
-  .order-items { flex: 1; }
-  .order-items-title { font-size: 13px; color: #4a5568; margin-bottom: 4px; }
-  .order-items-list { font-size: 15px; line-height: 1.6; }
-
-  .order-meta { text-align: right; }
-  .order-total { font-size: 20px; color: #d4af6e; font-weight: 600; }
-  .order-time { font-size: 12px; color: #4a5568; margin-top: 4px; }
-
-  .done-btn {
-    background: #4ade80;
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .empty { text-align: center; padding: 80px; color: #4a5568; font-size: 16px; }
-
-  /* 체크인 패널 */
-  .checkin-panel {
-    background: #0c1529;
-    border: 1px solid #1a2d50;
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .checkin-panel h3 { font-size: 16px; color: #d4af6e; margin-bottom: 12px; }
-
-  .room-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-
-  .room-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 1px solid #1a2d50;
-    background: #070e20;
-    color: #e2e8f0;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .room-btn:hover { border-color: #d4af6e; color: #d4af6e; }
-  .room-btn.active { background: #d4af6e; color: #000; border-color: #d4af6e; font-weight: 700; }
+  body { background: #0F1E35; color: #e2e8f0; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; min-height: 100vh; }
+  header { background: #0A1628; border-bottom: 1px solid #1C2E45; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .logo { font-size: 18px; font-weight: 700; color: #C8A45A; }
+  .live { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #4ADE80; }
+  .live::before { content:''; width:8px; height:8px; background:#4ADE80; border-radius:50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .main { padding: 28px 32px; max-width: 960px; }
+  .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  h2 { font-size: 20px; font-weight: 700; }
+  .count { color: #C8A45A; margin-left: 8px; }
+  .orders { display: flex; flex-direction: column; gap: 14px; }
+  .order-card { background: #0A1628; border: 1px solid #1C2E45; border-radius: 14px; padding: 20px 24px; transition: border-color 0.3s; }
+  .order-card.new { border-color: #C8A45A; }
+  .order-card.heating { border-color: #EF4444; }
+  .order-card.delivering { border-color: #3B82F6; }
+  .order-card.done { opacity: 0.4; border-color: #1C2E45; }
+  .order-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .room-tag { background: #C8A45A; color: #000; font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 6px; }
+  .guest-name { font-size: 16px; font-weight: 700; margin-left: 10px; }
+  .pay-badge { font-size: 11px; padding: 3px 10px; border-radius: 4px; font-weight: 700; }
+  .pay-room { background: rgba(200,164,90,0.15); color: #C8A45A; border: 1px solid rgba(200,164,90,0.3); }
+  .pay-pre { background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); }
+  .status-badge { font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 700; }
+  .s-new { background: rgba(200,164,90,0.15); color: #C8A45A; }
+  .s-heating { background: rgba(239,68,68,0.15); color: #F87171; }
+  .s-delivering { background: rgba(59,130,246,0.15); color: #60A5FA; }
+  .order-items { margin-bottom: 12px; border-bottom: 1px solid #1C2E45; padding-bottom: 12px; }
+  .order-item { display: flex; gap: 8px; padding: 4px 0; font-size: 14px; }
+  .item-name { flex: 1; }
+  .item-qty { color: #C8A45A; font-weight: 700; }
+  .memo-box { background: #0F1E35; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #4A6A82; margin-bottom: 14px; }
+  .memo-box span { color: #e2e8f0; }
+  .order-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .order-time { font-size: 12px; color: #4A6A82; }
+  .order-total { font-size: 16px; font-weight: 700; color: #C8A45A; }
+  .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .action-btn { border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .btn-heat { background: rgba(239,68,68,0.15); color: #F87171; border: 1px solid rgba(239,68,68,0.3); }
+  .btn-deliver { background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); }
+  .btn-done { background: #1C2E45; color: #4A6A82; border: 1px solid #1C2E45; }
+  .empty { text-align: center; padding: 80px; color: #4A6A82; font-size: 15px; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">JC Hotel · 프론트데스크</div>
-  <div class="time" id="clock"></div>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div class="live">실시간 연결 중</div>
+    <div style="font-size:14px;color:#4A6A82;" id="clock"></div>
+  </div>
 </header>
 
 <div class="main">
-
-  <!-- 체크인 -->
-  <div class="checkin-panel">
-    <div style="flex:1">
-      <h3>📋 객실 체크인 활성화</h3>
-      <div class="room-btns" id="room-btns">
-        <!-- 동적 생성 -->
-      </div>
-    </div>
+  <div class="dash-header">
+    <h2>🔔 주문 대기열 <span class="count" id="order-count">(0)</span></h2>
   </div>
-
-  <!-- 주문 현황 -->
-  <h2>🔔 주문 현황</h2>
   <div class="orders" id="orders">
     <div class="empty">들어온 주문이 없습니다</div>
   </div>
-
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyCpLSUhQ7tT2lFLMESRjPe9k-xrm8bWkiA",
-    authDomain: "ubpos-tv.firebaseapp.com",
-    projectId: "ubpos-tv",
-    storageBucket: "ubpos-tv.firebasestorage.app",
-    messagingSenderId: "211927218968",
-    appId: "1:211927218968:web:d339540a90d183feabbc6d"
+    apiKey: "AIzaSyDSFNwHWreQ5py9lq8fINEMAmGj_wbEqjE",
+    authDomain: "jc-hotel-roombar-27c58.firebaseapp.com",
+    projectId: "jc-hotel-roombar-27c58",
+    storageBucket: "jc-hotel-roombar-27c58.firebasestorage.app",
+    messagingSenderId: "866392617860",
+    appId: "1:866392617860:web:33d262c60779179f55e3d1"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 시계
   setInterval(() => {
     document.getElementById('clock').textContent = new Date().toLocaleTimeString('ko-KR');
   }, 1000);
 
-  // 객실 버튼
-  const rooms = ['101', '102', '103', '201', '202', '203', '301', '302', '303'];
-  const activeRooms = new Set();
-  const roomBtns = document.getElementById('room-btns');
-  rooms.forEach(r => {
-    const btn = document.createElement('button');
-    btn.className = 'room-btn';
-    btn.textContent = r + '호';
-    btn.onclick = () => {
-      if (activeRooms.has(r)) activeRooms.delete(r);
-      else activeRooms.add(r);
-      btn.classList.toggle('active', activeRooms.has(r));
-    };
-    roomBtns.appendChild(btn);
-  });
-
-  // 주문 실시간 수신
-  const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(20));
+  const q = query(collection(db,'orders'), orderBy('createdAt','desc'));
   onSnapshot(q, (snap) => {
+    const orders = snap.docs.map(d => ({id:d.id,...d.data()})).filter(o => o.status !== 'done');
+    document.getElementById('order-count').textContent = `(${orders.length})`;
     const el = document.getElementById('orders');
-    if (snap.empty) {
-      el.innerHTML = '<div class="empty">들어온 주문이 없습니다</div>';
-      return;
-    }
-    el.innerHTML = snap.docs.map(d => {
-      const o = d.data();
-      const time = o.createdAt?.toDate?.()?.toLocaleTimeString('ko-KR') || '방금';
-      const items = o.items?.map(i => `${i.emoji} ${i.name}`).join(', ') || '';
-      const isDone = o.status === 'done';
-      return `
-        <div class="order-card ${isDone ? 'done' : 'pending'}">
-          <div class="room-badge">${o.room}호</div>
-          <div class="order-items">
-            <div class="order-items-title">주문 내역</div>
-            <div class="order-items-list">${items}</div>
+    if (!orders.length) { el.innerHTML = '<div class="empty">들어온 주문이 없습니다</div>'; return; }
+    el.innerHTML = orders.map(o => {
+      const time = o.createdAt?.toDate?.() ? timeAgo(o.createdAt.toDate()) : '방금 전';
+      const payBadge = o.payment === 'prepaid'
+        ? '<span class="pay-badge pay-pre">삼성페이 선결제</span>'
+        : '<span class="pay-badge pay-room">객실 후불청구</span>';
+      const statusMap = { new:'<span class="status-badge s-new">🟡 신규</span>', heating:'<span class="status-badge s-heating">🔴 히팅 중</span>', delivering:'<span class="status-badge s-delivering">🔵 배달 중</span>' };
+      const itemsHTML = (o.items||[]).map(i => `<div class="order-item"><span class="item-name">• ${i.name}</span><span class="item-qty">${i.qty}개</span></div>`).join('');
+      return `<div class="order-card ${o.status||'new'}">
+        <div style="position:absolute;display:none;" id="x"></div>
+        <div class="order-top">
+          <div style="display:flex;align-items:center;">
+            <span class="room-tag">Room ${o.room}</span>
+            <span class="guest-name">${o.guestName||''} 고객님</span>
           </div>
-          <div class="order-meta">
-            <div class="order-total">₩ ${(o.total || 0).toLocaleString()}</div>
-            <div class="order-time">${time}</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${statusMap[o.status||'new']||''}
+            ${payBadge}
           </div>
-          ${!isDone ? `<button class="done-btn" onclick="markDone('${d.id}')">완료</button>` : '<span style="color:#4ade80;font-size:13px;">✓ 완료</span>'}
         </div>
-      `;
+        <div class="order-items">${itemsHTML}</div>
+        ${o.memo ? `<div class="memo-box">메모: <span>${o.memo}</span></div>` : ''}
+        <div class="order-footer">
+          <div>
+            <div class="order-time">접수: ${time}</div>
+            <div class="order-total">₩${(o.total||0).toLocaleString()}</div>
+          </div>
+          <div class="order-actions">
+            ${o.status==='new' ? `<button class="action-btn btn-heat" onclick="setStatus('${o.id}','heating')">🔥 히팅 시작</button>` : ''}
+            ${o.status!=='delivering' ? `<button class="action-btn btn-deliver" onclick="setStatus('${o.id}','delivering')">🛵 배달 시작</button>` : ''}
+            <button class="action-btn btn-done" onclick="setStatus('${o.id}','done')">✅ 완료</button>
+          </div>
+        </div>
+      </div>`;
     }).join('');
   });
 
-  window.markDone = async (id) => {
-    await updateDoc(doc(db, 'orders', id), { status: 'done' });
+  window.setStatus = async (id, status) => {
+    await updateDoc(doc(db,'orders',id), { status });
+    const msgs = { heating:'🔥 히팅 시작!', delivering:'🛵 배달 시작!', done:'✅ 완료 처리' };
+    toast(msgs[status]);
   };
-</script>
 
+  function timeAgo(date) {
+    const diff = Math.floor((Date.now()-date)/1000);
+    if (diff < 60) return '방금 전';
+    if (diff < 3600) return `${Math.floor(diff/60)}분 전`;
+    return `${Math.floor(diff/3600)}시간 전`;
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
 </body>
 </html>
