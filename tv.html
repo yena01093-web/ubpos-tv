@@ -6,861 +6,403 @@
 <title>JC Hotel</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0A1628; color: #fff; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; width: 100vw; height: 100vh; overflow: hidden; cursor: none; }
+  .screen { position: absolute; inset: 0; display: none; opacity: 0; transition: opacity 0.8s ease; }
+  .screen.active { display: flex; opacity: 1; }
 
-  body {
-    background: #060d1f;
-    color: #fff;
-    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    cursor: none;
-    outline: none;
-  }
+  /* 오프닝 */
+  #screen-opening { background: #0A1628; flex-direction: column; align-items: center; justify-content: center; }
+  .hotel-logo { font-size: 72px; font-weight: 200; letter-spacing: 0.3em; color: #C8A45A; text-transform: uppercase; animation: fadeInUp 1s ease forwards; }
+  .hotel-tagline { font-size: 16px; letter-spacing: 0.5em; color: #4A5E72; margin-top: 16px; text-transform: uppercase; animation: fadeInUp 1s 0.3s ease forwards; opacity: 0; }
+  @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-  /* 화면 전환 */
-  .screen {
-    position: absolute;
-    inset: 0;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.8s ease;
-  }
-  .screen.active {
-    display: flex;
-    opacity: 1;
-  }
+  /* 메인 */
+  #screen-main { flex-direction: column; }
+  .main-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #0F1E35 0%, #0F1E35 50%, #0F1E35 100%); }
+  .main-content { position: relative; z-index: 1; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+  .slide-area { padding: 60px; display: flex; flex-direction: column; justify-content: center; }
+  .slide-eyebrow { font-size: 11px; letter-spacing: 0.4em; color: #C8A45A; text-transform: uppercase; margin-bottom: 20px; }
+  .slide-title { font-size: 52px; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .slide-desc { font-size: 18px; color: #7A8FA6; line-height: 1.7; margin-bottom: 32px; }
+  .slide-price { font-size: 36px; font-weight: 300; color: #C8A45A; }
+  .slide-sub { font-size: 14px; color: #4A5E72; margin-top: 8px; letter-spacing: 0.1em; }
+  .slide-image-area { position: relative; overflow: hidden; }
+  .slide-image-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 140px; background: linear-gradient(135deg, #0F1E35, #1C2E45); }
+  .slide-image-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+  .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 60px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .weather-widget { font-size: 14px; color: #5A7082; }
+  .slide-dots { display: flex; gap: 8px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #2A4060; transition: all 0.3s; }
+  .dot.active { background: #C8A45A; width: 24px; border-radius: 3px; }
+  .bottom-hint { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #5A7082; }
+  .btn-hint { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid #2A4060; border-radius: 6px; font-size: 12px; }
 
-  /* ===== 오프닝 화면 ===== */
-  #screen-opening {
-    background: #060d1f;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
+  /* 주문 화면 */
+  #screen-order { background: #0F1E35; flex-direction: column; }
+  .order-header { padding: 28px 60px; border-bottom: 1px solid rgba(200,164,90,0.05); display: flex; align-items: center; justify-content: space-between; }
+  .order-title { font-size: 26px; font-weight: 700; color: #C8A45A; }
+  .order-back { font-size: 13px; color: #4A5E72; letter-spacing: 0.1em; cursor: pointer; }
+  .category-tabs { display: flex; gap: 8px; padding: 20px 60px 0; }
+  .cat-tab { padding: 10px 28px; border-radius: 8px; font-size: 15px; color: #5A7082; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: all 0.2s; }
+  .cat-tab.focused { background: #C8A45A; color: #000; border-color: #C8A45A; font-weight: 700; }
+  .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px 60px; flex: 1; overflow: hidden; }
+  .menu-card { background: rgba(255,255,255,0.02); border: 2px solid rgba(200,164,90,0.05); border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 8px; }
+  .menu-card.focused { border-color: #C8A45A; background: rgba(200,164,90,0.08); transform: scale(1.02); }
+  .menu-card.sold { opacity: 0.4; }
+  .menu-card-img { width: 100%; height: 80px; border-radius: 8px; object-fit: cover; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; overflow: hidden; }
+  .menu-card-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+  .menu-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .menu-desc-s { font-size: 11px; color: #4A5E72; line-height: 1.4; }
+  .menu-price { font-size: 16px; color: #C8A45A; font-weight: 300; margin-top: auto; }
+  .cart-bar { padding: 18px 60px; background: rgba(200,164,90,0.08); border-top: 1px solid rgba(200,164,90,0.15); display: flex; align-items: center; justify-content: space-between; }
+  .cart-info { font-size: 15px; color: rgba(255,255,255,0.6); }
+  .cart-total { font-size: 22px; color: #C8A45A; font-weight: 600; }
+  .cart-btn { padding: 12px 32px; background: #C8A45A; color: #000; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 0.05em; }
 
-  .hotel-logo {
-    font-size: 72px;
-    font-weight: 200;
-    letter-spacing: 0.3em;
-    color: #d4af6e;
-    text-transform: uppercase;
-    animation: fadeInUp 1s ease forwards;
-  }
+  /* 완료 */
+  #screen-complete { background: #0A1628; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+  .complete-icon { font-size: 80px; }
+  .complete-title { font-size: 36px; font-weight: 700; color: #C8A45A; }
+  .complete-msg { font-size: 17px; color: #5A7082; text-align: center; line-height: 1.8; }
 
-  .hotel-tagline {
-    font-size: 18px;
-    letter-spacing: 0.5em;
-    color: rgba(255,255,255,0.4);
-    margin-top: 16px;
-    text-transform: uppercase;
-    animation: fadeInUp 1s 0.3s ease forwards;
-    opacity: 0;
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ===== 메인 루프 화면 ===== */
-  #screen-main {
-    flex-direction: column;
-  }
-
-  .main-bg {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #070e20 0%, #0d1a35 50%, #070e20 100%);
-  }
-
-  .main-content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  /* 왼쪽 — 슬라이드 */
-  .slide-area {
-    padding: 60px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .slide-eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.4em;
-    color: #d4af6e;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
-
-  .slide-title {
-    font-size: 52px;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    margin-bottom: 16px;
-  }
-
-  .slide-desc {
-    font-size: 18px;
-    color: rgba(255,255,255,0.55);
-    line-height: 1.7;
-    margin-bottom: 32px;
-  }
-
-  .slide-price {
-    font-size: 36px;
-    font-weight: 300;
-    color: #d4af6e;
-    letter-spacing: 0.05em;
-  }
-
-  .slide-distance {
-    font-size: 14px;
-    color: rgba(255,255,255,0.4);
-    margin-top: 8px;
-    letter-spacing: 0.1em;
-  }
-
-  /* 오른쪽 — 이미지 */
-  .slide-image-area {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .slide-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.7;
-  }
-
-  .slide-image-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 120px;
-    background: linear-gradient(135deg, #0d1a35, #162040);
-  }
-
-  /* 하단 바 */
-  .bottom-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 24px 60px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.8));
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 10;
-  }
-
-  .bottom-hint {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    color: rgba(255,255,255,0.5);
-  }
-
-  .btn-hint {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 6px;
-    font-size: 12px;
-  }
-
-  /* 슬라이드 인디케이터 */
-  .slide-dots {
-    display: flex;
-    gap: 8px;
-  }
-
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transition: all 0.3s;
-  }
-
-  .dot.active {
-    background: #d4af6e;
-    width: 24px;
-    border-radius: 3px;
-  }
-
-  /* 날씨 */
-  .weather-widget {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: rgba(255,255,255,0.5);
-  }
-
-  /* ===== 주문 화면 ===== */
-  #screen-order {
-    background: #070e20;
-    flex-direction: column;
-  }
-
-  .order-header {
-    padding: 32px 60px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .order-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #d4af6e;
-    letter-spacing: 0.05em;
-  }
-
-  .order-back {
-    font-size: 13px;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 0.1em;
-  }
-
-  /* 카테고리 탭 */
-  .category-tabs {
-    display: flex;
-    gap: 4px;
-    padding: 24px 60px 0;
-  }
-
-  .cat-tab {
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    color: rgba(255,255,255,0.4);
-    border: 1px solid rgba(255,255,255,0.1);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .cat-tab.focused {
-    background: #d4af6e;
-    color: #000;
-    border-color: #d4af6e;
-    font-weight: 700;
-  }
-
-  /* 메뉴 그리드 */
-  .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    padding: 24px 60px;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  .menu-card {
-    background: rgba(255,255,255,0.04);
-    border: 2px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .menu-card.focused {
-    border-color: #d4af6e;
-    background: rgba(212,175,110,0.08);
-    transform: scale(1.02);
-  }
-
-  .menu-emoji {
-    font-size: 36px;
-  }
-
-  .menu-name {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.3;
-  }
-
-  .menu-desc-small {
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    line-height: 1.5;
-  }
-
-  .menu-price {
-    font-size: 18px;
-    color: #d4af6e;
-    font-weight: 300;
-    margin-top: auto;
-  }
-
-  /* 장바구니 */
-  .cart-bar {
-    padding: 20px 60px;
-    background: rgba(212,175,110,0.1);
-    border-top: 1px solid rgba(212,175,110,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .cart-info {
-    font-size: 16px;
-    color: rgba(255,255,255,0.7);
-  }
-
-  .cart-total {
-    font-size: 24px;
-    color: #d4af6e;
-    font-weight: 600;
-  }
-
-  .cart-btn {
-    padding: 12px 32px;
-    background: #d4af6e;
-    color: #000;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-
-  /* ===== 주문완료 화면 ===== */
-  #screen-complete {
-    background: #060d1f;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-  }
-
-  .complete-icon {
-    font-size: 80px;
-  }
-
-  .complete-title {
-    font-size: 36px;
-    font-weight: 700;
-    color: #d4af6e;
-  }
-
-  .complete-msg {
-    font-size: 18px;
-    color: rgba(255,255,255,0.5);
-    text-align: center;
-    line-height: 1.7;
-  }
-
-  .complete-time {
-    font-size: 48px;
-    font-weight: 200;
-    color: #fff;
-    letter-spacing: 0.1em;
-  }
-
-  /* ===== 팝업 ===== */
-  .popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-  }
-
-  .popup-overlay.show {
-    display: flex;
-  }
-
-  .popup {
-    background: #0c1529;
-    border: 1px solid rgba(212,175,110,0.3);
-    border-radius: 16px;
-    padding: 48px;
-    text-align: center;
-    max-width: 480px;
-    width: 90%;
-  }
-
-  .popup-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .popup-desc {
-    font-size: 16px;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 32px;
-    line-height: 1.6;
-  }
-
-  .popup-btns {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-  }
-
-  .popup-btn {
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .popup-btn.yes {
-    background: #d4af6e;
-    color: #000;
-  }
-
-  .popup-btn.no {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.2);
-  }
-
-  .popup-btn.focused {
-    outline: 2px solid #fff;
-    outline-offset: 2px;
-  }
+  /* 팝업 */
+  .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(8px); }
+  .popup-overlay.show { display: flex; }
+  .popup { background: #0A1628; border: 1px solid rgba(200,164,90,0.3); border-radius: 16px; padding: 48px; text-align: center; max-width: 440px; width: 90%; }
+  .popup-title { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+  .popup-desc { font-size: 15px; color: #5A7082; margin-bottom: 32px; line-height: 1.6; }
+  .popup-btns { display: flex; gap: 12px; justify-content: center; }
+  .popup-btn { padding: 13px 30px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .popup-btn.yes { background: #C8A45A; color: #000; }
+  .popup-btn.no { background: rgba(200,164,90,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.08); }
+  .popup-btn.focused { outline: 2px solid #fff; outline-offset: 2px; }
 </style>
 </head>
+<body>
 
-
-<!-- 오프닝 -->
 <div class="screen active" id="screen-opening">
   <div class="hotel-logo">JC Hotel</div>
-  <div class="hotel-tagline">단양 · Danyang</div>
+  <div class="hotel-tagline">JECHEON · CHUNGBUK, KOREA</div>
 </div>
 
-<!-- 메인 루프 -->
 <div class="screen" id="screen-main">
   <div class="main-bg"></div>
   <div class="main-content">
     <div class="slide-area">
-      <div class="slide-eyebrow" id="slide-eyebrow">룸서비스</div>
+      <div class="slide-eyebrow" id="slide-eyebrow">ROOM SERVICE</div>
       <div class="slide-title" id="slide-title">별이 빛나는 밤,<br>와인 한 잔</div>
       <div class="slide-desc" id="slide-desc">은은한 조명 아래 특별한 밤을 더 특별하게.</div>
-      <div class="slide-price" id="slide-price">₩ 35,000</div>
-      <div class="slide-distance" id="slide-distance"></div>
+      <div class="slide-price" id="slide-price">₩ 25,000</div>
+      <div class="slide-sub" id="slide-sub"></div>
     </div>
     <div class="slide-image-area">
       <div class="slide-image-placeholder" id="slide-image">🍷</div>
     </div>
   </div>
-
   <div class="bottom-bar">
-    <div class="weather-widget" id="weather">🌙 단양 18°C · 맑음</div>
+    <div class="weather-widget" id="weather">🌙 JECHEON</div>
     <div class="slide-dots" id="slide-dots"></div>
     <div class="bottom-hint">
       <span class="btn-hint">OK</span>
-      <span>주문하기</span>
+      <span>ORDER NOW</span>
     </div>
   </div>
 </div>
 
-<!-- 주문 화면 -->
 <div class="screen" id="screen-order">
   <div class="order-header">
-    <div class="order-title">📋 룸서비스 주문</div>
-    <div class="order-back">← 뒤로가기</div>
+    <div class="order-title">📋 ROOM SERVICE ORDER</div>
+    <div class="order-back" onclick="goMain()">← BACK</div>
   </div>
-
   <div class="category-tabs" id="category-tabs">
-    <div class="cat-tab focused">🍷 와인·맥주</div>
-    <div class="cat-tab">🧀 안주</div>
-    <div class="cat-tab">🍿 간식</div>
-    <div class="cat-tab">🥤 음료</div>
+    <div class="cat-tab focused">🍷 주류 & 음료</div>
+    <div class="cat-tab">🍕 5분 퀵안주</div>
   </div>
-
-  <div class="menu-grid" id="menu-grid">
-    <!-- Firebase에서 동적 로드 -->
-  </div>
-
+  <div class="menu-grid" id="menu-grid"></div>
   <div class="cart-bar">
-    <div class="cart-info" id="cart-info">장바구니가 비어있습니다</div>
+    <div class="cart-info" id="cart-info">Cart is empty</div>
     <div class="cart-total" id="cart-total"></div>
-    <div class="cart-btn">주문 확정 →</div>
+    <div class="cart-btn" onclick="submitOrder()">CONFIRM ORDER →</div>
   </div>
 </div>
 
-<!-- 주문완료 -->
 <div class="screen" id="screen-complete">
   <div class="complete-icon">✅</div>
-  <div class="complete-title">주문이 접수되었습니다</div>
-  <div class="complete-msg">곧 객실로 배달해드리겠습니다<br>잠시만 기다려 주세요</div>
-  <div class="complete-time" id="complete-time">약 20분</div>
+  <div class="complete-title">Order Received</div>
+  <div class="complete-msg">We will deliver to your room shortly.<br>Thank you for your patience.</div>
 </div>
 
-<!-- 추가주문 팝업 -->
 <div class="popup-overlay" id="popup-extra">
   <div class="popup">
-    <div class="popup-title">추가 주문 하시겠습니까?</div>
-    <div class="popup-desc">메뉴로 돌아가거나<br>TV를 시청하실 수 있습니다</div>
+    <div class="popup-title">Would you like to order more?</div>
+    <div class="popup-desc">Return to menu or continue watching TV.</div>
     <div class="popup-btns">
-      <div class="popup-btn yes focused" id="popup-yes">메뉴 보기</div>
-      <div class="popup-btn no" id="popup-no">TV 시청</div>
+      <div class="popup-btn yes focused" id="popup-yes" onclick="popupYes()">View Menu</div>
+      <div class="popup-btn no" id="popup-no" onclick="popupNo()">Watch TV</div>
     </div>
   </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyCpLSUhQ7tT2lFLMESRjPe9k-xrm8bWkiA",
-    authDomain: "ubpos-tv.firebaseapp.com",
-    projectId: "ubpos-tv",
-    storageBucket: "ubpos-tv.firebasestorage.app",
-    messagingSenderId: "211927218968",
-    appId: "1:211927218968:web:d339540a90d183feabbc6d"
+    apiKey: "AIzaSyDSFNwHWreQ5py9lq8fINEMAmGj_wbEqjE",
+    authDomain: "jc-hotel-roombar-27c58.firebaseapp.com",
+    projectId: "jc-hotel-roombar-27c58",
+    storageBucket: "jc-hotel-roombar-27c58.firebasestorage.app",
+    messagingSenderId: "866392617860",
+    appId: "1:866392617860:web:33d262c60779179f55e3d1"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // ===== 상태 =====
+  const ROOM = new URLSearchParams(location.search).get('room') || '101';
+  const COLS = 4;
   let currentScreen = 'opening';
   let slideIndex = 0;
   let slideTimer = null;
+  let slides = [];
+  let allMenus = { drink: [], food: [] };
+  let currentCat = 'drink';
+  let catIndex = 0;
   let menuFocusRow = 0;
   let menuFocusCol = 0;
-  let catFocus = 0;
-  let popupFocus = 0; // 0=예, 1=아니오
+  let popupFocus = 0;
   let cart = [];
-  let currentCategory = 0;
-  let slides = [];
-  let menus = { 0: [], 1: [], 2: [], 3: [] };
-  const ROOM_NUMBER = new URLSearchParams(location.search).get('room') || '101';
-  const COLS = 4;
 
-  // ===== 샘플 슬라이드 데이터 (Firebase 연동 전) =====
-  const sampleSlides = [
-    { type: 'menu', eyebrow: '오늘의 추천', title: '별이 빛나는 밤,\n와인 한 잔', desc: '은은한 조명 아래 특별한 밤을 더 특별하게.', price: '₩ 35,000', emoji: '🍷', distance: '' },
-    { type: 'menu', eyebrow: '인기 안주', title: '치즈 플래터\n& 하몽', desc: '엄선된 유럽산 치즈와 이베리코 하몽의 조화.', price: '₩ 28,000', emoji: '🧀', distance: '' },
-    { type: 'spot', eyebrow: '단양 관광', title: '도담삼봉', desc: '남한강 위에 솟은 세 개의 봉우리. 단양 8경 중 으뜸.', price: '', emoji: '⛰️', distance: '🚗 차로 5분' },
-    { type: 'spot', eyebrow: '단양 관광', title: '고수동굴', desc: '4억 5천만 년 역사의 천연 석회암 동굴.', price: '', emoji: '🦇', distance: '🚗 차로 10분' },
-    { type: 'spot', eyebrow: '추천 코스', title: '단양 당일 코스', desc: '도담삼봉 → 마늘시장 → 구경시장 → 사인암', price: '', emoji: '🗺️', distance: '총 소요 5~6시간' },
+  // 샘플 슬라이드
+  const defaultSlides = [
+    { eyebrow:"ROOM SERVICE", title:"별이 빛나는 밤,\n와인 한 잔", desc:"은은한 조명 아래 특별한 밤을 더 특별하게.", price:"₩ 25,000", emoji:"🍷", sub:"" },
+    { eyebrow:"ROOM SERVICE", title:"제천 수제\n크래프트 맥주", desc:"지역 브루어리에서 직접 만든 신선한 맥주.", price:"₩ 8,000", emoji:"🍺", sub:"" },
+    { eyebrow:"JECHEON TOUR", title:"Cheongpung Lake", desc:"충북의 아름다운 호수. 유람선과 케이블카 운영.", price:"", emoji:"🏞️", sub:"🚗 10 min drive" },
+    { eyebrow:"JECHEON TOUR", title:"Uirimji Reservoir", desc:"삼한시대에 만들어진 우리나라 최초의 저수지.", price:"", emoji:"🌿", sub:"🚗 5 min drive" },
+    { eyebrow:"RECOMMENDED COURSE", title:"Jecheon Day Trip", desc:"Cheongpung Lake → Herb Market → Night View", price:"", emoji:"🗺️", sub:"⏱ Full day experience" },
   ];
 
-  // ===== 샘플 메뉴 =====
-  const sampleMenus = {
-    0: [ // 와인·맥주
-      { name: '레드 와인', desc: '칠레산 카베르네 소비뇽', price: 35000, emoji: '🍷' },
-      { name: '화이트 와인', desc: '프랑스산 샤르도네', price: 35000, emoji: '🥂' },
-      { name: '단양 수제맥주', desc: '지역 브루어리 한정', price: 12000, emoji: '🍺' },
-      { name: '스파클링 와인', desc: '이탈리아 프로세코', price: 38000, emoji: '✨' },
-    ],
-    1: [ // 안주
-      { name: '치즈 플래터', desc: '고르곤졸라·브리·체다 3종', price: 28000, emoji: '🧀' },
-      { name: '하몽 & 올리브', desc: '이베리코 하몽 + 올리브 믹스', price: 24000, emoji: '🥩' },
-      { name: '과일 플래터', desc: '제철 과일 모둠', price: 18000, emoji: '🍇' },
-      { name: '견과류 믹스', desc: '프리미엄 견과류 5종', price: 14000, emoji: '🥜' },
-    ],
-    2: [ // 간식
-      { name: '컵라면', desc: '신라면 / 너구리 선택', price: 3000, emoji: '🍜' },
-      { name: '과자 세트', desc: '인기 과자 5종 모둠', price: 8000, emoji: '🍿' },
-      { name: '초콜릿', desc: '벨기에 프리미엄', price: 9000, emoji: '🍫' },
-      { name: '아이스크림', desc: '바닐라 / 딸기 선택', price: 6000, emoji: '🍦' },
-    ],
-    3: [ // 음료
-      { name: '생수 2병', desc: '제주 삼다수', price: 4000, emoji: '💧' },
-      { name: '아메리카노', desc: '핸드드립 커피', price: 5000, emoji: '☕' },
-      { name: '주스 모둠', desc: '오렌지·사과·포도', price: 6000, emoji: '🧃' },
-      { name: '탄산음료', desc: '콜라·사이다·환타', price: 3000, emoji: '🥤' },
-    ]
-  };
-  slides = sampleSlides;
-
-  // Firebase에서 메뉴 로드
-  async function loadMenusFromFirebase() {
+  // Firebase에서 메뉴+관광지 로드
+  async function loadData() {
     try {
-      const snap = await getDocs(collection(db, 'menus'));
-      if (!snap.empty) {
-        menus = { 0: [], 1: [], 2: [], 3: [] };
-        snap.forEach(d => {
-          const m = d.data();
-          const cat = m.cat ?? 0;
-          if (menus[cat]) menus[cat].push(m);
+      // 메뉴
+      const menuSnap = await getDocs(query(collection(db,'menus'), orderBy('createdAt','asc')));
+      if (!menuSnap.empty) {
+        allMenus = { drink: [], food: [] };
+        menuSnap.forEach(d => {
+          const m = { id: d.id, ...d.data() };
+          if (allMenus[m.category]) allMenus[m.category].push(m);
         });
-        // 메뉴 슬라이드도 Firebase 데이터로 업데이트
-        const menuSlides = [];
-        Object.values(menus).flat().slice(0, 3).forEach(m => {
-          menuSlides.push({ type: 'menu', eyebrow: '오늘의 추천', title: m.name, desc: m.desc, price: m.price ? `₩ ${Number(m.price).toLocaleString()}` : '', emoji: m.emoji || '🍽️', distance: '' });
-        });
-        // 관광지 슬라이드는 유지
-        const spotSlides = sampleSlides.filter(s => s.type === 'spot');
-        slides = [...menuSlides, ...spotSlides];
-        renderSlide(0);
-        renderDots();
       } else {
-        menus = sampleMenus;
+        allMenus = {
+          drink: [
+            { name:'엄선된 하우스 와인 (하프)', desc:'375ml 캐주얼 보름 와인', price:25000, emoji:'🍷', soldOut:false },
+            { name:'제천 수제 크래프트 맥주', desc:'캔 500ml + 얼음컵 제공', price:8000, emoji:'🍺', soldOut:false },
+            { name:'프리미엄 하이볼 세트', desc:'산토리 위스키 + 탄산수 + 레몬', price:18000, emoji:'🥃', soldOut:false },
+            { name:'에너지 드링크 믹스팩', desc:'레드불 2캔 + 몬스터 1캔', price:14000, emoji:'⚡', soldOut:false },
+          ],
+          food: [
+            { name:'고메 치즈 조각 피자 (2P)', desc:'전자레인지 3분 급속 조리', price:12000, emoji:'🍕', soldOut:false },
+            { name:'버팔로 윙 & 감자 믹스', desc:'마이크로 오븐 조리', price:15000, emoji:'🍗', soldOut:false },
+            { name:'야식 라면 세트', desc:'신라면 + 계란 + 참기름 키트', price:7000, emoji:'🍜', soldOut:false },
+            { name:'한우 육포 & 견과류 세트', desc:'안주용 프리미엄 건조육', price:22000, emoji:'🥩', soldOut:false },
+          ]
+        };
       }
+
+      // 관광지
+      const spotSnap = await getDocs(query(collection(db,'spots'), orderBy('createdAt','asc')));
+      const menuSlides = [];
+      [...allMenus.drink, ...allMenus.food].slice(0,2).forEach(m => {
+        menuSlides.push({ eyebrow:"ROOM SERVICE", title:m.name, desc:m.desc, price:m.price?`₩ ${Number(m.price).toLocaleString()}`:"", emoji:m.emoji||'🍽️', sub:"", imageUrl:m.imageUrl||'' });
+      });
+      const spotSlides = spotSnap.empty
+        ? defaultSlides.filter(s => s.eyebrow.includes('TOUR') || s.eyebrow.includes('COURSE'))
+        : spotSnap.docs.map(d => { const s=d.data(); return { eyebrow:"JECHEON TOUR", title:s.name, desc:s.desc, price:"", emoji:s.emoji||'📍', sub:s.distance||'', imageUrl:'' }; });
+      slides = [...menuSlides, ...spotSlides];
+      if (!slides.length) slides = defaultSlides;
+      renderSlide(0); renderDots();
     } catch(e) {
-      console.log('Firebase 로드 실패, 샘플 사용');
-      menus = sampleMenus;
+      slides = defaultSlides;
+      renderSlide(0); renderDots();
     }
   }
-  loadMenusFromFirebase();
 
-  // ===== 화면 전환 =====
+  // 화면 전환
   function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => {
-      s.classList.remove('active');
-      s.style.display = 'none';
-    });
-    const el = document.getElementById('screen-' + id);
+    currentScreen = id;
+    document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
+    const el = document.getElementById('screen-'+id);
     el.style.display = 'flex';
     setTimeout(() => el.classList.add('active'), 10);
-    currentScreen = id;
   }
 
-  // ===== 오프닝 =====
-  setTimeout(() => {
-    showScreen('main');
-    startSlideShow();
-    loadWeather();
-    renderDots();
-    renderSlide(0);
-  }, 2500);
+  // 오프닝
+  setTimeout(() => { showScreen('main'); startSlide(); loadWeather(); loadData(); }, 2500);
 
-  // ===== 슬라이드쇼 =====
-  function startSlideShow() {
-    slideTimer = setInterval(() => {
-      slideIndex = (slideIndex + 1) % slides.length;
-      renderSlide(slideIndex);
-    }, 5000);
+  // 슬라이드
+  function startSlide() {
+    clearInterval(slideTimer);
+    slideTimer = setInterval(() => { slideIndex=(slideIndex+1)%slides.length; renderSlide(slideIndex); }, 5000);
   }
 
   function renderSlide(i) {
-    const s = slides[i];
+    const s = slides[i] || defaultSlides[0];
     document.getElementById('slide-eyebrow').textContent = s.eyebrow;
-    document.getElementById('slide-title').innerHTML = s.title.replace('\n', '<br>');
+    document.getElementById('slide-title').innerHTML = s.title.replace('\n','<br>');
     document.getElementById('slide-desc').textContent = s.desc;
     document.getElementById('slide-price').textContent = s.price;
-    document.getElementById('slide-distance').textContent = s.distance;
-    document.getElementById('slide-image').textContent = s.emoji;
+    document.getElementById('slide-sub').textContent = s.sub||'';
+    const imgEl = document.getElementById('slide-image');
+    if (s.imageUrl) {
+      imgEl.innerHTML = `<img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='${s.emoji}'">`;
+    } else {
+      imgEl.textContent = s.emoji;
+    }
     renderDots();
   }
 
   function renderDots() {
-    const el = document.getElementById('slide-dots');
-    el.innerHTML = slides.map((_, i) => `<div class="dot ${i === slideIndex ? 'active' : ''}"></div>`).join('');
+    document.getElementById('slide-dots').innerHTML = slides.map((_,i) =>
+      `<div class="dot ${i===slideIndex?'active':''}"></div>`).join('');
   }
 
-  // ===== 날씨 =====
+  // 날씨
   async function loadWeather() {
     try {
-      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=36.98&longitude=128.36&current=temperature_2m,weathercode&timezone=Asia%2FSeoul');
+      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.13&longitude=128.19&current=temperature_2m,weathercode&timezone=Asia%2FSeoul');
       const data = await res.json();
       const temp = Math.round(data.current.temperature_2m);
       const code = data.current.weathercode;
-      const icon = code === 0 ? '☀️' : code < 50 ? '⛅' : code < 70 ? '🌧️' : '❄️';
-      document.getElementById('weather').textContent = `${icon} 단양 ${temp}°C`;
+      const icon = code===0?'☀️':code<50?'⛅':code<70?'🌧️':'❄️';
+      document.getElementById('weather').textContent = `${icon} JECHEON ${temp}°C`;
     } catch(e) {}
   }
 
-  // ===== 주문 화면 =====
+  // 주문 화면
   function showOrder() {
     clearInterval(slideTimer);
+    catIndex = 0; currentCat = 'drink';
+    menuFocusRow = 0; menuFocusCol = 0;
     showScreen('order');
-    catFocus = 0;
-    menuFocusRow = 0;
-    menuFocusCol = 0;
-    renderCategories();
-    renderMenus();
+    renderCats(); renderMenuGrid();
   }
 
-  function renderCategories() {
-    const tabs = document.querySelectorAll('.cat-tab');
-    tabs.forEach((t, i) => t.classList.toggle('focused', i === catFocus));
+  function renderCats() {
+    document.querySelectorAll('.cat-tab').forEach((t,i) => t.classList.toggle('focused', i===catIndex));
   }
 
-  function renderMenus() {
+  function renderMenuGrid() {
+    const items = allMenus[currentCat] || [];
     const grid = document.getElementById('menu-grid');
-    const items = menus[currentCategory] || [];
-    grid.innerHTML = items.map((m, i) => `
-      <div class="menu-card" data-idx="${i}">
-        <div class="menu-emoji">${m.emoji}</div>
+    grid.innerHTML = items.map((m,i) => {
+      const imgEl = m.imageUrl
+        ? `<div class="menu-card-img"><img src="${m.imageUrl}" onerror="this.parentElement.innerHTML='${m.emoji||'🍽️'}'"></div>`
+        : `<div class="menu-card-img">${m.emoji||'🍽️'}</div>`;
+      return `<div class="menu-card ${m.soldOut?'sold':''}" data-idx="${i}">
+        ${imgEl}
         <div class="menu-name">${m.name}</div>
-        <div class="menu-desc-small">${m.desc}</div>
-        <div class="menu-price">₩ ${m.price.toLocaleString()}</div>
-      </div>
-    `).join('');
-    // 클릭으로 메뉴 선택
-    grid.querySelectorAll('.menu-card').forEach((card, i) => {
+        <div class="menu-desc-s">${m.desc||''}</div>
+        <div class="menu-price">${m.soldOut?'품절':'₩ '+Number(m.price).toLocaleString()}</div>
+      </div>`;
+    }).join('');
+    grid.querySelectorAll('.menu-card').forEach((card,i) => {
       card.addEventListener('click', () => {
-        const row = Math.floor(i / COLS);
-        const col = i % COLS;
-        menuFocusRow = row;
-        menuFocusCol = col;
-        updateMenuFocus();
-        cart.push(items[i]);
-        updateCart();
+        if (items[i].soldOut) return;
+        cart.push(items[i]); updateCart();
+        menuFocusRow=Math.floor(i/COLS); menuFocusCol=i%COLS; updateFocus();
       });
     });
-    updateMenuFocus();
-    updateCart();
+    updateFocus(); updateCart();
   }
 
-  // 카테고리 탭 클릭
-  document.querySelectorAll('.cat-tab').forEach((tab, i) => {
+  document.querySelectorAll('.cat-tab').forEach((tab,i) => {
     tab.addEventListener('click', () => {
-      catFocus = i;
-      currentCategory = i;
-      menuFocusRow = 0;
-      menuFocusCol = 0;
-      renderMenus();
-      renderCategories();
+      catIndex=i; currentCat=i===0?'drink':'food';
+      menuFocusRow=0; menuFocusCol=0;
+      renderCats(); renderMenuGrid();
     });
   });
 
-  // 주문확정 버튼 클릭
-  document.querySelector('.cart-btn').addEventListener('click', submitOrder);
-
-  // 메인화면 OK 버튼 클릭
-  document.querySelector('.bottom-hint').addEventListener('click', () => {
-    if (currentScreen === 'main') showOrder();
-  });
-
-  // 뒤로가기 클릭
-  document.querySelector('.order-back').addEventListener('click', () => {
-    showScreen('main'); startSlideShow();
-  });
-
-  // 팝업 버튼 클릭
-  document.getElementById('popup-yes').addEventListener('click', () => {
-    document.getElementById('popup-extra').classList.remove('show');
-    showOrder();
-  });
-  document.getElementById('popup-no').addEventListener('click', () => {
-    document.getElementById('popup-extra').classList.remove('show');
-    showScreen('main'); startSlideShow();
-  });
-
-  function updateMenuFocus() {
-    const cards = document.querySelectorAll('.menu-card');
-    cards.forEach((c, i) => {
-      const row = Math.floor(i / COLS);
-      const col = i % COLS;
-      c.classList.toggle('focused', row === menuFocusRow && col === menuFocusCol);
+  function updateFocus() {
+    document.querySelectorAll('.menu-card').forEach((c,i) => {
+      c.classList.toggle('focused', Math.floor(i/COLS)===menuFocusRow && i%COLS===menuFocusCol);
     });
   }
 
   function updateCart() {
-    const total = cart.reduce((s, i) => s + i.price, 0);
-    document.getElementById('cart-info').textContent = cart.length > 0 ? `${cart.length}개 선택됨` : '장바구니가 비어있습니다';
-    document.getElementById('cart-total').textContent = total > 0 ? `₩ ${total.toLocaleString()}` : '';
+    const total = cart.reduce((s,i)=>s+i.price,0);
+    document.getElementById('cart-info').textContent = cart.length>0?`${cart.length}개 선택됨`:'Cart is empty';
+    document.getElementById('cart-total').textContent = total>0?`₩ ${total.toLocaleString()}`:'';
   }
 
-  // ===== 주문 완료 =====
   async function submitOrder() {
-    if (cart.length === 0) return;
+    if (!cart.length) return;
     try {
-      await addDoc(collection(db, 'orders'), {
-        room: ROOM_NUMBER,
-        items: cart,
-        total: cart.reduce((s, i) => s + i.price, 0),
-        status: 'pending',
+      await addDoc(collection(db,'orders'), {
+        room: ROOM,
+        guestName: `TV주문`,
+        memo: '',
+        payment: 'room',
+        items: cart.map(i=>({name:i.name,qty:1,price:i.price,note:i.desc||''})),
+        total: cart.reduce((s,i)=>s+i.price,0),
+        status: 'new',
         createdAt: serverTimestamp()
       });
-    } catch(e) { console.log('order saved locally'); }
+    } catch(e) {}
     cart = [];
     showScreen('complete');
-    setTimeout(() => {
-      showScreen('main');
-      startSlideShow();
-    }, 8000);
+    setTimeout(() => { showScreen('main'); startSlide(); }, 8000);
   }
 
-  // 페이지 로드시 포커스 강제 설정
-  document.body.setAttribute('tabindex', '0');
-  document.body.focus();
-  document.addEventListener('click', () => document.body.focus());
+  window.goMain = () => { showScreen('main'); startSlide(); };
+  window.popupYes = () => { document.getElementById('popup-extra').classList.remove('show'); showOrder(); };
+  window.popupNo = () => { document.getElementById('popup-extra').classList.remove('show'); showScreen('main'); startSlide(); };
 
-  // ===== 키보드 (리모콘 시뮬레이션) =====
+  // 키보드/리모컨
   window.addEventListener('keydown', (e) => {
     if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(e.key)) e.preventDefault();
-    // 팝업
+
     if (document.getElementById('popup-extra').classList.contains('show')) {
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        popupFocus = popupFocus === 0 ? 1 : 0;
-        document.getElementById('popup-yes').classList.toggle('focused', popupFocus === 0);
-        document.getElementById('popup-no').classList.toggle('focused', popupFocus === 1);
+      if (e.key==='ArrowLeft'||e.key==='ArrowRight') {
+        popupFocus = popupFocus===0?1:0;
+        document.getElementById('popup-yes').classList.toggle('focused', popupFocus===0);
+        document.getElementById('popup-no').classList.toggle('focused', popupFocus===1);
       }
-      if (e.key === 'Enter') {
-        document.getElementById('popup-extra').classList.remove('show');
-        if (popupFocus === 0) showOrder();
-        else { showScreen('main'); startSlideShow(); }
-      }
+      if (e.key==='Enter') { popupFocus===0?popupYes():popupNo(); }
       return;
     }
 
-    if (currentScreen === 'main') {
-      if (e.key === 'Enter') showOrder();
-      if (e.key === 'ArrowLeft') { slideIndex = (slideIndex - 1 + slides.length) % slides.length; renderSlide(slideIndex); }
-      if (e.key === 'ArrowRight') { slideIndex = (slideIndex + 1) % slides.length; renderSlide(slideIndex); }
+    if (currentScreen==='main') {
+      if (e.key==='Enter') { e.stopPropagation(); showOrder(); }
+      if (e.key==='ArrowLeft') { clearInterval(slideTimer); slideIndex=(slideIndex-1+slides.length)%slides.length; renderSlide(slideIndex); startSlide(); }
+      if (e.key==='ArrowRight') { clearInterval(slideTimer); slideIndex=(slideIndex+1)%slides.length; renderSlide(slideIndex); startSlide(); }
     }
 
-    if (currentScreen === 'order') {
-      const items = menus[currentCategory] || [];
-      const rows = Math.ceil(items.length / COLS);
-
-      if (e.key === 'ArrowLeft') {
-        if (menuFocusCol > 0) { menuFocusCol--; updateMenuFocus(); }
+    if (currentScreen==='order') {
+      const items = allMenus[currentCat]||[];
+      const rows = Math.ceil(items.length/COLS);
+      if (e.key==='ArrowLeft') { if(menuFocusCol>0){menuFocusCol--;updateFocus();} }
+      if (e.key==='ArrowRight') { if(menuFocusRow*COLS+menuFocusCol<items.length-1&&menuFocusCol<COLS-1){menuFocusCol++;updateFocus();} }
+      if (e.key==='ArrowUp') {
+        if (menuFocusRow>0) { menuFocusRow--;updateFocus(); }
+        else { catIndex=Math.max(0,catIndex-1); currentCat=catIndex===0?'drink':'food'; menuFocusRow=0;menuFocusCol=0; renderCats();renderMenuGrid(); }
       }
-      if (e.key === 'ArrowRight') {
-        const maxIdx = items.length - 1;
-        const curIdx = menuFocusRow * COLS + menuFocusCol;
-        if (curIdx < maxIdx && menuFocusCol < COLS - 1) { menuFocusCol++; updateMenuFocus(); }
+      if (e.key==='ArrowDown') {
+        if (menuFocusRow<rows-1) { menuFocusRow++;updateFocus(); }
+        else { catIndex=Math.min(1,catIndex+1); currentCat=catIndex===0?'drink':'food'; menuFocusRow=0;menuFocusCol=0; renderCats();renderMenuGrid(); }
       }
-      if (e.key === 'ArrowUp') {
-        if (menuFocusRow > 0) { menuFocusRow--; updateMenuFocus(); }
-        else { catFocus = Math.max(0, catFocus - 1); currentCategory = catFocus; menuFocusRow = 0; menuFocusCol = 0; renderMenus(); renderCategories(); }
+      if (e.key==='Enter') {
+        const idx = menuFocusRow*COLS+menuFocusCol;
+        if (idx<items.length&&!items[idx].soldOut) { cart.push(items[idx]); updateCart(); }
       }
-      if (e.key === 'ArrowDown') {
-        if (menuFocusRow < rows - 1) { menuFocusRow++; updateMenuFocus(); }
-        else { catFocus = Math.min(3, catFocus + 1); currentCategory = catFocus; menuFocusRow = 0; menuFocusCol = 0; renderMenus(); renderCategories(); }
-      }
-      if (e.key === 'Enter') {
-        const idx = menuFocusRow * COLS + menuFocusCol;
-        if (idx < items.length) { cart.push(items[idx]); updateCart(); }
-      }
-      if (e.key === 'Backspace' || e.key === 'Escape') {
-        showScreen('main'); startSlideShow();
-      }
-      if (e.key === ' ') submitOrder();
+      if (e.key===' ') submitOrder();
+      if (e.key==='Backspace'||e.key==='Escape') { showScreen('main'); startSlide(); }
     }
 
-    if (currentScreen === 'complete') {
-      if (e.key === 'Enter') {
-        popupFocus = 0;
+    if (currentScreen==='complete') {
+      if (e.key==='Enter') {
+        popupFocus=0;
         document.getElementById('popup-yes').classList.add('focused');
         document.getElementById('popup-no').classList.remove('focused');
         document.getElementById('popup-extra').classList.add('show');
@@ -868,6 +410,5 @@
     }
   });
 </script>
-
 </body>
 </html>
