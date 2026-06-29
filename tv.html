@@ -39,7 +39,7 @@
   .fb-price { font-size: 13px; color: #C8A45A; margin-left: auto; white-space: nowrap; }
 
   /* 주문 상태 위젯 */
-  .order-status-bar { position: absolute; top: 20px; right: 20px; z-index: 6; background: rgba(10,22,40,0.8); border: 1px solid; border-radius: 20px; padding: 6px 14px; font-size: 13px; display: none; align-items: center; gap: 6px; backdrop-filter: blur(8px); }
+  .order-status-bar { position: fixed; top: 24px; left: 28px; z-index: 205; background: rgba(10,22,40,0.8); border: 1px solid; border-radius: 20px; padding: 8px 16px; font-size: 13px; display: none; align-items: center; gap: 8px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
   .order-status-bar.show { display: flex; }
   .order-status-bar.s-new { border-color: rgba(200,164,90,0.5); color: #C8A45A; }
   .order-status-bar.s-heating { border-color: rgba(239,68,68,0.5); color: #F87171; }
@@ -54,9 +54,11 @@
   .dot { width: 6px; height: 6px; border-radius: 50%; background: #2A4060; transition: all 0.3s; }
   .dot.active { background: #C8A45A; width: 24px; border-radius: 3px; }
   .bottom-right { display: flex; align-items: center; gap: 16px; }
-  .lang-btns { display: flex; gap: 4px; }
-  .lang-btn { width: 30px; height: 28px; border-radius: 6px; border: 1px solid #2A4060; background: transparent; color: #5A7082; font-size: 11px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-  .lang-btn.active { background: rgba(200,164,90,0.15); color: #C8A45A; border-color: rgba(200,164,90,0.4); }
+  /* 언어 선택 — 우측 상단 고정 */
+  .lang-fixed { position: fixed; top: 24px; right: 28px; z-index: 210; display: flex; gap: 5px; padding: 8px 10px; background: rgba(10,22,40,0.6); border: 1px solid rgba(200,164,90,0.2); border-radius: 12px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .lang-btn { width: 36px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #5A7082; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; letter-spacing: 0.02em; }
+  .lang-btn:hover { border-color: rgba(200,164,90,0.4); color: #9AA8B8; }
+  .lang-btn.active { background: rgba(200,164,90,0.18); color: #C8A45A; border-color: rgba(200,164,90,0.5); }
   .bottom-hint { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A7082; }
   .btn-hint { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #2A4060; border-radius: 6px; font-size: 12px; }
 
@@ -154,7 +156,15 @@
   <div class="closed-msg" data-i18n="orderClosedMsg">현재 주문을 받지 않습니다.<br>프런트에 문의해 주세요.</div>
 </div>
 
-<!-- 주문 상태 위젯 -->
+<!-- 언어 선택 — 우측 상단 고정 -->
+<div class="lang-fixed">
+  <button class="lang-btn active" onclick="setLang('ko')">한</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('zh')">中</button>
+  <button class="lang-btn" onclick="setLang('ja')">日</button>
+</div>
+
+<!-- 주문 상태 위젯 — 좌측 상단 고정 -->
 <div class="order-status-bar" id="order-status-bar">
   <div class="osb-dot"></div>
   <span id="osb-text"></span>
@@ -191,17 +201,9 @@
   <div class="bottom-bar">
     <div class="weather-widget" id="weather">🌙 JECHEON</div>
     <div class="slide-dots" id="slide-dots"></div>
-    <div class="bottom-right">
-      <div class="lang-btns">
-        <button class="lang-btn active" onclick="setLang('ko')">한</button>
-        <button class="lang-btn" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" onclick="setLang('zh')">中</button>
-        <button class="lang-btn" onclick="setLang('ja')">日</button>
-      </div>
-      <div class="bottom-hint">
-        <span class="btn-hint">OK</span>
-        <span data-i18n="orderNow">ORDER NOW</span>
-      </div>
+    <div class="bottom-hint">
+      <span class="btn-hint">OK</span>
+      <span data-i18n="orderNow">ORDER NOW</span>
     </div>
   </div>
 </div>
