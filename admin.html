@@ -6,149 +6,58 @@
 <title>JC Hotel · 관리자</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #070e20;
-    color: #e2e8f0;
-    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-    min-height: 100vh;
-  }
-
-  header {
-    background: #0c1529;
-    border-bottom: 1px solid #1a2030;
-    padding: 16px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .logo { font-size: 18px; font-weight: 700; color: #d4af6e; }
-
-  .tabs {
-    display: flex;
-    gap: 0;
-    padding: 24px 32px 0;
-    border-bottom: 1px solid #1a2030;
-  }
-
-  .tab {
-    padding: 10px 24px;
-    font-size: 14px;
-    color: #4a5568;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-  }
-
-  .tab.active { color: #d4af6e; border-bottom-color: #d4af6e; }
-
+  body { background: #0F1E35; color: #e2e8f0; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; min-height: 100vh; }
+  header { background: #0A1628; border-bottom: 1px solid #1C2E45; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 18px; font-weight: 700; color: #C8A45A; }
+  .tabs { display: flex; padding: 24px 32px 0; border-bottom: 1px solid #1C2E45; }
+  .tab { padding: 10px 24px; font-size: 14px; color: #4A6A82; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab.active { color: #C8A45A; border-bottom-color: #C8A45A; }
   .panel { display: none; padding: 32px; }
   .panel.active { display: block; }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   h2 { font-size: 18px; font-weight: 700; }
-
-  .add-btn {
-    background: #d4af6e;
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
+  .add-btn { background: #C8A45A; color: #000; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .cat-select { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .cat-btn { padding: 7px 16px; border-radius: 6px; border: 1px solid #1C2E45; background: #0F1E35; color: #e2e8f0; font-size: 13px; cursor: pointer; }
+  .cat-btn.active { background: #C8A45A; color: #000; border-color: #C8A45A; font-weight: 700; }
   .items { display: flex; flex-direction: column; gap: 10px; }
-
-  .item-row {
-    background: #0c1529;
-    border: 1px solid #1a2d50;
-    border-radius: 10px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .item-emoji { font-size: 28px; width: 40px; text-align: center; }
-
+  .item-row { background: #0A1628; border: 1px solid #1C2E45; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+  .item-img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; background: #1C2E45; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; overflow: hidden; }
+  .item-img img { width: 100%; height: 100%; object-fit: cover; }
   .item-info { flex: 1; }
   .item-name { font-size: 15px; font-weight: 600; }
-  .item-desc { font-size: 12px; color: #4a5568; margin-top: 2px; }
-
-  .item-price { font-size: 16px; color: #d4af6e; }
-
-  .del-btn {
-    background: rgba(239,68,68,0.1);
-    color: #ef4444;
-    border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  /* 폼 */
-  .form-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-  }
-
+  .item-desc { font-size: 12px; color: #4A6A82; margin-top: 2px; }
+  .item-price { font-size: 16px; color: #C8A45A; white-space: nowrap; }
+  .sold-badge { font-size: 11px; background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); padding: 2px 8px; border-radius: 4px; }
+  .item-actions { display: flex; gap: 6px; }
+  .edit-btn { background: rgba(200,164,90,0.1); color: #C8A45A; border: 1px solid rgba(200,164,90,0.3); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+  .sold-btn { background: rgba(239,68,68,0.1); color: #EF4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+  .sold-btn.on { background: rgba(34,197,94,0.1); color: #4ADE80; border-color: rgba(34,197,94,0.3); }
+  .del-btn { background: transparent; color: #4A6A82; border: 1px solid #1C2E45; border-radius: 6px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+  .form-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(8px); }
   .form-overlay.show { display: flex; }
-
-  .form-box {
-    background: #0c1529;
-    border: 1px solid #1a2d50;
-    border-radius: 16px;
-    padding: 32px;
-    width: 480px;
-    max-width: 90vw;
-  }
-
-  .form-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; color: #d4af6e; }
-
+  .form-box { background: #0A1628; border: 1px solid #1C2E45; border-radius: 16px; padding: 32px; width: 480px; max-width: 90vw; max-height: 90vh; overflow-y: auto; }
+  .form-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; color: #C8A45A; }
   .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 12px; color: #4a5568; margin-bottom: 6px; letter-spacing: 0.1em; }
-  .form-group input, .form-group select, .form-group textarea {
-    width: 100%;
-    background: #070e20;
-    border: 1px solid #1a2d50;
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: #e2e8f0;
-    font-size: 14px;
-    outline: none;
-    font-family: inherit;
-  }
-  .form-group input:focus, .form-group select:focus { border-color: #d4af6e; }
-
+  .form-group label { display: block; font-size: 12px; color: #4A6A82; margin-bottom: 6px; letter-spacing: 0.1em; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 10px 14px; color: #e2e8f0; font-size: 14px; outline: none; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #C8A45A; }
+  .imgbb-tip { background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #4A6A82; margin-bottom: 8px; line-height: 1.6; }
+  .imgbb-tip a { color: #C8A45A; }
+  .img-preview { width: 100%; height: 120px; border-radius: 8px; background: #0F1E35; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; overflow: hidden; margin-top: 8px; border: 1px solid #1C2E45; }
+  .img-preview img { width: 100%; height: 100%; object-fit: cover; }
   .form-btns { display: flex; gap: 10px; margin-top: 24px; }
-  .form-submit { background: #d4af6e; color: #000; border: none; border-radius: 8px; padding: 12px 24px; font-size: 14px; font-weight: 700; cursor: pointer; flex: 1; }
-  .form-cancel { background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid #1a2d50; border-radius: 8px; padding: 12px 24px; font-size: 14px; cursor: pointer; }
-
-  .cat-select { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-  .cat-btn { padding: 7px 16px; border-radius: 6px; border: 1px solid #1a2d50; background: #070e20; color: #e2e8f0; font-size: 13px; cursor: pointer; }
-  .cat-btn.active { background: #d4af6e; color: #000; border-color: #d4af6e; font-weight: 700; }
+  .form-submit { background: #C8A45A; color: #000; border: none; border-radius: 8px; padding: 12px 24px; font-size: 14px; font-weight: 700; cursor: pointer; flex: 1; }
+  .form-cancel { background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid #1C2E45; border-radius: 8px; padding: 12px 24px; font-size: 14px; cursor: pointer; }
+  .empty-msg { color: #4A6A82; padding: 40px; text-align: center; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">JC Hotel · 관리자</div>
-  <div style="font-size:13px;color:#4a5568;">ubpos TV 시스템</div>
+  <div style="font-size:13px;color:#4A6A82;">Firebase: jc-hotel-roombar</div>
 </header>
 
 <div class="tabs">
@@ -160,16 +69,12 @@
 <div class="panel active" id="panel-menu">
   <div class="section-header">
     <h2>메뉴 관리</h2>
-    <button class="add-btn" onclick="openForm('menu')">+ 메뉴 추가</button>
+    <button class="add-btn" onclick="openMenuForm()">+ 메뉴 추가</button>
   </div>
-
-  <div class="cat-select" id="menu-cat-select">
-    <button class="cat-btn active" onclick="selectMenuCat(0, this)">🍷 와인·맥주</button>
-    <button class="cat-btn" onclick="selectMenuCat(1, this)">🧀 안주</button>
-    <button class="cat-btn" onclick="selectMenuCat(2, this)">🍿 간식</button>
-    <button class="cat-btn" onclick="selectMenuCat(3, this)">🥤 음료</button>
+  <div class="cat-select">
+    <button class="cat-btn active" onclick="selectCat('drink', this)">🍷 주류 & 음료</button>
+    <button class="cat-btn" onclick="selectCat('food', this)">🍕 5분 퀵안주</button>
   </div>
-
   <div class="items" id="menu-list"></div>
 </div>
 
@@ -177,48 +82,52 @@
 <div class="panel" id="panel-spot">
   <div class="section-header">
     <h2>관광지 관리</h2>
-    <button class="add-btn" onclick="openForm('spot')">+ 관광지 추가</button>
+    <button class="add-btn" onclick="openSpotForm()">+ 관광지 추가</button>
   </div>
   <div class="items" id="spot-list"></div>
 </div>
 
-<!-- 메뉴 추가 폼 -->
+<!-- 메뉴 폼 -->
 <div class="form-overlay" id="form-menu">
   <div class="form-box">
-    <div class="form-title">메뉴 추가</div>
+    <div class="form-title" id="menu-form-title">메뉴 추가</div>
     <div class="form-group">
-      <label>이모지</label>
+      <label>이미지 URL (imgbb.com 에서 업로드 후 Direct link 복사)</label>
+      <div class="imgbb-tip">📷 <a href="https://imgbb.com" target="_blank">imgbb.com</a> → 이미지 업로드 → Direct link 복사 → 붙여넣기</div>
+      <input type="text" id="m-imageUrl" placeholder="https://i.ibb.co/..." oninput="previewMenuImg()">
+      <div class="img-preview" id="m-img-preview">🍽️</div>
+    </div>
+    <div class="form-group">
+      <label>이모지 (이미지 없을 때 표시)</label>
       <input type="text" id="m-emoji" placeholder="🍷" maxlength="2">
     </div>
     <div class="form-group">
       <label>카테고리</label>
       <select id="m-cat">
-        <option value="0">🍷 와인·맥주</option>
-        <option value="1">🧀 안주</option>
-        <option value="2">🍿 간식</option>
-        <option value="3">🥤 음료</option>
+        <option value="drink">🍷 주류 & 음료</option>
+        <option value="food">🍕 5분 퀵안주</option>
       </select>
     </div>
     <div class="form-group">
-      <label>메뉴 이름</label>
-      <input type="text" id="m-name" placeholder="레드 와인">
+      <label>메뉴 이름 *</label>
+      <input type="text" id="m-name" placeholder="제천 수제 크래프트 맥주">
     </div>
     <div class="form-group">
       <label>설명</label>
-      <input type="text" id="m-desc" placeholder="칠레산 카베르네 소비뇽">
+      <input type="text" id="m-desc" placeholder="캔 500ml + 얼음컵 제공">
     </div>
     <div class="form-group">
-      <label>가격 (원)</label>
-      <input type="number" id="m-price" placeholder="35000">
+      <label>가격 (원) *</label>
+      <input type="number" id="m-price" placeholder="8000">
     </div>
     <div class="form-btns">
-      <button class="form-cancel" onclick="closeForm('menu')">취소</button>
-      <button class="form-submit" onclick="addMenu()">추가</button>
+      <button class="form-cancel" onclick="closeMenuForm()">취소</button>
+      <button class="form-submit" onclick="saveMenu()">저장</button>
     </div>
   </div>
 </div>
 
-<!-- 관광지 추가 폼 -->
+<!-- 관광지 폼 -->
 <div class="form-overlay" id="form-spot">
   <div class="form-box">
     <div class="form-title">관광지 추가</div>
@@ -227,126 +136,202 @@
       <input type="text" id="s-emoji" placeholder="⛰️" maxlength="2">
     </div>
     <div class="form-group">
-      <label>관광지 이름</label>
-      <input type="text" id="s-name" placeholder="도담삼봉">
+      <label>관광지 이름 *</label>
+      <input type="text" id="s-name" placeholder="청풍호">
     </div>
     <div class="form-group">
       <label>설명</label>
-      <textarea id="s-desc" rows="2" placeholder="남한강 위에 솟은 세 개의 봉우리"></textarea>
+      <textarea id="s-desc" rows="2" placeholder="충북의 아름다운 호수, 유람선 운영"></textarea>
     </div>
     <div class="form-group">
       <label>호텔에서 거리</label>
-      <input type="text" id="s-distance" placeholder="🚗 차로 5분">
+      <input type="text" id="s-distance" placeholder="🚗 5 min drive">
     </div>
     <div class="form-btns">
-      <button class="form-cancel" onclick="closeForm('spot')">취소</button>
-      <button class="form-submit" onclick="addSpot()">추가</button>
+      <button class="form-cancel" onclick="closeSpotForm()">취소</button>
+      <button class="form-submit" onclick="saveSpot()">저장</button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, orderBy, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyCpLSUhQ7tT2lFLMESRjPe9k-xrm8bWkiA",
-    authDomain: "ubpos-tv.firebaseapp.com",
-    projectId: "ubpos-tv",
-    storageBucket: "ubpos-tv.firebasestorage.app",
-    messagingSenderId: "211927218968",
-    appId: "1:211927218968:web:d339540a90d183feabbc6d"
+    apiKey: "AIzaSyDSFNwHWreQ5py9lq8fINEMAmGj_wbEqjE",
+    authDomain: "jc-hotel-roombar-27c58.firebaseapp.com",
+    projectId: "jc-hotel-roombar-27c58",
+    storageBucket: "jc-hotel-roombar-27c58.firebasestorage.app",
+    messagingSenderId: "866392617860",
+    appId: "1:866392617860:web:33d262c60779179f55e3d1"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  window.db = db;
 
-  let currentMenuCat = 0;
+  let currentCat = 'drink';
+  let editingMenuId = null;
 
   window.switchTab = (tab) => {
-    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i === 0 && tab === 'menu') || (i === 1 && tab === 'spot')));
-    document.getElementById('panel-menu').classList.toggle('active', tab === 'menu');
-    document.getElementById('panel-spot').classList.toggle('active', tab === 'spot');
-    if (tab === 'spot') loadSpots();
-    else loadMenus();
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='menu')||(i===1&&tab==='spot')));
+    document.getElementById('panel-menu').classList.toggle('active', tab==='menu');
+    document.getElementById('panel-spot').classList.toggle('active', tab==='spot');
+    if (tab==='spot') loadSpots(); else loadMenus();
   };
 
-  window.selectMenuCat = (cat, btn) => {
-    currentMenuCat = cat;
+  window.selectCat = (cat, btn) => {
+    currentCat = cat;
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     loadMenus();
   };
 
-  window.openForm = (type) => document.getElementById('form-' + type).classList.add('show');
-  window.closeForm = (type) => document.getElementById('form-' + type).classList.remove('show');
-
-  // 메뉴 로드
-  window.loadMenus = async () => {
-    const q = query(collection(db, 'menus'), where('cat', '==', currentMenuCat));
+  async function loadMenus() {
+    const q = query(collection(db,'menus'), where('category','==',currentCat), orderBy('createdAt','asc'));
     const snap = await getDocs(q);
     const el = document.getElementById('menu-list');
-    if (snap.empty) { el.innerHTML = '<div style="color:#4a5568;padding:20px;">메뉴가 없습니다. 추가해주세요.</div>'; return; }
+    if (snap.empty) { el.innerHTML = '<div class="empty-msg">메뉴가 없습니다</div>'; return; }
     el.innerHTML = snap.docs.map(d => {
       const m = d.data();
+      const imgEl = m.imageUrl
+        ? `<div class="item-img"><img src="${m.imageUrl}" onerror="this.parentElement.innerHTML='${m.emoji||'🍽️'}'"></div>`
+        : `<div class="item-img">${m.emoji||'🍽️'}</div>`;
       return `<div class="item-row">
-        <div class="item-emoji">${m.emoji}</div>
-        <div class="item-info"><div class="item-name">${m.name}</div><div class="item-desc">${m.desc}</div></div>
-        <div class="item-price">₩ ${Number(m.price).toLocaleString()}</div>
-        <button class="del-btn" onclick="deleteItem('menus','${d.id}', loadMenus)">삭제</button>
+        ${imgEl}
+        <div class="item-info">
+          <div class="item-name">${m.name} ${m.soldOut?'<span class="sold-badge">품절</span>':''}</div>
+          <div class="item-desc">${m.desc||''}</div>
+        </div>
+        <div class="item-price">₩${Number(m.price).toLocaleString()}</div>
+        <div class="item-actions">
+          <button class="edit-btn" onclick="editMenu('${d.id}')">✏️</button>
+          <button class="sold-btn ${m.soldOut?'on':''}" onclick="toggleSold('${d.id}',${!!m.soldOut})">${m.soldOut?'재개':'품절'}</button>
+          <button class="del-btn" onclick="delMenu('${d.id}')">🗑</button>
+        </div>
       </div>`;
     }).join('');
+  }
+
+  window.openMenuForm = () => {
+    editingMenuId = null;
+    document.getElementById('menu-form-title').textContent = '메뉴 추가';
+    document.getElementById('m-imageUrl').value = '';
+    document.getElementById('m-emoji').value = '';
+    document.getElementById('m-cat').value = currentCat;
+    document.getElementById('m-name').value = '';
+    document.getElementById('m-desc').value = '';
+    document.getElementById('m-price').value = '';
+    document.getElementById('m-img-preview').innerHTML = '🍽️';
+    document.getElementById('form-menu').classList.add('show');
   };
 
-  // 관광지 로드
-  window.loadSpots = async () => {
-    const snap = await getDocs(collection(db, 'spots'));
-    const el = document.getElementById('spot-list');
-    if (snap.empty) { el.innerHTML = '<div style="color:#4a5568;padding:20px;">관광지가 없습니다. 추가해주세요.</div>'; return; }
-    el.innerHTML = snap.docs.map(d => {
-      const s = d.data();
-      return `<div class="item-row">
-        <div class="item-emoji">${s.emoji}</div>
-        <div class="item-info"><div class="item-name">${s.name}</div><div class="item-desc">${s.desc}</div></div>
-        <div class="item-price" style="font-size:13px;color:#4a5568;">${s.distance}</div>
-        <button class="del-btn" onclick="deleteItem('spots','${d.id}', loadSpots)">삭제</button>
-      </div>`;
-    }).join('');
+  window.editMenu = async (id) => {
+    const snap = await getDocs(collection(db,'menus'));
+    const d = snap.docs.find(d => d.id === id);
+    if (!d) return;
+    const m = d.data();
+    editingMenuId = id;
+    document.getElementById('menu-form-title').textContent = '메뉴 수정';
+    document.getElementById('m-imageUrl').value = m.imageUrl||'';
+    document.getElementById('m-emoji').value = m.emoji||'';
+    document.getElementById('m-cat').value = m.category;
+    document.getElementById('m-name').value = m.name;
+    document.getElementById('m-desc').value = m.desc||'';
+    document.getElementById('m-price').value = m.price;
+    document.getElementById('m-img-preview').innerHTML = m.imageUrl
+      ? `<img src="${m.imageUrl}" onerror="this.parentElement.innerHTML='🍽️'">`
+      : (m.emoji||'🍽️');
+    document.getElementById('form-menu').classList.add('show');
   };
 
-  window.addMenu = async () => {
-    const emoji = document.getElementById('m-emoji').value || '🍽️';
-    const cat = parseInt(document.getElementById('m-cat').value);
-    const name = document.getElementById('m-name').value;
-    const desc = document.getElementById('m-desc').value;
-    const price = parseInt(document.getElementById('m-price').value);
-    if (!name || !price) return alert('이름과 가격을 입력해주세요');
-    await addDoc(collection(db, 'menus'), { emoji, cat, name, desc, price, createdAt: serverTimestamp() });
-    closeForm('menu');
+  window.closeMenuForm = () => document.getElementById('form-menu').classList.remove('show');
+
+  window.previewMenuImg = () => {
+    const url = document.getElementById('m-imageUrl').value.trim();
+    const box = document.getElementById('m-img-preview');
+    box.innerHTML = url ? `<img src="${url}" onerror="this.parentElement.innerHTML='❌ URL 오류'">` : '🍽️';
+  };
+
+  window.saveMenu = async () => {
+    const name = document.getElementById('m-name').value.trim();
+    const price = document.getElementById('m-price').value;
+    if (!name||!price) { toast('이름과 가격을 입력해주세요'); return; }
+    const data = {
+      name, price: Number(price),
+      desc: document.getElementById('m-desc').value.trim(),
+      category: document.getElementById('m-cat').value,
+      emoji: document.getElementById('m-emoji').value || '🍽️',
+      imageUrl: document.getElementById('m-imageUrl').value.trim(),
+      updatedAt: serverTimestamp()
+    };
+    if (editingMenuId) {
+      await updateDoc(doc(db,'menus',editingMenuId), data);
+      toast('✅ 수정 완료');
+    } else {
+      data.createdAt = serverTimestamp(); data.soldOut = false;
+      await addDoc(collection(db,'menus'), data);
+      toast('✅ 추가 완료');
+    }
+    closeMenuForm(); loadMenus();
+  };
+
+  window.toggleSold = async (id, current) => {
+    await updateDoc(doc(db,'menus',id), { soldOut: !current });
+    toast(!current ? '❌ 품절 처리' : '✅ 판매 재개');
     loadMenus();
   };
 
-  window.addSpot = async () => {
-    const emoji = document.getElementById('s-emoji').value || '📍';
-    const name = document.getElementById('s-name').value;
-    const desc = document.getElementById('s-desc').value;
-    const distance = document.getElementById('s-distance').value;
-    if (!name) return alert('이름을 입력해주세요');
-    await addDoc(collection(db, 'spots'), { emoji, name, desc, distance, createdAt: serverTimestamp() });
-    closeForm('spot');
-    loadSpots();
+  window.delMenu = async (id) => {
+    if (!confirm('삭제할까요?')) return;
+    await deleteDoc(doc(db,'menus',id));
+    toast('🗑 삭제 완료'); loadMenus();
   };
 
-  window.deleteItem = async (col, id, reload) => {
-    if (!confirm('삭제하시겠습니까?')) return;
-    await deleteDoc(doc(db, col, id));
-    reload();
+  async function loadSpots() {
+    const snap = await getDocs(query(collection(db,'spots'), orderBy('createdAt','asc')));
+    const el = document.getElementById('spot-list');
+    if (snap.empty) { el.innerHTML = '<div class="empty-msg">관광지가 없습니다</div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const s = d.data();
+      return `<div class="item-row">
+        <div class="item-img">${s.emoji||'📍'}</div>
+        <div class="item-info"><div class="item-name">${s.name}</div><div class="item-desc">${s.desc||''}</div></div>
+        <div class="item-price" style="font-size:13px;color:#4A6A82;">${s.distance||''}</div>
+        <div class="item-actions"><button class="del-btn" onclick="delSpot('${d.id}')">🗑</button></div>
+      </div>`;
+    }).join('');
+  }
+
+  window.openSpotForm = () => document.getElementById('form-spot').classList.add('show');
+  window.closeSpotForm = () => document.getElementById('form-spot').classList.remove('show');
+
+  window.saveSpot = async () => {
+    const name = document.getElementById('s-name').value.trim();
+    if (!name) { toast('이름을 입력해주세요'); return; }
+    await addDoc(collection(db,'spots'), {
+      emoji: document.getElementById('s-emoji').value||'📍',
+      name, desc: document.getElementById('s-desc').value.trim(),
+      distance: document.getElementById('s-distance').value.trim(),
+      createdAt: serverTimestamp()
+    });
+    closeSpotForm(); loadSpots(); toast('✅ 추가 완료');
   };
 
-  // 초기 로드
+  window.delSpot = async (id) => {
+    if (!confirm('삭제할까요?')) return;
+    await deleteDoc(doc(db,'spots',id)); loadSpots(); toast('🗑 삭제 완료');
+  };
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
   loadMenus();
 </script>
-
 </body>
 </html>
