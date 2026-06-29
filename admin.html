@@ -287,8 +287,14 @@
 <!-- 관광지 폼 -->
 <div class="form-overlay" id="form-spot">
   <div class="form-box">
-    <div class="form-title">관광지 추가</div>
-    <div class="form-group"><label>이모지</label><input type="text" id="s-emoji" placeholder="⛰️" maxlength="2"></div>
+    <div class="form-title" id="spot-form-title">관광지 추가</div>
+    <div class="form-group">
+      <label>슬라이드 이미지 URL (우측 화면에 표시)</label>
+      <div class="imgbb-tip">📷 <a href="https://imgbb.com" target="_blank">imgbb.com</a> → 이미지 업로드 → Direct link 복사</div>
+      <input type="text" id="s-imageUrl" placeholder="https://i.ibb.co/..." oninput="previewSpotImg()">
+      <div class="img-preview" id="s-img-preview">📍</div>
+    </div>
+    <div class="form-group"><label>이모지 (이미지 없을 때 표시)</label><input type="text" id="s-emoji" placeholder="⛰️" maxlength="2"></div>
     <div class="form-group"><label>관광지 이름 *</label><input type="text" id="s-name" placeholder="청풍호"></div>
     <div class="form-group"><label>설명</label><textarea id="s-desc" rows="2" placeholder="충북의 아름다운 호수, 유람선 운영"></textarea></div>
     <div class="form-group"><label>거리</label><input type="text" id="s-distance" placeholder="🚗 5 min drive"></div>
@@ -319,6 +325,7 @@
 
   let currentCat = 'drink';
   let editingMenuId = null;
+  let editingSpotId = null;
   let globalOrderOpen = true;
 
   // ── Tab ──────────────────────────────────────────────
@@ -555,29 +562,77 @@
     if (snap.empty) { el.innerHTML = '<div class="empty-msg">관광지가 없습니다</div>'; return; }
     el.innerHTML = snap.docs.map(d => {
       const s = d.data();
+      const imgEl = s.imageUrl
+        ? `<div class="item-img"><img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='${s.emoji||'📍'}'"></div>`
+        : `<div class="item-img">${s.emoji||'📍'}</div>`;
       return `<div class="item-row">
-        <div class="item-img">${s.emoji||'📍'}</div>
-        <div class="item-info"><div class="item-name">${s.name}</div><div class="item-desc">${s.desc||''}</div></div>
+        ${imgEl}
+        <div class="item-info">
+          <div class="item-name">${s.name}</div>
+          <div class="item-desc">${s.desc||''}</div>
+        </div>
         <div class="item-price" style="font-size:13px;color:#4A6A82;">${s.distance||''}</div>
-        <div class="item-actions"><button class="del-btn" onclick="delSpot('${d.id}')">🗑</button></div>
+        <div class="item-actions">
+          <button class="edit-btn" onclick="editSpot('${d.id}')">✏️</button>
+          <button class="del-btn" onclick="delSpot('${d.id}')">🗑</button>
+        </div>
       </div>`;
     }).join('');
   }
 
-  window.openSpotForm = () => document.getElementById('form-spot').classList.add('show');
+  window.openSpotForm = () => {
+    editingSpotId = null;
+    document.getElementById('spot-form-title').textContent = '관광지 추가';
+    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('s-img-preview').innerHTML = '📍';
+    document.getElementById('form-spot').classList.add('show');
+  };
+
+  window.editSpot = async (id) => {
+    const snap = await getDoc(doc(db,'spots',id));
+    if (!snap.exists()) return;
+    const s = snap.data();
+    editingSpotId = id;
+    document.getElementById('spot-form-title').textContent = '관광지 수정';
+    document.getElementById('s-imageUrl').value = s.imageUrl||'';
+    document.getElementById('s-emoji').value = s.emoji||'';
+    document.getElementById('s-name').value = s.name;
+    document.getElementById('s-desc').value = s.desc||'';
+    document.getElementById('s-distance').value = s.distance||'';
+    document.getElementById('s-img-preview').innerHTML = s.imageUrl
+      ? `<img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='📍'">`
+      : (s.emoji||'📍');
+    document.getElementById('form-spot').classList.add('show');
+  };
+
   window.closeSpotForm = () => document.getElementById('form-spot').classList.remove('show');
+
+  window.previewSpotImg = () => {
+    const url = document.getElementById('s-imageUrl').value.trim();
+    document.getElementById('s-img-preview').innerHTML = url
+      ? `<img src="${url}" onerror="this.parentElement.innerHTML='❌ URL 오류'">`
+      : '📍';
+  };
 
   window.saveSpot = async () => {
     const name = document.getElementById('s-name').value.trim();
     if (!name) { toast('이름을 입력해주세요'); return; }
-    await addDoc(collection(db,'spots'), {
+    const data = {
       emoji: document.getElementById('s-emoji').value||'📍',
-      name, desc: document.getElementById('s-desc').value.trim(),
+      name,
+      desc: document.getElementById('s-desc').value.trim(),
       distance: document.getElementById('s-distance').value.trim(),
-      createdAt: serverTimestamp()
-    });
-    ['s-emoji','s-name','s-desc','s-distance'].forEach(id => document.getElementById(id).value='');
-    closeSpotForm(); loadSpots(); toast('✅ 추가 완료');
+      imageUrl: document.getElementById('s-imageUrl').value.trim(),
+    };
+    if (editingSpotId) {
+      await updateDoc(doc(db,'spots',editingSpotId), { ...data, updatedAt: serverTimestamp() });
+      toast('✅ 수정 완료');
+    } else {
+      await addDoc(collection(db,'spots'), { ...data, createdAt: serverTimestamp() });
+      toast('✅ 추가 완료');
+    }
+    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance'].forEach(id => document.getElementById(id).value='');
+    closeSpotForm(); loadSpots();
   };
 
   window.delSpot = async (id) => {
