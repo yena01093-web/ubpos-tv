@@ -7,62 +7,127 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0F1E35; color: #e2e8f0; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; min-height: 100vh; }
-  header { background: #0A1628; border-bottom: 1px solid #1C2E45; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+  header { background: #0A1628; border-bottom: 1px solid #1C2E45; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: 0; z-index: 50; }
   .logo { font-size: 18px; font-weight: 700; color: #C8A45A; }
-  .tabs { display: flex; padding: 24px 32px 0; border-bottom: 1px solid #1C2E45; }
-  .tab { padding: 10px 24px; font-size: 14px; color: #4A6A82; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .hdr-toggle { padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: all 0.2s; }
+  .hdr-toggle.open { background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
+  .hdr-toggle.closed { background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); }
+  .tabs { display: flex; padding: 20px 32px 0; border-bottom: 1px solid #1C2E45; gap: 4px; }
+  .tab { padding: 10px 22px; font-size: 14px; color: #4A6A82; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
   .tab.active { color: #C8A45A; border-bottom-color: #C8A45A; }
-  .panel { display: none; padding: 32px; }
+  .panel { display: none; padding: 28px 32px; }
   .panel.active { display: block; }
   .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   h2 { font-size: 18px; font-weight: 700; }
-  .add-btn { background: #C8A45A; color: #000; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .add-btn { background: #C8A45A; color: #000; border: none; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .cat-select { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-  .cat-btn { padding: 7px 16px; border-radius: 6px; border: 1px solid #1C2E45; background: #0F1E35; color: #e2e8f0; font-size: 13px; cursor: pointer; }
+  .cat-btn { padding: 7px 16px; border-radius: 6px; border: 1px solid #1C2E45; background: #0F1E35; color: #e2e8f0; font-size: 13px; cursor: pointer; font-family: inherit; }
   .cat-btn.active { background: #C8A45A; color: #000; border-color: #C8A45A; font-weight: 700; }
   .items { display: flex; flex-direction: column; gap: 10px; }
-  .item-row { background: #0A1628; border: 1px solid #1C2E45; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
-  .item-img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; background: #1C2E45; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; overflow: hidden; }
+  .item-row { background: #0A1628; border: 1px solid #1C2E45; border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
+  .item-img { width: 52px; height: 52px; border-radius: 8px; background: #1C2E45; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; overflow: hidden; }
   .item-img img { width: 100%; height: 100%; object-fit: cover; }
-  .item-info { flex: 1; }
+  .item-info { flex: 1; min-width: 0; }
   .item-name { font-size: 15px; font-weight: 600; }
   .item-desc { font-size: 12px; color: #4A6A82; margin-top: 2px; }
   .item-price { font-size: 16px; color: #C8A45A; white-space: nowrap; }
-  .sold-badge { font-size: 11px; background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); padding: 2px 8px; border-radius: 4px; }
-  .item-actions { display: flex; gap: 6px; }
-  .edit-btn { background: rgba(200,164,90,0.1); color: #C8A45A; border: 1px solid rgba(200,164,90,0.3); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
-  .sold-btn { background: rgba(239,68,68,0.1); color: #EF4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+  .sold-badge { font-size: 11px; background: rgba(239,68,68,0.15); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); padding: 2px 8px; border-radius: 4px; margin-left: 6px; }
+  .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .edit-btn { background: rgba(200,164,90,0.1); color: #C8A45A; border: 1px solid rgba(200,164,90,0.3); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .sold-btn { background: rgba(239,68,68,0.1); color: #EF4444; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
   .sold-btn.on { background: rgba(34,197,94,0.1); color: #4ADE80; border-color: rgba(34,197,94,0.3); }
-  .del-btn { background: transparent; color: #4A6A82; border: 1px solid #1C2E45; border-radius: 6px; padding: 6px 10px; font-size: 12px; cursor: pointer; }
+  .del-btn { background: transparent; color: #4A6A82; border: 1px solid #1C2E45; border-radius: 6px; padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
   .form-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(8px); }
   .form-overlay.show { display: flex; }
-  .form-box { background: #0A1628; border: 1px solid #1C2E45; border-radius: 16px; padding: 32px; width: 480px; max-width: 90vw; max-height: 90vh; overflow-y: auto; }
-  .form-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; color: #C8A45A; }
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 12px; color: #4A6A82; margin-bottom: 6px; letter-spacing: 0.1em; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 10px 14px; color: #e2e8f0; font-size: 14px; outline: none; font-family: inherit; }
+  .form-box { background: #0A1628; border: 1px solid #1C2E45; border-radius: 16px; padding: 28px; width: 480px; max-width: 90vw; max-height: 90vh; overflow-y: auto; }
+  .form-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; color: #C8A45A; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; color: #4A6A82; margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 9px 13px; color: #e2e8f0; font-size: 14px; outline: none; font-family: inherit; }
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #C8A45A; }
-  .imgbb-tip { background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #4A6A82; margin-bottom: 8px; line-height: 1.6; }
+  .imgbb-tip { background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 9px 13px; font-size: 12px; color: #4A6A82; margin-bottom: 7px; line-height: 1.6; }
   .imgbb-tip a { color: #C8A45A; }
-  .img-preview { width: 100%; height: 120px; border-radius: 8px; background: #0F1E35; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; overflow: hidden; margin-top: 8px; border: 1px solid #1C2E45; }
+  .img-preview { width: 100%; height: 110px; border-radius: 8px; background: #0F1E35; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; overflow: hidden; margin-top: 7px; border: 1px solid #1C2E45; }
   .img-preview img { width: 100%; height: 100%; object-fit: cover; }
-  .form-btns { display: flex; gap: 10px; margin-top: 24px; }
-  .form-submit { background: #C8A45A; color: #000; border: none; border-radius: 8px; padding: 12px 24px; font-size: 14px; font-weight: 700; cursor: pointer; flex: 1; }
-  .form-cancel { background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid #1C2E45; border-radius: 8px; padding: 12px 24px; font-size: 14px; cursor: pointer; }
+  .form-btns { display: flex; gap: 10px; margin-top: 20px; }
+  .form-submit { background: #C8A45A; color: #000; border: none; border-radius: 8px; padding: 11px 22px; font-size: 14px; font-weight: 700; cursor: pointer; flex: 1; font-family: inherit; }
+  .form-cancel { background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid #1C2E45; border-radius: 8px; padding: 11px 22px; font-size: 14px; cursor: pointer; font-family: inherit; }
   .empty-msg { color: #4A6A82; padding: 40px; text-align: center; }
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+
+  /* Room grid */
+  .room-toolbar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .room-tool-btn { padding: 7px 14px; border-radius: 6px; border: 1px solid #1C2E45; background: #0F1E35; color: #e2e8f0; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .room-tool-btn:hover { border-color: #C8A45A; color: #C8A45A; }
+  .room-tool-btn.danger { color: #EF4444; border-color: rgba(239,68,68,0.3); }
+  .room-tool-btn.danger:hover { background: rgba(239,68,68,0.08); }
+  .room-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; }
+  .room-card { background: #0A1628; border: 1px solid #1C2E45; border-radius: 10px; padding: 10px 4px 8px; text-align: center; transition: all 0.18s; user-select: none; }
+  .room-card.active { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.4); }
+  .room-card.inactive { opacity: 0.45; }
+  .room-num { font-size: 15px; font-weight: 700; color: #e2e8f0; cursor: pointer; }
+  .room-card.active .room-num { color: #4ADE80; }
+  .room-status { font-size: 10px; margin-top: 3px; color: #4A6A82; cursor: pointer; }
+  .room-card.active .room-status { color: rgba(74,222,128,0.7); }
+  .room-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2A4060; margin-right: 2px; vertical-align: middle; }
+  .room-card.active .room-dot { background: #4ADE80; }
+  .room-amount { font-size: 11px; color: #C8A45A; margin-top: 3px; min-height: 14px; }
+  .room-checkout { font-size: 9px; color: #4A6A82; background: transparent; border: none; cursor: pointer; font-family: inherit; padding: 2px 0; display: block; width: 100%; margin-top: 2px; }
+  .room-checkout:hover { color: #EF4444; }
+  .room-stats { font-size: 13px; color: #4A6A82; }
+
+  /* Settings */
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .settings-grid { grid-template-columns: 1fr; } .room-grid { grid-template-columns: repeat(5,1fr); } }
+  .settings-card { background: #0A1628; border: 1px solid #1C2E45; border-radius: 12px; padding: 22px; }
+  .settings-card h3 { font-size: 12px; font-weight: 700; color: #C8A45A; margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .toggle-label { font-size: 14px; }
+  .toggle-switch { position: relative; width: 46px; height: 24px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-slider { position: absolute; inset: 0; background: #2A4060; border-radius: 12px; transition: 0.3s; cursor: pointer; }
+  .toggle-slider::before { content:''; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+  input:checked + .toggle-slider { background: #C8A45A; }
+  input:checked + .toggle-slider::before { transform: translateX(22px); }
+  .settings-status { font-size: 13px; color: #4A6A82; margin-top: 10px; }
+  .settings-status.green { color: #4ADE80; }
+  .settings-status.red { color: #EF4444; }
+  .time-row { display: flex; gap: 12px; margin-top: 14px; }
+  .time-group { flex: 1; }
+  .time-group label { display: block; font-size: 12px; color: #4A6A82; margin-bottom: 5px; }
+  .time-group input[type="time"] { width: 100%; background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 14px; outline: none; font-family: inherit; }
+  .time-group input[type="time"]:focus { border-color: #C8A45A; }
+  .save-btn { padding: 9px 16px; background: rgba(200,164,90,0.15); color: #C8A45A; border: 1px solid rgba(200,164,90,0.3); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.2s; }
+  .save-btn:hover { background: rgba(200,164,90,0.3); }
+  .featured-select { width: 100%; background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; padding: 9px 13px; color: #e2e8f0; font-size: 14px; outline: none; font-family: inherit; }
+  .featured-select:focus { border-color: #C8A45A; }
+  .featured-list { width: 100%; background: #0F1E35; border: 1px solid #1C2E45; border-radius: 8px; color: #e2e8f0; font-size: 13px; outline: none; font-family: inherit; min-height: 120px; margin-top: 8px; }
+  .featured-list option { padding: 6px 10px; }
+  .featured-list option:checked { background: rgba(200,164,90,0.2); }
+  .featured-preview { background: #0F1E35; border: 1px solid rgba(200,164,90,0.2); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; min-height: 56px; margin-top: 12px; }
+  .fp-emoji { font-size: 28px; }
+  .fp-name { font-size: 14px; font-weight: 600; }
+  .fp-price { font-size: 13px; color: #C8A45A; margin-top: 2px; }
+  .featured-btns { display: flex; gap: 8px; margin-top: 10px; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 11px 22px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 <header>
   <div class="logo">JC Hotel · 관리자</div>
-  <div style="font-size:13px;color:#4A6A82;">Firebase: jc-hotel-roombar</div>
+  <div class="header-right">
+    <button class="hdr-toggle open" id="order-hdr-toggle" onclick="toggleOrderOpen()">● 주문 수신 중</button>
+    <div style="font-size:12px;color:#4A6A82;">Firebase: jc-hotel-roombar</div>
+  </div>
 </header>
 
 <div class="tabs">
   <div class="tab active" onclick="switchTab('menu')">🍷 메뉴 관리</div>
   <div class="tab" onclick="switchTab('spot')">⛰️ 관광지 관리</div>
+  <div class="tab" onclick="switchTab('room')">🏨 객실 관리</div>
+  <div class="tab" onclick="switchTab('settings')">⚙️ 설정</div>
 </div>
 
 <!-- 메뉴 패널 -->
@@ -72,8 +137,9 @@
     <button class="add-btn" onclick="openMenuForm()">+ 메뉴 추가</button>
   </div>
   <div class="cat-select">
-    <button class="cat-btn active" onclick="selectCat('drink', this)">🍷 주류 & 음료</button>
-    <button class="cat-btn" onclick="selectCat('food', this)">🍕 5분 퀵안주</button>
+    <button class="cat-btn active" onclick="selectCat('drink',this)">🍷 주류 &amp; 음료</button>
+    <button class="cat-btn" onclick="selectCat('food',this)">🍕 5분 퀵안주</button>
+    <button class="cat-btn" onclick="selectCat('package',this)">📦 패키지</button>
   </div>
   <div class="items" id="menu-list"></div>
 </div>
@@ -87,39 +153,110 @@
   <div class="items" id="spot-list"></div>
 </div>
 
+<!-- 객실 패널 -->
+<div class="panel" id="panel-room">
+  <div class="section-header">
+    <h2>객실 관리 (101 – 150)</h2>
+    <span class="room-stats" id="room-stats"></span>
+  </div>
+  <div class="room-toolbar">
+    <button class="room-tool-btn" onclick="initRooms()">⚡ Firebase 동기화</button>
+    <button class="room-tool-btn" onclick="setAllRooms(true)">✅ 전체 활성화</button>
+    <button class="room-tool-btn danger" onclick="setAllRooms(false)">⛔ 전체 비활성화</button>
+  </div>
+  <div class="room-grid" id="room-grid"></div>
+</div>
+
+<!-- 설정 패널 -->
+<div class="panel" id="panel-settings">
+  <div class="section-header">
+    <h2>시스템 설정</h2>
+    <button class="save-btn" onclick="saveAllSettings()">💾 저장</button>
+  </div>
+  <div class="settings-grid">
+    <div class="settings-card">
+      <h3>주문 수신 제어</h3>
+      <div class="toggle-row">
+        <span class="toggle-label">주문 수신</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="chk-order-open" checked onchange="syncOrderToggle()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="settings-status green" id="order-open-status">현재 주문을 받고 있습니다</div>
+    </div>
+
+    <div class="settings-card">
+      <h3>야간 주문 제한</h3>
+      <div class="toggle-row">
+        <span class="toggle-label">야간 제한 사용</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="chk-night-enabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="time-row">
+        <div class="time-group">
+          <label>마감 시작</label>
+          <input type="time" id="night-start" value="22:00">
+        </div>
+        <div class="time-group">
+          <label>주문 재개</label>
+          <input type="time" id="night-end" value="07:00">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card" style="grid-column:1/-1;">
+      <h3>오늘의 추천 메뉴</h3>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:220px;">
+          <select class="featured-select" id="feat-cat" onchange="loadFeaturedOptions()">
+            <option value="drink">🍷 주류 &amp; 음료</option>
+            <option value="food">🍕 5분 퀵안주</option>
+            <option value="package">📦 패키지</option>
+          </select>
+          <select class="featured-list" id="feat-menu" size="5"></select>
+          <div class="featured-btns">
+            <button class="save-btn" onclick="saveFeatured()">✨ 추천 설정</button>
+            <button class="room-tool-btn danger" onclick="clearFeatured()">해제</button>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:12px;color:#4A6A82;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;">현재 추천</div>
+          <div class="featured-preview" id="featured-preview">
+            <span class="fp-emoji">✨</span>
+            <div><div class="fp-name" id="fp-name">설정되지 않음</div><div class="fp-price" id="fp-price"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- 메뉴 폼 -->
 <div class="form-overlay" id="form-menu">
   <div class="form-box">
     <div class="form-title" id="menu-form-title">메뉴 추가</div>
     <div class="form-group">
-      <label>이미지 URL (imgbb.com 에서 업로드 후 Direct link 복사)</label>
-      <div class="imgbb-tip">📷 <a href="https://imgbb.com" target="_blank">imgbb.com</a> → 이미지 업로드 → Direct link 복사 → 붙여넣기</div>
+      <label>이미지 URL</label>
+      <div class="imgbb-tip">📷 <a href="https://imgbb.com" target="_blank">imgbb.com</a> → 업로드 → Direct link 복사</div>
       <input type="text" id="m-imageUrl" placeholder="https://i.ibb.co/..." oninput="previewMenuImg()">
       <div class="img-preview" id="m-img-preview">🍽️</div>
     </div>
-    <div class="form-group">
-      <label>이모지 (이미지 없을 때 표시)</label>
-      <input type="text" id="m-emoji" placeholder="🍷" maxlength="2">
-    </div>
+    <div class="form-group"><label>이모지</label><input type="text" id="m-emoji" placeholder="🍷" maxlength="2"></div>
     <div class="form-group">
       <label>카테고리</label>
       <select id="m-cat">
-        <option value="drink">🍷 주류 & 음료</option>
+        <option value="drink">🍷 주류 &amp; 음료</option>
         <option value="food">🍕 5분 퀵안주</option>
+        <option value="package">📦 패키지</option>
       </select>
     </div>
-    <div class="form-group">
-      <label>메뉴 이름 *</label>
-      <input type="text" id="m-name" placeholder="제천 수제 크래프트 맥주">
-    </div>
-    <div class="form-group">
-      <label>설명</label>
-      <input type="text" id="m-desc" placeholder="캔 500ml + 얼음컵 제공">
-    </div>
-    <div class="form-group">
-      <label>가격 (원) *</label>
-      <input type="number" id="m-price" placeholder="8000">
-    </div>
+    <div class="form-group"><label>메뉴 이름 *</label><input type="text" id="m-name" placeholder="제천 수제 크래프트 맥주"></div>
+    <div class="form-group"><label>설명</label><input type="text" id="m-desc" placeholder="캔 500ml + 얼음컵 제공"></div>
+    <div class="form-group"><label>가격 (원) *</label><input type="number" id="m-price" placeholder="8000"></div>
+    <div class="form-group"><label>구성품 (패키지용 — 줄바꿈 구분)</label><textarea id="m-components" rows="3" placeholder="수제맥주 1캔&#10;안주 1종&#10;얼음컵 2개"></textarea></div>
     <div class="form-btns">
       <button class="form-cancel" onclick="closeMenuForm()">취소</button>
       <button class="form-submit" onclick="saveMenu()">저장</button>
@@ -131,22 +268,10 @@
 <div class="form-overlay" id="form-spot">
   <div class="form-box">
     <div class="form-title">관광지 추가</div>
-    <div class="form-group">
-      <label>이모지</label>
-      <input type="text" id="s-emoji" placeholder="⛰️" maxlength="2">
-    </div>
-    <div class="form-group">
-      <label>관광지 이름 *</label>
-      <input type="text" id="s-name" placeholder="청풍호">
-    </div>
-    <div class="form-group">
-      <label>설명</label>
-      <textarea id="s-desc" rows="2" placeholder="충북의 아름다운 호수, 유람선 운영"></textarea>
-    </div>
-    <div class="form-group">
-      <label>호텔에서 거리</label>
-      <input type="text" id="s-distance" placeholder="🚗 5 min drive">
-    </div>
+    <div class="form-group"><label>이모지</label><input type="text" id="s-emoji" placeholder="⛰️" maxlength="2"></div>
+    <div class="form-group"><label>관광지 이름 *</label><input type="text" id="s-name" placeholder="청풍호"></div>
+    <div class="form-group"><label>설명</label><textarea id="s-desc" rows="2" placeholder="충북의 아름다운 호수, 유람선 운영"></textarea></div>
+    <div class="form-group"><label>거리</label><input type="text" id="s-distance" placeholder="🚗 5 min drive"></div>
     <div class="form-btns">
       <button class="form-cancel" onclick="closeSpotForm()">취소</button>
       <button class="form-submit" onclick="saveSpot()">저장</button>
@@ -158,7 +283,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, orderBy, serverTimestamp }
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, updateDoc, query, where, orderBy, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -174,14 +299,104 @@
 
   let currentCat = 'drink';
   let editingMenuId = null;
+  let globalOrderOpen = true;
 
+  // ── Tab ──────────────────────────────────────────────
   window.switchTab = (tab) => {
-    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='menu')||(i===1&&tab==='spot')));
-    document.getElementById('panel-menu').classList.toggle('active', tab==='menu');
-    document.getElementById('panel-spot').classList.toggle('active', tab==='spot');
-    if (tab==='spot') loadSpots(); else loadMenus();
+    const tabs = ['menu','spot','room','settings'];
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
+    tabs.forEach(id => document.getElementById('panel-'+id).classList.toggle('active', id===tab));
+    ({ menu: loadMenus, spot: loadSpots, room: loadRooms, settings: loadSettings })[tab]?.();
   };
 
+  // ── Order open ───────────────────────────────────────
+  async function syncOrderToggle() {
+    const open = document.getElementById('chk-order-open').checked;
+    globalOrderOpen = open;
+    await setDoc(doc(db,'settings','global'), { orderOpen: open }, { merge: true });
+    updateOrderUI(open);
+    toast(open ? '✅ 주문 수신 중' : '⛔ 주문 마감됨');
+  }
+  window.syncOrderToggle = syncOrderToggle;
+
+  window.toggleOrderOpen = async () => {
+    const chk = document.getElementById('chk-order-open');
+    if (chk) { chk.checked = !chk.checked; await syncOrderToggle(); }
+  };
+
+  function updateOrderUI(open) {
+    const btn = document.getElementById('order-hdr-toggle');
+    const status = document.getElementById('order-open-status');
+    const chk = document.getElementById('chk-order-open');
+    btn.textContent = open ? '● 주문 수신 중' : '○ 주문 마감됨';
+    btn.className = `hdr-toggle ${open?'open':'closed'}`;
+    if (status) { status.textContent = open ? '현재 주문을 받고 있습니다' : '주문이 마감되어 있습니다'; status.className = `settings-status ${open?'green':'red'}`; }
+    if (chk) chk.checked = open;
+  }
+
+  // ── Settings ─────────────────────────────────────────
+  async function loadSettings() {
+    const snap = await getDoc(doc(db,'settings','global'));
+    if (snap.exists()) {
+      const d = snap.data();
+      globalOrderOpen = d.orderOpen !== false;
+      document.getElementById('chk-order-open').checked = globalOrderOpen;
+      document.getElementById('chk-night-enabled').checked = !!d.nightEnabled;
+      document.getElementById('night-start').value = d.nightStart || '22:00';
+      document.getElementById('night-end').value = d.nightEnd || '07:00';
+      updateOrderUI(globalOrderOpen);
+    }
+    const featSnap = await getDoc(doc(db,'settings','featured'));
+    if (featSnap.exists()) renderFeaturedPreview(featSnap.data());
+    loadFeaturedOptions();
+  }
+
+  window.saveAllSettings = async () => {
+    const orderOpen = document.getElementById('chk-order-open').checked;
+    const nightEnabled = document.getElementById('chk-night-enabled').checked;
+    const nightStart = document.getElementById('night-start').value;
+    const nightEnd = document.getElementById('night-end').value;
+    await setDoc(doc(db,'settings','global'), { orderOpen, nightEnabled, nightStart, nightEnd, updatedAt: serverTimestamp() }, { merge: true });
+    globalOrderOpen = orderOpen;
+    updateOrderUI(orderOpen);
+    toast('✅ 설정 저장됨');
+  };
+
+  // ── Featured ─────────────────────────────────────────
+  window.loadFeaturedOptions = async () => {
+    const cat = document.getElementById('feat-cat').value;
+    const snap = await getDocs(query(collection(db,'menus'), where('category','==',cat), orderBy('createdAt','asc')));
+    const sel = document.getElementById('feat-menu');
+    if (snap.empty) { sel.innerHTML = '<option disabled>메뉴 없음</option>'; return; }
+    sel.innerHTML = snap.docs.map(d => {
+      const m = d.data();
+      return `<option value="${d.id}" data-name="${m.name}" data-emoji="${m.emoji||'🍽️'}" data-price="${m.price||0}" data-desc="${m.desc||''}" data-img="${m.imageUrl||''}">${m.emoji||''} ${m.name} — ₩${Number(m.price).toLocaleString()}</option>`;
+    }).join('');
+  };
+
+  window.saveFeatured = async () => {
+    const sel = document.getElementById('feat-menu');
+    if (!sel.value) { toast('메뉴를 선택하세요'); return; }
+    const o = sel.options[sel.selectedIndex];
+    const data = { menuId: sel.value, menuName: o.dataset.name, menuEmoji: o.dataset.emoji, menuPrice: Number(o.dataset.price), menuDesc: o.dataset.desc, menuImageUrl: o.dataset.img, updatedAt: serverTimestamp() };
+    await setDoc(doc(db,'settings','featured'), data);
+    renderFeaturedPreview(data);
+    toast('✨ 추천 메뉴 설정됨');
+  };
+
+  window.clearFeatured = async () => {
+    await setDoc(doc(db,'settings','featured'), { menuId: null, menuName: null, updatedAt: serverTimestamp() });
+    renderFeaturedPreview(null);
+    toast('추천 메뉴 해제됨');
+  };
+
+  function renderFeaturedPreview(d) {
+    document.getElementById('fp-name').textContent = d?.menuName || '설정되지 않음';
+    document.getElementById('fp-price').textContent = d?.menuPrice ? `₩${Number(d.menuPrice).toLocaleString()}` : '';
+    document.querySelector('#featured-preview .fp-emoji').textContent = d?.menuEmoji || '✨';
+  }
+
+  // ── Menu ─────────────────────────────────────────────
   window.selectCat = (cat, btn) => {
     currentCat = cat;
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -190,8 +405,7 @@
   };
 
   async function loadMenus() {
-    const q = query(collection(db,'menus'), where('category','==',currentCat), orderBy('createdAt','asc'));
-    const snap = await getDocs(q);
+    const snap = await getDocs(query(collection(db,'menus'), where('category','==',currentCat), orderBy('createdAt','asc')));
     const el = document.getElementById('menu-list');
     if (snap.empty) { el.innerHTML = '<div class="empty-msg">메뉴가 없습니다</div>'; return; }
     el.innerHTML = snap.docs.map(d => {
@@ -199,10 +413,11 @@
       const imgEl = m.imageUrl
         ? `<div class="item-img"><img src="${m.imageUrl}" onerror="this.parentElement.innerHTML='${m.emoji||'🍽️'}'"></div>`
         : `<div class="item-img">${m.emoji||'🍽️'}</div>`;
+      const comp = m.components?.length ? ` <span style="font-size:11px;color:#4A6A82;">(${m.components.length}종 구성)</span>` : '';
       return `<div class="item-row">
         ${imgEl}
         <div class="item-info">
-          <div class="item-name">${m.name} ${m.soldOut?'<span class="sold-badge">품절</span>':''}</div>
+          <div class="item-name">${m.name}${comp}${m.soldOut?'<span class="sold-badge">품절</span>':''}</div>
           <div class="item-desc">${m.desc||''}</div>
         </div>
         <div class="item-price">₩${Number(m.price).toLocaleString()}</div>
@@ -218,21 +433,16 @@
   window.openMenuForm = () => {
     editingMenuId = null;
     document.getElementById('menu-form-title').textContent = '메뉴 추가';
-    document.getElementById('m-imageUrl').value = '';
-    document.getElementById('m-emoji').value = '';
+    ['m-imageUrl','m-emoji','m-name','m-desc','m-price','m-components'].forEach(id => document.getElementById(id).value='');
     document.getElementById('m-cat').value = currentCat;
-    document.getElementById('m-name').value = '';
-    document.getElementById('m-desc').value = '';
-    document.getElementById('m-price').value = '';
     document.getElementById('m-img-preview').innerHTML = '🍽️';
     document.getElementById('form-menu').classList.add('show');
   };
 
   window.editMenu = async (id) => {
-    const snap = await getDocs(collection(db,'menus'));
-    const d = snap.docs.find(d => d.id === id);
-    if (!d) return;
-    const m = d.data();
+    const snap = await getDoc(doc(db,'menus',id));
+    if (!snap.exists()) return;
+    const m = snap.data();
     editingMenuId = id;
     document.getElementById('menu-form-title').textContent = '메뉴 수정';
     document.getElementById('m-imageUrl').value = m.imageUrl||'';
@@ -241,9 +451,8 @@
     document.getElementById('m-name').value = m.name;
     document.getElementById('m-desc').value = m.desc||'';
     document.getElementById('m-price').value = m.price;
-    document.getElementById('m-img-preview').innerHTML = m.imageUrl
-      ? `<img src="${m.imageUrl}" onerror="this.parentElement.innerHTML='🍽️'">`
-      : (m.emoji||'🍽️');
+    document.getElementById('m-components').value = (m.components||[]).join('\n');
+    document.getElementById('m-img-preview').innerHTML = m.imageUrl ? `<img src="${m.imageUrl}">` : (m.emoji||'🍽️');
     document.getElementById('form-menu').classList.add('show');
   };
 
@@ -251,45 +460,43 @@
 
   window.previewMenuImg = () => {
     const url = document.getElementById('m-imageUrl').value.trim();
-    const box = document.getElementById('m-img-preview');
-    box.innerHTML = url ? `<img src="${url}" onerror="this.parentElement.innerHTML='❌ URL 오류'">` : '🍽️';
+    document.getElementById('m-img-preview').innerHTML = url ? `<img src="${url}" onerror="this.parentElement.innerHTML='❌'">` : '🍽️';
   };
 
   window.saveMenu = async () => {
     const name = document.getElementById('m-name').value.trim();
     const price = document.getElementById('m-price').value;
     if (!name||!price) { toast('이름과 가격을 입력해주세요'); return; }
+    const compRaw = document.getElementById('m-components').value.trim();
     const data = {
       name, price: Number(price),
       desc: document.getElementById('m-desc').value.trim(),
       category: document.getElementById('m-cat').value,
-      emoji: document.getElementById('m-emoji').value || '🍽️',
+      emoji: document.getElementById('m-emoji').value||'🍽️',
       imageUrl: document.getElementById('m-imageUrl').value.trim(),
+      components: compRaw ? compRaw.split('\n').map(s=>s.trim()).filter(Boolean) : [],
       updatedAt: serverTimestamp()
     };
     if (editingMenuId) {
-      await updateDoc(doc(db,'menus',editingMenuId), data);
-      toast('✅ 수정 완료');
+      await updateDoc(doc(db,'menus',editingMenuId), data); toast('✅ 수정 완료');
     } else {
       data.createdAt = serverTimestamp(); data.soldOut = false;
-      await addDoc(collection(db,'menus'), data);
-      toast('✅ 추가 완료');
+      await addDoc(collection(db,'menus'), data); toast('✅ 추가 완료');
     }
     closeMenuForm(); loadMenus();
   };
 
-  window.toggleSold = async (id, current) => {
-    await updateDoc(doc(db,'menus',id), { soldOut: !current });
-    toast(!current ? '❌ 품절 처리' : '✅ 판매 재개');
-    loadMenus();
+  window.toggleSold = async (id, cur) => {
+    await updateDoc(doc(db,'menus',id), { soldOut: !cur });
+    toast(!cur ? '❌ 품절 처리' : '✅ 판매 재개'); loadMenus();
   };
 
   window.delMenu = async (id) => {
     if (!confirm('삭제할까요?')) return;
-    await deleteDoc(doc(db,'menus',id));
-    toast('🗑 삭제 완료'); loadMenus();
+    await deleteDoc(doc(db,'menus',id)); toast('🗑 삭제 완료'); loadMenus();
   };
 
+  // ── Spot ─────────────────────────────────────────────
   async function loadSpots() {
     const snap = await getDocs(query(collection(db,'spots'), orderBy('createdAt','asc')));
     const el = document.getElementById('spot-list');
@@ -317,6 +524,7 @@
       distance: document.getElementById('s-distance').value.trim(),
       createdAt: serverTimestamp()
     });
+    ['s-emoji','s-name','s-desc','s-distance'].forEach(id => document.getElementById(id).value='');
     closeSpotForm(); loadSpots(); toast('✅ 추가 완료');
   };
 
@@ -325,12 +533,95 @@
     await deleteDoc(doc(db,'spots',id)); loadSpots(); toast('🗑 삭제 완료');
   };
 
+  // ── Rooms ─────────────────────────────────────────────
+  const ROOM_MIN = 101, ROOM_MAX = 150;
+
+  async function loadRooms() {
+    const snap = await getDocs(collection(db,'rooms'));
+    const map = {};
+    snap.forEach(d => { map[d.id] = d.data(); });
+    renderRoomGrid(map);
+  }
+
+  function renderRoomGrid(map) {
+    const grid = document.getElementById('room-grid');
+    let activeCount = 0;
+    const cards = [];
+    for (let n = ROOM_MIN; n <= ROOM_MAX; n++) {
+      const id = String(n);
+      const d = map[id] || {};
+      const isActive = d.active !== false;
+      const amount = d.totalAmount || 0;
+      if (isActive) activeCount++;
+      cards.push(`<div class="room-card ${isActive?'active':'inactive'}" id="rc-${id}">
+        <div class="room-num" onclick="toggleRoom('${id}',${isActive})">${n}</div>
+        <div class="room-status" onclick="toggleRoom('${id}',${isActive})"><span class="room-dot"></span>${isActive?'활성':'비활성'}</div>
+        <div class="room-amount" id="ra-${id}">${amount>0?'₩'+Number(amount).toLocaleString():''}</div>
+        ${amount>0?`<button class="room-checkout" onclick="checkoutRoom('${id}',event)">체크아웃</button>`:''}
+      </div>`);
+    }
+    grid.innerHTML = cards.join('');
+    document.getElementById('room-stats').textContent = `활성 ${activeCount} / 전체 ${ROOM_MAX-ROOM_MIN+1}`;
+  }
+
+  window.toggleRoom = async (id, cur) => {
+    const newVal = !cur;
+    await updateDoc(doc(db,'rooms',id), { active: newVal, updatedAt: serverTimestamp() });
+    const card = document.getElementById(`rc-${id}`);
+    if (card) {
+      card.classList.toggle('active', newVal);
+      card.classList.toggle('inactive', !newVal);
+      card.querySelector('.room-status').innerHTML = `<span class="room-dot"></span>${newVal?'활성':'비활성'}`;
+    }
+    const stats = document.getElementById('room-stats');
+    const [a,t] = stats.textContent.match(/\d+/g).map(Number);
+    stats.textContent = `활성 ${a+(newVal?1:-1)} / 전체 ${t}`;
+    toast(newVal ? `✅ ${id}호 활성화` : `⛔ ${id}호 비활성화`);
+  };
+
+  window.checkoutRoom = async (id, e) => {
+    e.stopPropagation();
+    if (!confirm(`${id}호 체크아웃 — 누적 금액을 초기화합니다. 계속할까요?`)) return;
+    await updateDoc(doc(db,'rooms',id), { totalAmount: 0, lastCheckout: serverTimestamp() });
+    const amtEl = document.getElementById(`ra-${id}`);
+    if (amtEl) amtEl.textContent = '';
+    const card = document.getElementById(`rc-${id}`);
+    card?.querySelector('.room-checkout')?.remove();
+    toast(`✅ ${id}호 체크아웃 완료`);
+  };
+
+  window.initRooms = async () => {
+    if (!confirm('101~150호를 Firebase에 동기화합니다. 기존 상태는 유지됩니다. 계속?')) return;
+    const snap = await getDocs(collection(db,'rooms'));
+    const existing = new Set(snap.docs.map(d => d.id));
+    const promises = [];
+    for (let n = ROOM_MIN; n <= ROOM_MAX; n++) {
+      const id = String(n);
+      if (!existing.has(id)) promises.push(setDoc(doc(db,'rooms',id), { active: true, totalAmount: 0, updatedAt: serverTimestamp() }));
+    }
+    await Promise.all(promises);
+    toast(`✅ 동기화 완료 (신규 ${promises.length}개 추가)`); loadRooms();
+  };
+
+  window.setAllRooms = async (active) => {
+    const label = active ? '활성화' : '비활성화';
+    if (!confirm(`101~150호 전체를 ${label}합니다. 계속?`)) return;
+    const snap = await getDocs(collection(db,'rooms'));
+    await Promise.all(snap.docs.map(d => updateDoc(doc(db,'rooms',d.id), { active, updatedAt: serverTimestamp() })));
+    toast(`${active?'✅':'⛔'} 전체 ${label} 완료`); loadRooms();
+  };
+
+  // ── Toast ─────────────────────────────────────────────
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
+  // ── Init ──────────────────────────────────────────────
+  getDoc(doc(db,'settings','global')).then(snap => {
+    if (snap.exists()) { const d = snap.data(); globalOrderOpen = d.orderOpen !== false; updateOrderUI(globalOrderOpen); }
+  });
   loadMenus();
 </script>
 </body>
