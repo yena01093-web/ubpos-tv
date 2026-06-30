@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JC Hotel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Noto+Serif+KR:wght@300;400&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0A1628; color: #fff; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; width: 100vw; height: 100vh; overflow: hidden; cursor: none; }
@@ -21,11 +22,11 @@
   .main-bg { position: absolute; inset: 0; background: #0F1E35; background-size: cover; background-position: center; transition: background-image 0.6s ease; }
   .main-content { position: relative; z-index: 1; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr; }
   .slide-area { padding: 60px; display: flex; flex-direction: column; justify-content: center; }
-  .slide-eyebrow { font-size: 11px; letter-spacing: 0.4em; color: #C8A45A; text-transform: uppercase; margin-bottom: 20px; }
-  .slide-title { font-size: 52px; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
-  .slide-desc { font-size: 18px; color: #7A8FA6; line-height: 1.7; margin-bottom: 32px; }
-  .slide-price { font-size: 36px; font-weight: 300; color: #C8A45A; }
-  .slide-sub { font-size: 14px; color: #4A5E72; margin-top: 8px; letter-spacing: 0.1em; }
+  .slide-eyebrow { font-size: 10px; letter-spacing: 0.5em; color: #C8A45A; text-transform: uppercase; margin-bottom: 24px; font-family: 'Cormorant Garamond', serif; }
+  .slide-title { font-size: 34px; font-weight: 300; line-height: 1.4; letter-spacing: 0.02em; margin-bottom: 20px; font-family: 'Noto Serif KR', 'Cormorant Garamond', serif; color: rgba(255,255,255,0.92); }
+  .slide-desc { font-size: 14px; color: #6A8099; line-height: 1.9; margin-bottom: 36px; letter-spacing: 0.03em; font-weight: 300; }
+  .slide-price { font-size: 28px; font-weight: 300; color: #C8A45A; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.05em; }
+  .slide-sub { font-size: 12px; color: #4A5E72; margin-top: 8px; letter-spacing: 0.2em; }
   .slide-image-area { position: relative; overflow: hidden; }
   .slide-image-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 140px; background: linear-gradient(135deg, #0F1E35, #1C2E45); }
   .slide-image-placeholder img { width: 100%; height: 100%; object-fit: cover; }
