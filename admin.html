@@ -131,6 +131,9 @@
 
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 11px 22px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
+  .cat-wrap { display: inline-flex; align-items: center; gap: 3px; }
+  .cat-edit-icon { background: transparent; border: 1px solid transparent; color: #4A6A82; font-size: 11px; cursor: pointer; padding: 3px 7px; border-radius: 5px; font-family: inherit; transition: all 0.15s; }
+  .cat-edit-icon:hover { border-color: rgba(200,164,90,0.3); color: #C8A45A; }
 </style>
 </head>
 <body>
@@ -156,11 +159,7 @@
     <h2>메뉴 관리</h2>
     <button class="add-btn" onclick="openMenuForm()">+ 메뉴 추가</button>
   </div>
-  <div class="cat-select">
-    <button class="cat-btn active" onclick="selectCat('drink',this)">🍷 주류 &amp; 음료</button>
-    <button class="cat-btn" onclick="selectCat('food',this)">🍕 5분 퀵안주</button>
-    <button class="cat-btn" onclick="selectCat('package',this)">📦 패키지</button>
-  </div>
+  <div class="cat-select" id="cat-select"></div>
   <div class="items" id="menu-list"></div>
 </div>
 
@@ -168,9 +167,11 @@
 <div class="panel" id="panel-spot">
   <div class="section-header">
     <h2>관광지 관리</h2>
-    <button class="add-btn" onclick="openSpotForm()">+ 관광지 추가</button>
+    <span style="font-size:13px;color:#4A6A82;">10개 고정 슬롯 — tv.html 슬라이드에 바로 반영</span>
   </div>
-  <div class="items" id="spot-list"></div>
+  <div class="slide-grid" id="spot-slot-grid">
+    <div style="color:#4A6A82;font-size:14px;padding:20px;">로딩 중...</div>
+  </div>
 </div>
 
 <!-- 객실 패널 -->
@@ -336,6 +337,20 @@
   </div>
 </div>
 
+<!-- 카테고리 편집 폼 -->
+<div class="form-overlay" id="form-cat">
+  <div class="form-box" style="max-width:360px;">
+    <div class="form-title">카테고리 편집</div>
+    <div class="form-group"><label>이모지</label><input type="text" id="cat-edit-emoji" placeholder="🍷" maxlength="2"></div>
+    <div class="form-group"><label>카테고리 이름 *</label><input type="text" id="cat-edit-label" placeholder="주류 & 음료"></div>
+    <div class="form-group"><label>순서</label><select id="cat-edit-order" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;"></select></div>
+    <div class="form-btns">
+      <button class="form-cancel" onclick="closeCatEdit()">취소</button>
+      <button class="form-submit" onclick="saveCatEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -358,13 +373,16 @@
   let editingMenuId = null;
   let editingSpotId = null;
   let globalOrderOpen = true;
+  let catOrder = ['drink','food','package'];
+  let catMeta = { drink:{label:'주류 & 음료',emoji:'🍷'}, food:{label:'5분 퀵안주',emoji:'🍕'}, package:{label:'패키지',emoji:'📦'} };
+  let editingCatKey = null;
 
   // ── Tab ──────────────────────────────────────────────
   window.switchTab = (tab) => {
     const tabs = ['menu','spot','room','settings','slide'];
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
     tabs.forEach(id => document.getElementById('panel-'+id).classList.toggle('active', id===tab));
-    ({ menu: loadMenus, spot: loadSpots, room: loadRooms, settings: loadSettings, slide: loadSlides })[tab]?.();
+    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides })[tab]?.();
   };
 
   // ── Order open ───────────────────────────────────────
@@ -550,12 +568,115 @@
     toast(`✅ 슬롯 ${i} 저장됨`);
   };
 
+  // ── Spot Slots ───────────────────────────────────────
+  async function loadSpotSlots() {
+    const grid = document.getElementById('spot-slot-grid');
+    const snap = await getDocs(collection(db, 'spot_slots'));
+    const dataMap = {};
+    snap.docs.forEach(d => { dataMap[d.id] = d.data(); });
+
+    grid.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+      const slotId = `slot_${i}`;
+      const d = dataMap[slotId] || {};
+      const isActive = d.active !== false;
+      const card = document.createElement('div');
+      card.className = 'slot-card' + (isActive ? ' active-slot' : '');
+      card.id = `sslot-card-${i}`;
+      card.innerHTML = `
+        <div class="slot-header">
+          <span class="slot-num">${i}</span>
+          <span style="font-size:13px;color:#C8A45A;font-weight:600;">관광지</span>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#4A6A82;cursor:pointer;margin-left:auto;">
+            <input type="checkbox" id="sslot-active-${i}" ${isActive?'checked':''} style="accent-color:#C8A45A;" onchange="toggleSpotSlotActive(${i})">노출
+          </label>
+        </div>
+        <input class="slot-name-input" id="sslot-name-${i}" type="text" placeholder="관광지 이름" value="${d.name||''}">
+        <div class="slot-url-row">
+          <input class="slot-url-input" id="sslot-url-${i}" type="text" placeholder="https://i.ibb.co/..." value="${d.imageUrl||''}" oninput="previewSpotSlot(${i})">
+        </div>
+        <div class="slot-preview" id="sslot-preview-${i}">
+          ${d.imageUrl ? `<img src="${d.imageUrl}" onerror="this.parentElement.textContent='이미지 없음'">` : '이미지 없음'}
+        </div>
+        <button class="slot-save" onclick="saveSpotSlot(${i})">💾 저장</button>`;
+      grid.appendChild(card);
+    }
+  }
+
+  window.previewSpotSlot = (i) => {
+    const url = document.getElementById(`sslot-url-${i}`).value.trim();
+    const box = document.getElementById(`sslot-preview-${i}`);
+    box.innerHTML = url ? `<img src="${url}" onerror="this.parentElement.textContent='URL 오류'">` : '이미지 없음';
+  };
+
+  window.toggleSpotSlotActive = (i) => {
+    const checked = document.getElementById(`sslot-active-${i}`).checked;
+    document.getElementById(`sslot-card-${i}`).classList.toggle('active-slot', checked);
+  };
+
+  window.saveSpotSlot = async (i) => {
+    const name = document.getElementById(`sslot-name-${i}`).value.trim();
+    const imageUrl = document.getElementById(`sslot-url-${i}`).value.trim();
+    const active = document.getElementById(`sslot-active-${i}`).checked;
+    await setDoc(doc(db, 'spot_slots', `slot_${i}`), { slotId: i, name, imageUrl, active, updatedAt: serverTimestamp() });
+    toast(`✅ 관광지 슬롯 ${i} 저장됨`);
+  };
+
   // ── Menu ─────────────────────────────────────────────
-  window.selectCat = (cat, btn) => {
+  window.selectCat = (cat) => {
     currentCat = cat;
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    renderCatButtons();
     loadMenus();
+  };
+
+  async function loadCatSettings() {
+    try {
+      const snap = await getDoc(doc(db,'settings','categories'));
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.order?.length) catOrder = d.order;
+        if (d.meta) catMeta = {...catMeta, ...d.meta};
+      }
+    } catch(e) {}
+    renderCatButtons();
+  }
+
+  function renderCatButtons() {
+    const el = document.getElementById('cat-select');
+    if (!el) return;
+    el.innerHTML = catOrder.map(key => {
+      const m = catMeta[key] || {label:key, emoji:'📁'};
+      return `<div class="cat-wrap">
+        <button class="cat-btn ${key===currentCat?'active':''}" onclick="selectCat('${key}')">${m.emoji} ${m.label}</button>
+        <button class="cat-edit-icon" onclick="openCatEdit('${key}')" title="편집">✏️</button>
+      </div>`;
+    }).join('');
+  }
+
+  window.openCatEdit = (key) => {
+    editingCatKey = key;
+    const m = catMeta[key] || {};
+    document.getElementById('cat-edit-emoji').value = m.emoji || '';
+    document.getElementById('cat-edit-label').value = m.label || '';
+    const sel = document.getElementById('cat-edit-order');
+    sel.innerHTML = catOrder.map((k,i) => `<option value="${i}" ${k===key?'selected':''}>${i+1}번째</option>`).join('');
+    document.getElementById('form-cat').classList.add('show');
+  };
+
+  window.closeCatEdit = () => document.getElementById('form-cat').classList.remove('show');
+
+  window.saveCatEdit = async () => {
+    const emoji = document.getElementById('cat-edit-emoji').value.trim();
+    const label = document.getElementById('cat-edit-label').value.trim();
+    if (!label) { toast('이름을 입력해주세요'); return; }
+    catMeta[editingCatKey] = { label, emoji: emoji || catMeta[editingCatKey]?.emoji || '📁' };
+    const newPos = parseInt(document.getElementById('cat-edit-order').value);
+    const curPos = catOrder.indexOf(editingCatKey);
+    if (newPos !== curPos) { catOrder.splice(curPos,1); catOrder.splice(newPos,0,editingCatKey); }
+    await setDoc(doc(db,'settings','categories'), { order:catOrder, meta:catMeta, updatedAt:serverTimestamp() });
+    renderCatButtons();
+    closeCatEdit();
+    toast('✅ 카테고리 저장됨');
   };
 
   async function loadMenus() {
@@ -824,6 +945,7 @@
   getDoc(doc(db,'settings','global')).then(snap => {
     if (snap.exists()) { const d = snap.data(); globalOrderOpen = d.orderOpen !== false; updateOrderUI(globalOrderOpen); }
   });
+  loadCatSettings();
   loadMenus();
 </script>
 </body>
