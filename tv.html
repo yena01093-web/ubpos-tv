@@ -392,8 +392,17 @@
       }));
       const spotSlides = spotSnap.empty
         ? defaultSlides.filter(s => s.eyebrow.includes('TOUR'))
-        : spotSnap.docs.map(d => { const s=d.data(); return { eyebrow:"JECHEON TOUR", title:s.name, desc:s.desc, price:"", emoji:s.emoji||'📍', sub:s.distance||'', imageUrl:'' }; });
-      slides = [...menuSlides, ...spotSlides];
+        : spotSnap.docs.map(d => { const s=d.data(); return { eyebrow:"JECHEON TOUR", title:s.name, desc:s.desc, price:"", emoji:s.emoji||'📍', sub:s.distance||'', imageUrl:s.imageUrl||'' }; });
+
+      const catEyebrow = { '추천안주':'RECOMMENDED', '주류':'ROOM SERVICE', '관광지':'JECHEON TOUR', '기타':'SPECIAL' };
+      const slideSnap = await getDocs(collection(db,'slides'));
+      const fixedSlides = slideSnap.docs
+        .map(d => d.data())
+        .filter(s => s.active !== false && s.name)
+        .sort((a,b) => a.slotId - b.slotId)
+        .map(s => ({ eyebrow: catEyebrow[s.category]||'SPECIAL', title:s.name, desc:'', price:'', emoji:'✨', sub:'', imageUrl:s.imageUrl||'' }));
+
+      slides = [...fixedSlides, ...menuSlides, ...spotSlides];
       if (!slides.length) slides = defaultSlides;
     } catch(e) {
       slides = defaultSlides;
