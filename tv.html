@@ -60,6 +60,10 @@
   .lang-btn { width: 36px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #5A7082; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; letter-spacing: 0.02em; }
   .lang-btn:hover { border-color: rgba(200,164,90,0.4); color: #9AA8B8; }
   .lang-btn.active { background: rgba(200,164,90,0.18); color: #C8A45A; border-color: rgba(200,164,90,0.5); }
+
+  /* 나가기 버튼 */
+  .exit-btn { position: fixed; bottom: 28px; left: 28px; z-index: 210; padding: 7px 16px; background: rgba(10,22,40,0.45); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: rgba(255,255,255,0.35); font-size: 12px; letter-spacing: 0.12em; cursor: pointer; font-family: inherit; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.25s; }
+  .exit-btn:hover { background: rgba(10,22,40,0.7); border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
   .bottom-hint { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A7082; }
   .btn-hint { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #2A4060; border-radius: 6px; font-size: 12px; }
 
@@ -156,6 +160,9 @@
   <div class="closed-title" data-i18n="orderClosed">주문이 마감되었습니다</div>
   <div class="closed-msg" data-i18n="orderClosedMsg">현재 주문을 받지 않습니다.<br>프런트에 문의해 주세요.</div>
 </div>
+
+<!-- 나가기 버튼 — 좌측 하단 고정 -->
+<button class="exit-btn" onclick="window.history.length > 1 ? window.history.back() : window.close()">나가기</button>
 
 <!-- 언어 선택 — 우측 상단 고정 -->
 <div class="lang-fixed">
@@ -378,13 +385,17 @@
   // ── Load data ─────────────────────────────────────────
   async function loadData() {
     try {
-      const menuSnap = await getDocs(query(collection(db,'menus'), orderBy('createdAt','asc')));
+      const menuSnap = await getDocs(collection(db,'menu_slots'));
       if (!menuSnap.empty) {
-        allMenus = { drink: [], food: [], package: [] };
+        allMenus = {};
+        CATS.forEach(cat => { allMenus[cat] = []; });
         menuSnap.forEach(d => {
           const m = { id: d.id, ...d.data() };
-          if (allMenus[m.category] !== undefined) allMenus[m.category].push(m);
+          if (m.active !== false && m.name && allMenus[m.category] !== undefined) {
+            allMenus[m.category].push(m);
+          }
         });
+        CATS.forEach(cat => { allMenus[cat].sort((a,b) => (a.slotId||0) - (b.slotId||0)); });
       }
       const spotSnap = await getDocs(query(collection(db,'spots'), orderBy('createdAt','asc')));
       const menuSlides = [...allMenus.drink, ...allMenus.food].slice(0,2).map(m => ({
