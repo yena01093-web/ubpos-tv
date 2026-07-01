@@ -302,6 +302,24 @@
         </div>
       </div>
     </div>
+    <div class="settings-card" style="grid-column:1/-1;">
+      <h3>🎵 배경음악</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div>
+          <div style="font-size:12px;color:#4A6A82;margin-bottom:10px;letter-spacing:.05em;">장르별 YouTube 영상 ID</div>
+          <div style="display:flex;flex-direction:column;gap:8px;" id="music-genre-inputs"></div>
+          <div style="margin-top:14px;">
+            <label style="font-size:12px;color:#4A6A82;">기본 장르 (전체 객실)</label>
+            <select id="music-default-genre" style="display:block;margin-top:6px;width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:13px;font-family:inherit;outline:none;"></select>
+          </div>
+          <button class="save-btn" style="margin-top:14px;" onclick="saveMusicSettings()">🎵 저장</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#4A6A82;margin-bottom:10px;letter-spacing:.05em;">객실별 개별 설정</div>
+          <div style="max-height:280px;overflow-y:auto;" id="music-room-overrides"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -999,6 +1017,7 @@
     const featSnap = await getDoc(doc(db,'settings','featured'));
     if (featSnap.exists()) renderFeaturedPreview(featSnap.data());
     loadFeaturedOptions();
+    loadMusicSettings();
   }
 
   function updateCheckoutStatus(enabled, time){
@@ -1037,6 +1056,71 @@
       el.style.background = '#0F1E35';
     }
   }
+
+  // ── Background Music ─────────────────────────────────
+  const MUSIC_GENRES = [
+    { key:'none',      label:'🔕 없음' },
+    { key:'jazz',      label:'🎵 재즈' },
+    { key:'classical', label:'🎼 클래식' },
+    { key:'lofi',      label:'🌊 로파이' },
+    { key:'nature',    label:'🍃 자연/힐링' },
+    { key:'pop',       label:'🎸 팝' },
+  ];
+  let musicCfg = { defaultGenre:'none', genres:{}, rooms:{} };
+
+  async function loadMusicSettings() {
+    const snap = await getDoc(doc(db,'settings','music'));
+    if(snap.exists()) musicCfg = { defaultGenre:'none', genres:{}, rooms:{}, ...snap.data() };
+    const optHtml = MUSIC_GENRES.map(g=>`<option value="${g.key}">${g.label}</option>`).join('');
+    // genre ID inputs
+    document.getElementById('music-genre-inputs').innerHTML = MUSIC_GENRES.filter(g=>g.key!=='none').map(g=>`
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="width:90px;font-size:13px;flex-shrink:0;">${g.label}</span>
+        <input id="mgid-${g.key}" type="text" value="${musicCfg.genres[g.key]||''}" placeholder="YouTube 영상 ID"
+          style="flex:1;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:7px 10px;color:#e2e8f0;font-size:12px;outline:none;font-family:inherit;">
+      </div>`).join('');
+    // default selector
+    const defSel = document.getElementById('music-default-genre');
+    defSel.innerHTML = optHtml;
+    defSel.value = musicCfg.defaultGenre || 'none';
+    // room overrides
+    const floors = [
+      {label:'1층', rooms:[101,102,103,104,105,106,107,108,109,110]},
+      {label:'2층', rooms:[111,112,113,114,115,116,117,118,119,120]},
+      {label:'3층', rooms:[121,122,123,124,125,126,127,128,129,130]},
+      {label:'4층', rooms:[131,132,133,134,135,136,137,138,139,140]},
+      {label:'5층', rooms:[141,142,143,144,145,146,147,148,149,150]},
+    ];
+    document.getElementById('music-room-overrides').innerHTML = floors.map(f=>`
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px;color:#4A6A82;margin-bottom:5px;">${f.label}</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;">
+          ${f.rooms.map(r=>`
+            <div style="text-align:center;">
+              <div style="font-size:10px;color:#6A8099;margin-bottom:2px;">${r}</div>
+              <select data-room="${r}" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:5px;padding:3px 1px;color:#e2e8f0;font-size:10px;font-family:inherit;outline:none;">
+                <option value="">(기본)</option>${optHtml}
+              </select>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+    Object.entries(musicCfg.rooms||{}).forEach(([r,g])=>{
+      const s=document.querySelector(`#music-room-overrides select[data-room="${r}"]`);
+      if(s) s.value=g;
+    });
+  }
+
+  window.saveMusicSettings = async () => {
+    const genres={};
+    MUSIC_GENRES.filter(g=>g.key!=='none').forEach(g=>{ const v=document.getElementById('mgid-'+g.key)?.value.trim(); if(v) genres[g.key]=v; });
+    const rooms={};
+    document.querySelectorAll('#music-room-overrides select[data-room]').forEach(s=>{ if(s.value) rooms[s.dataset.room]=s.value; });
+    const defaultGenre = document.getElementById('music-default-genre').value;
+    try {
+      await setDoc(doc(db,'settings','music'), { defaultGenre, genres, rooms, updatedAt:serverTimestamp() });
+      toast('🎵 배경음악 설정 저장됨');
+    } catch(e) { toast('저장 오류: '+e.message); }
+  };
 
   window.saveBgImage = async () => {
     const url = document.getElementById('bg-imageUrl').value.trim();

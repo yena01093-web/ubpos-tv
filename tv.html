@@ -175,6 +175,9 @@
 <!-- 조식 신청 버튼 — 우측 하단 고정 -->
 <button class="exit-btn" id="breakfastBtn" onclick="openBreakfastModal()" style="left:auto;right:28px;color:rgba(200,164,90,0.6);border-color:rgba(200,164,90,0.2)">🥐 조식 신청</button>
 
+<!-- 배경음악 버튼 -->
+<button id="music-btn" onclick="toggleMusicMute()" style="display:none;position:fixed;bottom:28px;right:148px;z-index:210;padding:7px 14px;background:rgba(10,22,40,0.45);border:1px solid rgba(200,164,90,0.2);border-radius:20px;color:rgba(200,164,90,0.6);font-size:13px;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:all .25s;">🎵</button>
+
 <!-- 조식 신청 모달 -->
 <div id="breakfastModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:flex-end;justify-content:center;backdrop-filter:blur(12px)">
   <div style="background:linear-gradient(160deg,#0A1628,#0F1E35);border:1px solid rgba(200,164,90,.3);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;animation:slideUp .3s ease">
@@ -488,6 +491,57 @@
     } catch(e) {}
   }
 
+  // ── Background Music ─────────────────────────────────
+  let ytPlayer = null, musicMuted = false;
+
+  async function loadMusicSettings() {
+    try {
+      const snap = await getDoc(doc(db,'settings','music'));
+      if(!snap.exists()) return;
+      const d = snap.data();
+      const genre = d.rooms?.[ROOM] || d.defaultGenre || 'none';
+      if(genre === 'none' || !d.genres?.[genre]) return;
+      startMusic(d.genres[genre]);
+    } catch(e) {}
+  }
+
+  function startMusic(videoId) {
+    if(!videoId || ytPlayer) return;
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+    const div = document.createElement('div');
+    div.id = 'yt-player-el';
+    div.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;pointer-events:none;';
+    document.body.appendChild(div);
+    window.onYouTubeIframeAPIReady = () => {
+      ytPlayer = new YT.Player('yt-player-el', {
+        videoId,
+        playerVars: { autoplay:1, loop:1, playlist:videoId, controls:0, fs:0, iv_load_policy:3, disablekb:1, mute:1 },
+        events: {
+          onReady(e) {
+            e.target.playVideo();
+            // 소리 켜기 시도 (브라우저 정책상 안 되면 뮤트 유지)
+            setTimeout(()=>{ try{ e.target.unMute(); e.target.setVolume(25); musicMuted=false; }catch(_){musicMuted=true;} updateMusicBtn(); }, 500);
+            document.getElementById('music-btn').style.display='flex';
+          }
+        }
+      });
+    };
+  }
+
+  function updateMusicBtn() {
+    const btn = document.getElementById('music-btn');
+    if(btn) btn.textContent = musicMuted ? '🔇' : '🎵';
+  }
+
+  window.toggleMusicMute = () => {
+    if(!ytPlayer) return;
+    musicMuted = !musicMuted;
+    musicMuted ? ytPlayer.mute() : (ytPlayer.unMute(), ytPlayer.setVolume(25));
+    updateMusicBtn();
+  };
+
   function scheduleCheckoutBanner(checkoutTime, noticeHours) {
     const [h, m] = checkoutTime.split(':').map(Number);
     const now = new Date();
@@ -642,6 +696,7 @@
     showScreen('main'); startSlide(); loadWeather();
     startOrderStatusListener();
     applyLang();
+    loadMusicSettings();
   }, 2500);
 
   // ── Slide ─────────────────────────────────────────────
