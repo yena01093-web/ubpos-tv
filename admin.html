@@ -1162,20 +1162,20 @@
 
   function initQrTab() {
     const input = document.getElementById('qr-base-url');
-    if(!input.value) input.value = location.origin + location.pathname.replace('admin.html','tv.html');
+    if(!input.value) input.value = 'https://ubpos-food.vercel.app/order/seoul-hotel';
     renderQrGrid();
   }
 
   window.renderQrGrid = () => {
     const base = document.getElementById('qr-base-url').value.trim().replace(/\/$/, '');
-    if(!base) { toast('TV 페이지 주소를 입력해주세요'); return; }
+    if(!base) { toast('주문 페이지 주소를 입력해주세요'); return; }
     const grid = document.getElementById('qr-grid');
     grid.innerHTML = QR_FLOORS.map(f => `
       <div style="margin-bottom:28px;">
         <div style="font-size:13px;font-weight:700;color:#C8A45A;margin-bottom:12px;letter-spacing:.05em;">${f.label}</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
           ${f.rooms.map(r => {
-            const url = `${base}?room=${r}`;
+            const url = `${base}/${r}`;
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=${encodeURIComponent(url)}`;
             return `
               <div class="qr-card" style="background:#0A1628;border:1px solid #1C2E45;border-radius:12px;padding:14px;text-align:center;">
