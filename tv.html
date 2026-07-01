@@ -47,6 +47,7 @@
   .order-status-bar.s-delivering { border-color: rgba(59,130,246,0.5); color: #60A5FA; }
   .osb-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
 
   /* 체크아웃 알림 배너 */
   .checkout-banner { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 210; background: rgba(10,22,40,0.88); border: 1px solid rgba(200,164,90,0.5); border-radius: 16px; padding: 14px 28px; display: none; align-items: center; gap: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); animation: fadeInUp 0.5s ease; }
@@ -186,7 +187,10 @@
     <div style="margin-bottom:14px">
       <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">인원수</label>
       <div style="display:flex;gap:8px">
-        ${[1,2,3,4].map(n=>`<button onclick="selectBfCount(${n})" id="bfCnt-${n}" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">${n}명</button>`).join('')}
+        <button onclick="selectBfCount(1)" id="bfCnt-1" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">1명</button>
+        <button onclick="selectBfCount(2)" id="bfCnt-2" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">2명</button>
+        <button onclick="selectBfCount(3)" id="bfCnt-3" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">3명</button>
+        <button onclick="selectBfCount(4)" id="bfCnt-4" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">4명</button>
       </div>
     </div>
     <div style="margin-bottom:18px">
@@ -508,7 +512,7 @@
 
   // ── Breakfast ─────────────────────────────────────────
   let bfGuestCount = 1;
-  const TODAY_BF = new Date().toISOString().split('T')[0];
+  const todayBF = () => new Date().toLocaleDateString('sv-SE');
 
   window.openBreakfastModal = ()=>{
     bfGuestCount=1;
@@ -529,7 +533,7 @@
     try{
       await addDoc(collection(db,'hotel_breakfast'),{
         roomId:room, guestCount:bfGuestCount, note:note||'',
-        date:TODAY_BF, status:'pending',
+        date:todayBF(), status:'pending',
         ts:serverTimestamp()
       });
       closeBreakfastModal();

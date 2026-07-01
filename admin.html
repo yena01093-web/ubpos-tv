@@ -580,12 +580,17 @@
   const STATUS_BTN   = { new:'🍳 준비 시작', heating:'🛵 배달 출발', delivering:'✅ 완료' };
 
   function initOrdersTab(){
-    if(ordersUnsub) return; // 이미 리스닝 중
-    const today = new Date().toISOString().split('T')[0];
-    const q = query(collection(db,'orders'), where('date','==',today), orderBy('createdAt','desc'));
+    if(ordersUnsub) return;
+    const q = query(collection(db,'orders'), orderBy('createdAt','desc'), limit(100));
     ordersUnsub = onSnapshot(q, snap => {
-      const orders = [];
-      snap.forEach(d => orders.push({id:d.id,...d.data()}));
+      const today = todayStr();
+      const all = [];
+      snap.forEach(d => all.push({id:d.id,...d.data()}));
+      const orders = all.filter(o=>{
+        if(o.date) return o.date === today;
+        if(o.createdAt?.toDate) return o.createdAt.toDate().toLocaleDateString('sv-SE') === today;
+        return false;
+      });
       renderOrdersList(orders);
     });
   }
@@ -632,7 +637,7 @@
   const CLEAN_LABEL = { clean:'🟢 청소 완료', dirty:'🔴 청소 필요', inspection:'🟡 점검중' };
   const CLEAN_COLOR = { clean:'#4ADE80', dirty:'#EF4444', inspection:'#F59E0B' };
   const CLEAN_BG    = { clean:'rgba(74,222,128,.1)', dirty:'rgba(239,68,68,.1)', inspection:'rgba(245,158,11,.1)' };
-  const CLEAN_NEXT  = { dirty:'clean', clean:'dirty', inspection:'clean' };
+  const CLEAN_NEXT  = { dirty:'clean', clean:'inspection', inspection:'dirty' };
 
   function initCleanTab(){
     if(cleanUnsub) return;
@@ -682,19 +687,24 @@
   window.cycleClean = async r=>{
     const cur=cleanData[r]?.status||'dirty';
     const next=CLEAN_NEXT[cur];
-    await setDoc(doc(db,'hotel_room_status',r),{status:next,updatedAt:serverTimestamp()},{merge:true});
+    try{
+      await setDoc(doc(db,'hotel_room_status',r),{status:next,updatedAt:serverTimestamp()},{merge:true});
+    }catch(e){ toast('오류: '+e.message); }
   };
 
   // ── Breakfast Tab ─────────────────────────────────────
-  let breakfastUnsub = null;
-  const TODAY_STR = new Date().toISOString().split('T')[0];
+  let breakfastUnsub = null, breakfastQueryDate = null;
+  function todayStr(){ return new Date().toLocaleDateString('sv-SE'); }
 
   function initBreakfastTab(){
-    document.getElementById('breakfast-date').textContent = TODAY_STR + ' 조식';
-    if(breakfastUnsub) return;
-    const q = query(collection(db,'hotel_breakfast'), where('date','==',TODAY_STR), orderBy('ts','desc'));
+    const today = todayStr();
+    document.getElementById('breakfast-date').textContent = today + ' 조식';
+    if(breakfastQueryDate === today) return;
+    if(breakfastUnsub){ breakfastUnsub(); breakfastUnsub=null; }
+    breakfastQueryDate = today;
+    const q = query(collection(db,'hotel_breakfast'), where('date','==',today));
     breakfastUnsub = onSnapshot(q, snap=>{
-      const list=snap.docs.map(d=>({id:d.id,...d.data()}));
+      const list=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0));
       const total=list.reduce((s,r)=>s+(r.guestCount||1),0);
       document.getElementById('breakfast-stats').textContent=`신청 ${list.length}객실 · 총 ${total}명`;
       document.getElementById('breakfast-list').innerHTML=list.length===0
@@ -716,12 +726,13 @@
   }
 
   window.confirmBreakfast = async id=>{
-    await updateDoc(doc(db,'hotel_breakfast',id),{status:'confirmed'});
+    try{
+      await updateDoc(doc(db,'hotel_breakfast',id),{status:'confirmed'});
+    }catch(e){ toast('오류: '+e.message); }
   };
 
   // ── Reservation Tab ───────────────────────────────────
   let reservationUnsub = null, reservations = [];
-  const RES_TODAY = new Date().toISOString().split('T')[0];
   const RES_FLOORS = {
     '1층': Array.from({length:10},(_,i)=>String(101+i)),
     '2층': Array.from({length:10},(_,i)=>String(111+i)),
@@ -736,10 +747,10 @@
   function initReservationTab(){
     const ci = document.getElementById('rn-checkin');
     const co = document.getElementById('rn-checkout');
-    if(ci && !ci.value){ ci.value = RES_TODAY; }
+    if(ci && !ci.value){ ci.value = todayStr(); }
     if(co && !co.value){
-      const t=new Date(RES_TODAY); t.setDate(t.getDate()+1);
-      co.value = t.toISOString().split('T')[0];
+      const t=new Date(); t.setDate(t.getDate()+1);
+      co.value = t.toLocaleDateString('sv-SE');
     }
     updateResPrice();
     if(reservationUnsub) return;
@@ -757,10 +768,11 @@
   }
 
   function renderResStats(){
+    const today = todayStr();
     const occupied = reservations.filter(r=>r.status==='checkedin').length;
-    const todayIn  = reservations.filter(r=>r.checkin===RES_TODAY && r.status==='booked').length;
-    const todayOut = reservations.filter(r=>r.checkout===RES_TODAY && r.status==='checkedin').length;
-    const ym = RES_TODAY.slice(0,7);
+    const todayIn  = reservations.filter(r=>r.checkin===today && r.status==='booked').length;
+    const todayOut = reservations.filter(r=>r.checkout===today && r.status==='checkedin').length;
+    const ym = today.slice(0,7);
     const revenue = reservations.filter(r=>r.checkin&&r.checkin.startsWith(ym)&&r.status!=='cancelled').reduce((s,r)=>s+(r.price||0),0);
     const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
     set('res-stat-in', todayIn);
@@ -869,17 +881,23 @@
   window.closeResModal = ()=>{ document.getElementById('res-modal').style.display='none'; };
 
   async function doResCheckin(id){
-    await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedin',checkinAt:serverTimestamp()});
-    closeResModal(); toast('✅ 체크인 처리 완료');
+    try{
+      await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedin',checkinAt:serverTimestamp()});
+      closeResModal(); toast('✅ 체크인 처리 완료');
+    }catch(e){ toast('체크인 오류: '+e.message); }
   }
   async function doResCheckout(id){
-    await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedout',checkoutAt:serverTimestamp()});
-    closeResModal(); toast('🚪 체크아웃 처리 완료');
+    try{
+      await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedout',checkoutAt:serverTimestamp()});
+      closeResModal(); toast('🚪 체크아웃 처리 완료');
+    }catch(e){ toast('체크아웃 오류: '+e.message); }
   }
   async function doResCancel(id){
     if(!confirm('예약을 취소하시겠습니까?')) return;
-    await updateDoc(doc(db,'hotel_reservations',id),{status:'cancelled'});
-    closeResModal(); toast('❌ 예약 취소됨');
+    try{
+      await updateDoc(doc(db,'hotel_reservations',id),{status:'cancelled'});
+      closeResModal(); toast('❌ 예약 취소됨');
+    }catch(e){ toast('취소 오류: '+e.message); }
   }
 
   window.resSubTab = tab=>{
