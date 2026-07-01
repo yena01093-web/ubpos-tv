@@ -27,7 +27,8 @@
   .slide-desc { font-size: 14px; color: #6A8099; line-height: 1.9; margin-bottom: 36px; letter-spacing: 0.03em; font-weight: 300; }
   .slide-price { font-size: 28px; font-weight: 300; color: #C8A45A; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.05em; }
   .slide-sub { font-size: 12px; color: #4A5E72; margin-top: 8px; letter-spacing: 0.2em; }
-  .slide-image-area { position: relative; overflow: hidden; }
+  .slide-area { transition: opacity 0.5s ease; }
+  .slide-image-area { position: relative; overflow: hidden; transition: opacity 0.5s ease; }
   .slide-image-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 140px; background: linear-gradient(135deg, #0F1E35, #1C2E45); }
   .slide-image-placeholder img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -707,15 +708,23 @@
 
   function renderSlide(i) {
     const s = slides[i] || defaultSlides[0];
-    document.getElementById('slide-eyebrow').textContent = s.eyebrow;
-    document.getElementById('slide-title').innerHTML = s.title.replace('\n','<br>');
-    document.getElementById('slide-desc').textContent = s.desc;
-    document.getElementById('slide-price').textContent = s.price;
-    document.getElementById('slide-sub').textContent = s.sub||'';
-    const imgEl = document.getElementById('slide-image');
-    if (s.imageUrl) imgEl.innerHTML = `<img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='${s.emoji}'">`;
-    else imgEl.textContent = s.emoji;
-    renderDots();
+    const area = document.querySelector('.slide-area');
+    const imgArea = document.querySelector('.slide-image-area');
+    area.style.opacity = '0';
+    imgArea.style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('slide-eyebrow').textContent = s.eyebrow;
+      document.getElementById('slide-title').innerHTML = s.title.replace('\n','<br>');
+      document.getElementById('slide-desc').textContent = s.desc;
+      document.getElementById('slide-price').textContent = s.price;
+      document.getElementById('slide-sub').textContent = s.sub||'';
+      const imgEl = document.getElementById('slide-image');
+      if (s.imageUrl) imgEl.innerHTML = `<img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='${s.emoji}'">`;
+      else imgEl.textContent = s.emoji;
+      renderDots();
+      area.style.opacity = '1';
+      imgArea.style.opacity = '1';
+    }, 500);
   }
 
   function renderDots() {
