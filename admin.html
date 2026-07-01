@@ -134,6 +134,13 @@
   .cat-wrap { display: inline-flex; align-items: center; gap: 3px; }
   .cat-edit-icon { background: transparent; border: 1px solid transparent; color: #4A6A82; font-size: 11px; cursor: pointer; padding: 3px 7px; border-radius: 5px; font-family: inherit; transition: all 0.15s; }
   .cat-edit-icon:hover { border-color: rgba(200,164,90,0.3); color: #C8A45A; }
+  @media print {
+    body > *:not(#panel-qr) { display: none !important; }
+    #panel-qr { display: block !important; background: #fff; color: #000; }
+    #panel-qr .section-header, #panel-qr input, #panel-qr button:not(.qr-card *) { display: none !important; }
+    .qr-card { border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; break-inside: avoid; }
+    .qr-card div { color: #000 !important; }
+  }
 </style>
 </head>
 <body>
@@ -155,6 +162,7 @@
   <div class="tab" onclick="switchTab('clean')">🧹 청소 현황</div>
   <div class="tab" onclick="switchTab('breakfast')">🥐 조식 신청</div>
   <div class="tab" onclick="switchTab('reservation')">📅 예약 관리</div>
+  <div class="tab" onclick="switchTab('qr')">🔖 QR 코드</div>
 </div>
 
 <!-- 메뉴 패널 -->
@@ -517,6 +525,20 @@
   </div>
 </div>
 
+<!-- QR 코드 패널 -->
+<div class="panel" id="panel-qr">
+  <div class="section-header">
+    <h2>🔖 객실 QR 코드</h2>
+    <button class="save-btn" onclick="window.print()">🖨 전체 인쇄</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+    <span style="font-size:13px;color:#4A6A82;">TV 페이지 주소:</span>
+    <input id="qr-base-url" placeholder="https://..." style="flex:1;min-width:260px;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit;">
+    <button class="save-btn" onclick="renderQrGrid()">🔄 생성</button>
+  </div>
+  <div id="qr-grid"></div>
+</div>
+
 <!-- 예약 상세 모달 -->
 <div id="res-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px)">
   <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:16px;padding:26px;width:440px;max-width:95vw;max-height:90vh;overflow-y:auto">
@@ -584,10 +606,10 @@
 
   // ── Tab ──────────────────────────────────────────────
   window.switchTab = (tab) => {
-    const tabs = ['menu','spot','room','settings','slide','orders','clean','breakfast','reservation'];
+    const tabs = ['menu','spot','room','settings','slide','orders','clean','breakfast','reservation','qr'];
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
     tabs.forEach(id => document.getElementById('panel-'+id).classList.toggle('active', id===tab));
-    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab, clean: initCleanTab, breakfast: initBreakfastTab, reservation: initReservationTab })[tab]?.();
+    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab, clean: initCleanTab, breakfast: initBreakfastTab, reservation: initReservationTab, qr: initQrTab })[tab]?.();
   };
 
   // ── Orders Tab ───────────────────────────────────────
@@ -1127,6 +1149,43 @@
       await setDoc(doc(db,'settings','music'), { defaultGenre, genres, rooms, updatedAt:serverTimestamp() });
       toast('🎵 배경음악 설정 저장됨');
     } catch(e) { toast('저장 오류: '+e.message); }
+  };
+
+  // ── QR Code Tab ──────────────────────────────────────
+  const QR_FLOORS = [
+    {label:'1층', rooms:[101,102,103,104,105,106,107,108,109,110]},
+    {label:'2층', rooms:[111,112,113,114,115,116,117,118,119,120]},
+    {label:'3층', rooms:[121,122,123,124,125,126,127,128,129,130]},
+    {label:'4층', rooms:[131,132,133,134,135,136,137,138,139,140]},
+    {label:'5층', rooms:[141,142,143,144,145,146,147,148,149,150]},
+  ];
+
+  function initQrTab() {
+    const input = document.getElementById('qr-base-url');
+    if(!input.value) input.value = location.origin + location.pathname.replace('admin.html','tv.html');
+    renderQrGrid();
+  }
+
+  window.renderQrGrid = () => {
+    const base = document.getElementById('qr-base-url').value.trim().replace(/\/$/, '');
+    if(!base) { toast('TV 페이지 주소를 입력해주세요'); return; }
+    const grid = document.getElementById('qr-grid');
+    grid.innerHTML = QR_FLOORS.map(f => `
+      <div style="margin-bottom:28px;">
+        <div style="font-size:13px;font-weight:700;color:#C8A45A;margin-bottom:12px;letter-spacing:.05em;">${f.label}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+          ${f.rooms.map(r => {
+            const url = `${base}?room=${r}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=${encodeURIComponent(url)}`;
+            return `
+              <div class="qr-card" style="background:#0A1628;border:1px solid #1C2E45;border-radius:12px;padding:14px;text-align:center;">
+                <div style="font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:8px;">${r}호</div>
+                <img src="${qrUrl}" style="width:120px;height:120px;border-radius:6px;background:#fff;padding:4px;" loading="lazy">
+                <div style="font-size:10px;color:#4A6A82;margin-top:6px;word-break:break-all;">${url}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
   };
 
   window.saveBgImage = async () => {
