@@ -154,6 +154,7 @@
   <div class="tab" onclick="switchTab('orders')" id="tab-orders">📦 주문 관리</div>
   <div class="tab" onclick="switchTab('clean')">🧹 청소 현황</div>
   <div class="tab" onclick="switchTab('breakfast')">🥐 조식 신청</div>
+  <div class="tab" onclick="switchTab('reservation')">📅 예약 관리</div>
 </div>
 
 <!-- 메뉴 패널 -->
@@ -389,6 +390,125 @@
   <div id="orders-list" style="display:flex;flex-direction:column;gap:12px"></div>
 </div>
 
+<!-- 예약 관리 패널 -->
+<div class="panel" id="panel-reservation">
+  <!-- 오늘 현황 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">
+    <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:900;color:#60A5FA" id="res-stat-in">0</div>
+      <div style="font-size:11px;color:#4A6A82;margin-top:3px">오늘 체크인</div>
+    </div>
+    <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:900;color:#F59E0B" id="res-stat-out">0</div>
+      <div style="font-size:11px;color:#4A6A82;margin-top:3px">오늘 체크아웃</div>
+    </div>
+    <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:900;color:#4ADE80" id="res-stat-occupied">0</div>
+      <div style="font-size:11px;color:#4A6A82;margin-top:3px">현재 투숙중</div>
+    </div>
+    <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:26px;font-weight:900;color:#C8A45A" id="res-stat-revenue">0</div>
+      <div style="font-size:11px;color:#4A6A82;margin-top:3px">이달 매출(만원)</div>
+    </div>
+  </div>
+
+  <!-- 서브탭 -->
+  <div style="display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid #1C2E45;padding-bottom:12px">
+    <button onclick="resSubTab('rooms')" id="rst-rooms" style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(200,164,90,.15);color:#C8A45A;border:1px solid rgba(200,164,90,.4)">🏠 객실현황</button>
+    <button onclick="resSubTab('list')"  id="rst-list"  style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;background:transparent;color:#4A6A82;border:1px solid #1C2E45">📋 예약목록</button>
+    <button onclick="resSubTab('new')"   id="rst-new"   style="padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;background:transparent;color:#4A6A82;border:1px solid #1C2E45">➕ 예약등록</button>
+  </div>
+
+  <!-- 객실현황 -->
+  <div id="res-rooms-panel">
+    <div id="res-room-grid"></div>
+  </div>
+
+  <!-- 예약목록 -->
+  <div id="res-list-panel" style="display:none">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <input id="res-search" placeholder="🔍 예약자명 · 객실번호 · 연락처" oninput="renderReservationList()" style="flex:1;min-width:180px;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+      <select id="res-filter" onchange="renderReservationList()" style="background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit">
+        <option value="all">전체</option>
+        <option value="booked">예약확정</option>
+        <option value="checkedin">체크인</option>
+        <option value="checkedout">체크아웃</option>
+        <option value="cancelled">취소</option>
+      </select>
+    </div>
+    <div id="res-list"></div>
+  </div>
+
+  <!-- 예약등록 -->
+  <div id="res-new-panel" style="display:none">
+    <div style="max-width:480px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">예약자명 *</label>
+          <input id="rn-name" placeholder="홍길동" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">연락처 *</label>
+          <input id="rn-phone" placeholder="010-0000-0000" type="tel" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">체크인 *</label>
+          <input id="rn-checkin" type="date" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">체크아웃 *</label>
+          <input id="rn-checkout" type="date" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">인원</label>
+          <select id="rn-guests" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+            <option value="1">1명</option>
+            <option value="2" selected>2명</option>
+            <option value="3">3명</option>
+            <option value="4">4명</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">객실번호 *</label>
+          <input id="rn-room" placeholder="예: 105" type="number" min="101" max="150" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">객실 타입</label>
+          <select id="rn-type" onchange="updateResPrice()" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+            <option value="스탠다드" data-price="80000">스탠다드 80,000원</option>
+            <option value="디럭스" data-price="120000">디럭스 120,000원</option>
+            <option value="패밀리" data-price="160000">패밀리 160,000원</option>
+            <option value="스위트" data-price="200000">스위트 200,000원</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">메모</label>
+        <input id="rn-note" placeholder="요청사항, 특이사항 등" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+      </div>
+      <div style="background:#0A1628;border:1px solid rgba(200,164,90,.3);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:#4A6A82">예상 금액</span>
+        <span id="rn-total" style="font-size:18px;font-weight:700;color:#C8A45A">-</span>
+      </div>
+      <button onclick="submitReservation()" style="background:#C8A45A;color:#000;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">✅ 예약 등록</button>
+    </div>
+  </div>
+</div>
+
+<!-- 예약 상세 모달 -->
+<div id="res-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px)">
+  <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:16px;padding:26px;width:440px;max-width:95vw;max-height:90vh;overflow-y:auto">
+    <div style="font-size:17px;font-weight:700;margin-bottom:18px;color:#C8A45A" id="res-modal-title">예약 상세</div>
+    <div id="res-modal-content"></div>
+    <div id="res-modal-actions" style="display:flex;flex-direction:column;gap:8px;margin-top:16px"></div>
+    <button onclick="closeResModal()" style="width:100%;margin-top:8px;padding:11px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:14px;cursor:pointer;font-family:inherit">닫기</button>
+  </div>
+</div>
+
 <!-- 청소 현황 패널 -->
 <div class="panel" id="panel-clean">
   <div class="section-header">
@@ -446,10 +566,10 @@
 
   // ── Tab ──────────────────────────────────────────────
   window.switchTab = (tab) => {
-    const tabs = ['menu','spot','room','settings','slide','orders','clean','breakfast'];
+    const tabs = ['menu','spot','room','settings','slide','orders','clean','breakfast','reservation'];
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
     tabs.forEach(id => document.getElementById('panel-'+id).classList.toggle('active', id===tab));
-    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab, clean: initCleanTab, breakfast: initBreakfastTab })[tab]?.();
+    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab, clean: initCleanTab, breakfast: initBreakfastTab, reservation: initReservationTab })[tab]?.();
   };
 
   // ── Orders Tab ───────────────────────────────────────
@@ -597,6 +717,221 @@
 
   window.confirmBreakfast = async id=>{
     await updateDoc(doc(db,'hotel_breakfast',id),{status:'confirmed'});
+  };
+
+  // ── Reservation Tab ───────────────────────────────────
+  let reservationUnsub = null, reservations = [];
+  const RES_TODAY = new Date().toISOString().split('T')[0];
+  const RES_FLOORS = {
+    '1층': Array.from({length:10},(_,i)=>String(101+i)),
+    '2층': Array.from({length:10},(_,i)=>String(111+i)),
+    '3층': Array.from({length:10},(_,i)=>String(121+i)),
+    '4층': Array.from({length:10},(_,i)=>String(131+i)),
+    '5층': Array.from({length:10},(_,i)=>String(141+i)),
+  };
+  const RES_STATUS_LABEL = { booked:'예약확정', checkedin:'체크인', checkedout:'체크아웃', cancelled:'취소' };
+  const RES_STATUS_COLOR = { booked:'#60A5FA', checkedin:'#4ADE80', checkedout:'#4A6A82', cancelled:'#EF4444' };
+  const RES_ROOM_COLOR   = { booked:'#60A5FA', checkedin:'#4ADE80', available:'#4A6A82' };
+
+  function initReservationTab(){
+    const ci = document.getElementById('rn-checkin');
+    const co = document.getElementById('rn-checkout');
+    if(ci && !ci.value){ ci.value = RES_TODAY; }
+    if(co && !co.value){
+      const t=new Date(RES_TODAY); t.setDate(t.getDate()+1);
+      co.value = t.toISOString().split('T')[0];
+    }
+    updateResPrice();
+    if(reservationUnsub) return;
+    reservationUnsub = onSnapshot(
+      query(collection(db,'hotel_reservations'), orderBy('createdAt','desc')),
+      snap=>{ reservations=snap.docs.map(d=>({id:d.id,...d.data()})); renderResAll(); },
+      e=>console.error('reservations:',e)
+    );
+  }
+
+  function renderResAll(){
+    renderResStats();
+    renderResRoomGrid();
+    renderReservationList();
+  }
+
+  function renderResStats(){
+    const occupied = reservations.filter(r=>r.status==='checkedin').length;
+    const todayIn  = reservations.filter(r=>r.checkin===RES_TODAY && r.status==='booked').length;
+    const todayOut = reservations.filter(r=>r.checkout===RES_TODAY && r.status==='checkedin').length;
+    const ym = RES_TODAY.slice(0,7);
+    const revenue = reservations.filter(r=>r.checkin&&r.checkin.startsWith(ym)&&r.status!=='cancelled').reduce((s,r)=>s+(r.price||0),0);
+    const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+    set('res-stat-in', todayIn);
+    set('res-stat-out', todayOut);
+    set('res-stat-occupied', occupied);
+    set('res-stat-revenue', Math.floor(revenue/10000));
+  }
+
+  function renderResRoomGrid(){
+    const el=document.getElementById('res-room-grid'); if(!el) return;
+    const bookedRooms={};
+    reservations.filter(r=>r.status==='booked'||r.status==='checkedin').forEach(r=>{
+      if(r.roomId) bookedRooms[r.roomId]=r;
+    });
+    el.innerHTML = Object.entries(RES_FLOORS).map(([floor,rooms])=>`
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:#4A6A82;letter-spacing:.1em;margin-bottom:8px">${floor}</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+          ${rooms.map(r=>{
+            const res=bookedRooms[r];
+            const s=res?res.status:'available';
+            const col=RES_ROOM_COLOR[s]||'#4A6A82';
+            return `<div onclick="showResRoomDetail('${r}')" style="background:#0A1628;border:1px solid ${col}44;border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='${col}'" onmouseout="this.style.borderColor='${col}44'">
+              <div style="font-size:15px;font-weight:900;color:${col}">${r}</div>
+              <div style="font-size:9px;margin-top:3px;color:${col}99">${s==='available'?'빈방':s==='booked'?'예약':s==='checkedin'?'투숙':''}</div>
+              ${res?`<div style="font-size:9px;color:#4A6A82;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${res.name||''}</div>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  window.showResRoomDetail = r=>{
+    const res=reservations.find(x=>(x.status==='booked'||x.status==='checkedin')&&x.roomId===r);
+    if(!res){ toast(`🏠 ${r}호 — 빈 방`); return; }
+    openResModal(res.id);
+  };
+
+  window.renderReservationList = ()=>{
+    const el=document.getElementById('res-list'); if(!el) return;
+    const q=(document.getElementById('res-search')?.value||'').toLowerCase();
+    const f=document.getElementById('res-filter')?.value||'all';
+    let list=reservations;
+    if(f!=='all') list=list.filter(r=>r.status===f);
+    if(q) list=list.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.roomId||'').includes(q)||(r.phone||'').includes(q));
+    if(!list.length){ el.innerHTML='<div style="text-align:center;color:#4A6A82;padding:20px">예약 없음</div>'; return; }
+    el.innerHTML=list.map(r=>{
+      const col=RES_STATUS_COLOR[r.status]||'#4A6A82';
+      const nights=r.checkin&&r.checkout?Math.max(1,Math.ceil((new Date(r.checkout)-new Date(r.checkin))/(864e5))):'-';
+      return `<div onclick="openResModal('${r.id}')" style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px 18px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:14px">
+        <div style="font-size:20px;font-weight:900;color:${col};min-width:44px;text-align:center">${r.roomId||'?'}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:15px">${r.name||'이름없음'} <span style="font-size:12px;color:#4A6A82">${r.phone||''}</span></div>
+          <div style="font-size:12px;color:#4A6A82;margin-top:2px">${r.checkin||''} ~ ${r.checkout||''} · ${nights}박 · ${r.guests||1}명</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;font-weight:700;color:${col};padding:3px 10px;background:${col}22;border:1px solid ${col}44;border-radius:6px;display:inline-block">${RES_STATUS_LABEL[r.status]||r.status}</div>
+          <div style="font-size:13px;color:#C8A45A;margin-top:4px">${(r.price||0).toLocaleString()}원</div>
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  window.openResModal = id=>{
+    const r=reservations.find(x=>x.id===id); if(!r) return;
+    const col=RES_STATUS_COLOR[r.status]||'#4A6A82';
+    const nights=r.checkin&&r.checkout?Math.max(1,Math.ceil((new Date(r.checkout)-new Date(r.checkin))/(864e5))):'-';
+    const row=(l,v)=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1C2E45;font-size:13px"><span style="color:#4A6A82">${l}</span><span>${v}</span></div>`;
+    document.getElementById('res-modal-title').textContent=`${r.roomId||'?'}호 예약 상세`;
+    document.getElementById('res-modal-content').innerHTML=`
+      ${row('예약자', r.name||'-')}
+      ${row('연락처', r.phone||'-')}
+      ${row('객실', `${r.roomId}호 (${r.type||'-'})`)}
+      ${row('체크인', r.checkin||'-')}
+      ${row('체크아웃', r.checkout||'-')}
+      ${row('인원', `${r.guests||1}명 · ${nights}박`)}
+      ${r.note?row('메모',r.note):''}
+      <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:16px;font-weight:700;color:#C8A45A"><span>결제금액</span><span>${(r.price||0).toLocaleString()}원</span></div>
+      <div style="text-align:center;margin-top:4px"><span style="font-size:12px;font-weight:700;color:${col};padding:4px 14px;background:${col}22;border:1px solid ${col}44;border-radius:8px">${RES_STATUS_LABEL[r.status]||r.status}</span></div>`;
+    const acts=document.getElementById('res-modal-actions');
+    acts.innerHTML='';
+    if(r.status==='booked'){
+      const btn=document.createElement('button');
+      btn.style.cssText='background:rgba(74,222,128,.15);color:#4ADE80;border:1px solid rgba(74,222,128,.3);border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit';
+      btn.textContent='✅ 체크인 처리';
+      btn.onclick=()=>doResCheckin(id);
+      acts.appendChild(btn);
+    }
+    if(r.status==='checkedin'){
+      const btn=document.createElement('button');
+      btn.style.cssText='background:rgba(245,158,11,.15);color:#F59E0B;border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit';
+      btn.textContent='🚪 체크아웃 처리';
+      btn.onclick=()=>doResCheckout(id);
+      acts.appendChild(btn);
+    }
+    if(r.status!=='cancelled'&&r.status!=='checkedout'){
+      const btn=document.createElement('button');
+      btn.style.cssText='background:rgba(239,68,68,.1);color:#EF4444;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-family:inherit';
+      btn.textContent='❌ 예약 취소';
+      btn.onclick=()=>doResCancel(id);
+      acts.appendChild(btn);
+    }
+    document.getElementById('res-modal').style.display='flex';
+  };
+
+  window.closeResModal = ()=>{ document.getElementById('res-modal').style.display='none'; };
+
+  async function doResCheckin(id){
+    await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedin',checkinAt:serverTimestamp()});
+    closeResModal(); toast('✅ 체크인 처리 완료');
+  }
+  async function doResCheckout(id){
+    await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedout',checkoutAt:serverTimestamp()});
+    closeResModal(); toast('🚪 체크아웃 처리 완료');
+  }
+  async function doResCancel(id){
+    if(!confirm('예약을 취소하시겠습니까?')) return;
+    await updateDoc(doc(db,'hotel_reservations',id),{status:'cancelled'});
+    closeResModal(); toast('❌ 예약 취소됨');
+  }
+
+  window.resSubTab = tab=>{
+    ['rooms','list','new'].forEach(t=>{
+      const btn=document.getElementById('rst-'+t);
+      const panel=document.getElementById('res-'+t+'-panel');
+      const active=t===tab;
+      if(btn){ btn.style.background=active?'rgba(200,164,90,.15)':'transparent'; btn.style.color=active?'#C8A45A':'#4A6A82'; btn.style.borderColor=active?'rgba(200,164,90,.4)':'#1C2E45'; }
+      if(panel) panel.style.display=active?'':'none';
+    });
+  };
+
+  window.updateResPrice = ()=>{
+    const typeEl=document.getElementById('rn-type');
+    const ci=document.getElementById('rn-checkin')?.value;
+    const co=document.getElementById('rn-checkout')?.value;
+    const el=document.getElementById('rn-total');
+    if(!el) return;
+    if(!ci||!co){ el.textContent='-'; return; }
+    const nights=Math.max(1,Math.ceil((new Date(co)-new Date(ci))/(864e5)));
+    const price=parseInt(typeEl?.options[typeEl.selectedIndex]?.dataset.price||80000);
+    el.textContent=`${(price*nights).toLocaleString()}원 (${nights}박)`;
+  };
+  document.getElementById('rn-checkin')?.addEventListener('change',updateResPrice);
+  document.getElementById('rn-checkout')?.addEventListener('change',updateResPrice);
+
+  window.submitReservation = async ()=>{
+    const name=document.getElementById('rn-name').value.trim();
+    const phone=document.getElementById('rn-phone').value.trim();
+    const checkin=document.getElementById('rn-checkin').value;
+    const checkout=document.getElementById('rn-checkout').value;
+    const guests=document.getElementById('rn-guests').value;
+    const roomId=document.getElementById('rn-room').value.trim();
+    const typeEl=document.getElementById('rn-type');
+    const type=typeEl.value;
+    const unitPrice=parseInt(typeEl.options[typeEl.selectedIndex].dataset.price);
+    const note=document.getElementById('rn-note').value.trim();
+    if(!name||!phone||!checkin||!checkout||!roomId){ toast('필수 항목을 모두 입력해주세요'); return; }
+    if(checkin>=checkout){ toast('체크아웃은 체크인 이후여야 합니다'); return; }
+    const nights=Math.max(1,Math.ceil((new Date(checkout)-new Date(checkin))/(864e5)));
+    const conflict=reservations.find(r=>r.roomId===roomId&&r.status!=='cancelled'&&r.status!=='checkedout'&&r.checkin<checkout&&r.checkout>checkin);
+    if(conflict){ toast(`${roomId}호는 해당 기간에 이미 예약이 있습니다`); return; }
+    try{
+      await addDoc(collection(db,'hotel_reservations'),{
+        name, phone, checkin, checkout, guests:parseInt(guests),
+        roomId, type, price: unitPrice*nights, note,
+        status:'booked', createdAt:serverTimestamp()
+      });
+      ['rn-name','rn-phone','rn-room','rn-note'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+      toast(`✅ ${name}님 ${roomId}호 예약 완료!`);
+      resSubTab('rooms');
+    }catch(e){ toast('오류: '+e.message); }
   };
 
   // ── Order open ───────────────────────────────────────
