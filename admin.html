@@ -151,6 +151,7 @@
   <div class="tab" onclick="switchTab('room')">🏨 객실 관리</div>
   <div class="tab" onclick="switchTab('settings')">⚙️ 설정</div>
   <div class="tab" onclick="switchTab('slide')">🎞️ 슬라이드</div>
+  <div class="tab" onclick="switchTab('orders')" id="tab-orders">📦 주문 관리</div>
 </div>
 
 <!-- 메뉴 패널 -->
@@ -377,11 +378,20 @@
   </div>
 </div>
 
+<!-- 주문 관리 패널 -->
+<div class="panel" id="panel-orders">
+  <div class="section-header">
+    <h2>📦 주문 관리</h2>
+    <div style="font-size:12px;color:#4A6A82" id="orders-count">실시간 수신 중...</div>
+  </div>
+  <div id="orders-list" style="display:flex;flex-direction:column;gap:12px"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, updateDoc, query, where, orderBy, serverTimestamp }
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, updateDoc, onSnapshot, query, where, orderBy, limit, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -405,10 +415,65 @@
 
   // ── Tab ──────────────────────────────────────────────
   window.switchTab = (tab) => {
-    const tabs = ['menu','spot','room','settings','slide'];
+    const tabs = ['menu','spot','room','settings','slide','orders'];
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
     tabs.forEach(id => document.getElementById('panel-'+id).classList.toggle('active', id===tab));
-    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides })[tab]?.();
+    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab })[tab]?.();
+  };
+
+  // ── Orders Tab ───────────────────────────────────────
+  let ordersUnsub = null;
+  const STATUS_LABEL = { new:'접수됨', heating:'준비 중', delivering:'배달 중', done:'완료' };
+  const STATUS_COLOR = { new:'#C8A45A', heating:'#F87171', delivering:'#60A5FA', done:'#4ADE80' };
+  const STATUS_NEXT  = { new:'heating', heating:'delivering', delivering:'done' };
+  const STATUS_BTN   = { new:'🍳 준비 시작', heating:'🛵 배달 출발', delivering:'✅ 완료' };
+
+  function initOrdersTab(){
+    if(ordersUnsub) return; // 이미 리스닝 중
+    const today = new Date().toISOString().split('T')[0];
+    const q = query(collection(db,'orders'), where('date','==',today), orderBy('createdAt','desc'));
+    ordersUnsub = onSnapshot(q, snap => {
+      const orders = [];
+      snap.forEach(d => orders.push({id:d.id,...d.data()}));
+      renderOrdersList(orders);
+    });
+  }
+
+  function renderOrdersList(orders){
+    const el = document.getElementById('orders-list');
+    const cnt = document.getElementById('orders-count');
+    const active = orders.filter(o=>o.status!=='done');
+    cnt.textContent = `오늘 총 ${orders.length}건 · 처리 중 ${active.length}건`;
+    if(!orders.length){
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:#4A6A82">오늘 접수된 주문 없음</div>';
+      return;
+    }
+    el.innerHTML = orders.map(o => {
+      const ts = o.createdAt?.toDate?.()?.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}) || '--:--';
+      const items = (o.items||[]).map(i=>`${i.name||'?'} ×${i.qty||1}`).join(', ');
+      const total = (o.total||0).toLocaleString();
+      const color = STATUS_COLOR[o.status||'new'];
+      const next  = STATUS_NEXT[o.status||'new'];
+      const btnTxt = STATUS_BTN[o.status||'new'];
+      return `<div style="background:#0F1E35;border:1px solid ${color}44;border-radius:12px;padding:16px 18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <span style="font-size:16px;font-weight:700">🏨 ${o.room||'?'}호</span>
+            <span style="font-size:11px;color:#4A6A82;margin-left:8px">${ts}</span>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${color};background:${color}22;padding:4px 10px;border-radius:20px">${STATUS_LABEL[o.status||'new']}</span>
+        </div>
+        <div style="font-size:13px;color:#9AB0C4;margin-bottom:10px">${items}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:15px;font-weight:700;color:#C8A45A">${total}원</span>
+          ${next ? `<button onclick="advanceOrder('${o.id}','${next}')" style="background:${color};color:#000;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">${btnTxt}</button>` : '<span style="font-size:12px;color:#4ADE80">✅ 처리완료</span>'}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.advanceOrder = async (id, nextStatus) => {
+    await updateDoc(doc(db,'orders',id), { status: nextStatus });
   };
 
   // ── Order open ───────────────────────────────────────
