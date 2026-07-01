@@ -148,7 +148,7 @@
 
 <!-- QR 고정 -->
 <div class="qr-fixed">
-  <img class="qr-img" alt="주문 QR" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=https%3A%2F%2Fubpos-food.vercel.app%2Forder%2Fsupercrispy-jc%2F4c9eb3c6-70c6-46f7-9147-c584712d5d6e">
+  <img class="qr-img" id="room-qr-img" alt="주문 QR" src="">
   <div class="qr-text">
     <div class="qr-eyebrow" data-i18n="scanOrder">Scan to Order</div>
     <div class="qr-title" data-i18n="mobileOrder">휴대폰으로<br>간편 주문</div>
@@ -327,6 +327,9 @@
   document.body.focus();
   const ROOM = new URLSearchParams(location.search).get('room') || '101';
   const COLS = 4;
+  const _orderUrl = `https://ubpos-food.vercel.app/order/seoul-hotel/${ROOM}`;
+  const _qrImg = document.getElementById('room-qr-img');
+  if (_qrImg) _qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=${encodeURIComponent(_orderUrl)}`;
   // CATS and catMeta are declared above (dynamic from Firebase)
 
   let currentScreen = 'opening';
