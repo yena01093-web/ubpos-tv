@@ -248,6 +248,32 @@
       </div>
     </div>
 
+    <div class="settings-card">
+      <h3>체크아웃 알림</h3>
+      <div class="toggle-row">
+        <span class="toggle-label">알림 사용</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="chk-checkout-enabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="time-row" style="margin-top:12px">
+        <div class="time-group">
+          <label>체크아웃 시간</label>
+          <input type="time" id="checkout-time" value="11:00">
+        </div>
+        <div class="time-group">
+          <label>알림 시작 (몇 시간 전)</label>
+          <select id="checkout-notice-hours" style="background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:7px 10px;color:#e2e8f0;font-size:13px;font-family:inherit;outline:none;">
+            <option value="1">1시간 전</option>
+            <option value="2" selected>2시간 전</option>
+            <option value="3">3시간 전</option>
+          </select>
+        </div>
+      </div>
+      <div class="settings-status" id="checkout-status" style="margin-top:8px">알림 비활성화됨</div>
+    </div>
+
     <div class="settings-card" style="grid-column:1/-1;">
       <h3>오늘의 추천 메뉴</h3>
       <div style="display:flex;gap:20px;flex-wrap:wrap;">
@@ -424,10 +450,21 @@
       const bg = d.bgImageUrl || '';
       document.getElementById('bg-imageUrl').value = bg;
       renderBgPreview(bg);
+      document.getElementById('chk-checkout-enabled').checked = !!d.checkoutEnabled;
+      document.getElementById('checkout-time').value = d.checkoutTime || '11:00';
+      document.getElementById('checkout-notice-hours').value = d.checkoutNoticeHours || '2';
+      updateCheckoutStatus(!!d.checkoutEnabled, d.checkoutTime || '11:00');
     }
     const featSnap = await getDoc(doc(db,'settings','featured'));
     if (featSnap.exists()) renderFeaturedPreview(featSnap.data());
     loadFeaturedOptions();
+  }
+
+  function updateCheckoutStatus(enabled, time){
+    const el = document.getElementById('checkout-status');
+    if(!el) return;
+    if(enabled){ el.textContent = `✅ 체크아웃 ${time} 알림 활성화됨`; el.className='settings-status green'; }
+    else { el.textContent = '알림 비활성화됨'; el.className='settings-status'; }
   }
 
   window.saveAllSettings = async () => {
@@ -436,7 +473,11 @@
     const nightStart = document.getElementById('night-start').value;
     const nightEnd = document.getElementById('night-end').value;
     const bgImageUrl = document.getElementById('bg-imageUrl').value.trim();
-    await setDoc(doc(db,'settings','global'), { orderOpen, nightEnabled, nightStart, nightEnd, bgImageUrl, updatedAt: serverTimestamp() }, { merge: true });
+    const checkoutEnabled = document.getElementById('chk-checkout-enabled').checked;
+    const checkoutTime = document.getElementById('checkout-time').value;
+    const checkoutNoticeHours = parseInt(document.getElementById('checkout-notice-hours').value);
+    updateCheckoutStatus(checkoutEnabled, checkoutTime);
+    await setDoc(doc(db,'settings','global'), { orderOpen, nightEnabled, nightStart, nightEnd, bgImageUrl, checkoutEnabled, checkoutTime, checkoutNoticeHours, updatedAt: serverTimestamp() }, { merge: true });
     globalOrderOpen = orderOpen;
     updateOrderUI(orderOpen);
     toast('✅ 설정 저장됨');

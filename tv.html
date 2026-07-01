@@ -48,6 +48,13 @@
   .osb-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
+  /* 체크아웃 알림 배너 */
+  .checkout-banner { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 210; background: rgba(10,22,40,0.88); border: 1px solid rgba(200,164,90,0.5); border-radius: 16px; padding: 14px 28px; display: none; align-items: center; gap: 14px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); animation: fadeInUp 0.5s ease; }
+  .checkout-banner.show { display: flex; }
+  .checkout-banner-icon { font-size: 28px; }
+  .checkout-banner-text { font-size: 15px; color: #C8A45A; font-weight: 300; letter-spacing: 0.05em; }
+  .checkout-banner-time { font-size: 22px; font-weight: 300; color: #fff; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.1em; }
+
   /* 하단 바 */
   .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 60px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
   .weather-widget { font-size: 14px; color: #5A7082; }
@@ -173,6 +180,15 @@
 </div>
 
 <!-- 주문 상태 위젯 — 좌측 상단 고정 -->
+<!-- 체크아웃 알림 배너 -->
+<div class="checkout-banner" id="checkout-banner">
+  <div class="checkout-banner-icon">🛎</div>
+  <div>
+    <div class="checkout-banner-text">체크아웃 시간 안내</div>
+    <div class="checkout-banner-time" id="checkout-banner-time">오전 11:00</div>
+  </div>
+</div>
+
 <div class="order-status-bar" id="order-status-bar">
   <div class="osb-dot"></div>
   <span id="osb-text"></span>
@@ -437,7 +453,30 @@
       if (d.orderOpen === false) { orderAllowed = false; }
       if (d.nightEnabled && isNightRestricted(d.nightStart, d.nightEnd)) { orderAllowed = false; }
       applyBgImage(d.bgImageUrl || '');
+      if (d.checkoutEnabled && d.checkoutTime) { scheduleCheckoutBanner(d.checkoutTime, d.checkoutNoticeHours || 2); }
     } catch(e) {}
+  }
+
+  function scheduleCheckoutBanner(checkoutTime, noticeHours) {
+    const [h, m] = checkoutTime.split(':').map(Number);
+    const now = new Date();
+    const checkout = new Date(now); checkout.setHours(h, m, 0, 0);
+    const notice  = new Date(checkout); notice.setHours(notice.getHours() - noticeHours);
+    const inWindow = now >= notice && now < checkout;
+    const banner = document.getElementById('checkout-banner');
+    const timeEl = document.getElementById('checkout-banner-time');
+    if (inWindow) {
+      const ampm = h < 12 ? '오전' : '오후';
+      const dh = h <= 12 ? h : h - 12;
+      timeEl.textContent = `${ampm} ${dh}:${String(m).padStart(2,'0')}`;
+      banner.classList.add('show');
+    }
+    // 알림 시작 시각에 자동 표시
+    const msToNotice = notice - now;
+    if (msToNotice > 0) setTimeout(() => scheduleCheckoutBanner(checkoutTime, noticeHours), msToNotice + 500);
+    // 체크아웃 시각에 자동 숨김
+    const msToEnd = checkout - now;
+    if (msToEnd > 0) setTimeout(() => banner.classList.remove('show'), msToEnd + 500);
   }
 
   function applyBgImage(url) {
