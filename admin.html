@@ -1055,10 +1055,10 @@
   // ── Featured ─────────────────────────────────────────
   window.loadFeaturedOptions = async () => {
     const cat = document.getElementById('feat-cat').value;
-    const snap = await getDocs(query(collection(db,'menus'), where('category','==',cat), orderBy('createdAt','asc')));
+    const snap = await getDocs(query(collection(db,'menus'), where('category','==',cat)));
     const sel = document.getElementById('feat-menu');
     if (snap.empty) { sel.innerHTML = '<option disabled>메뉴 없음</option>'; return; }
-    sel.innerHTML = snap.docs.map(d => {
+    sel.innerHTML = snap.docs.sort((a,b)=>(a.data().createdAt?.seconds||0)-(b.data().createdAt?.seconds||0)).map(d => {
       const m = d.data();
       return `<option value="${d.id}" data-name="${m.name}" data-emoji="${m.emoji||'🍽️'}" data-price="${m.price||0}" data-desc="${m.desc||''}" data-img="${m.imageUrl||''}">${m.emoji||''} ${m.name} — ₩${Number(m.price).toLocaleString()}</option>`;
     }).join('');
@@ -1262,10 +1262,12 @@
   };
 
   async function loadMenus() {
-    const snap = await getDocs(query(collection(db,'menus'), where('category','==',currentCat), orderBy('createdAt','asc')));
-    const el = document.getElementById('menu-list');
-    if (snap.empty) { el.innerHTML = '<div class="empty-msg">메뉴가 없습니다</div>'; return; }
-    el.innerHTML = snap.docs.map(d => {
+    try {
+      const snap = await getDocs(query(collection(db,'menus'), where('category','==',currentCat)));
+      const el = document.getElementById('menu-list');
+      const docs = snap.docs.slice().sort((a,b)=>(a.data().createdAt?.seconds||0)-(b.data().createdAt?.seconds||0));
+      if (!docs.length) { el.innerHTML = '<div class="empty-msg">메뉴가 없습니다</div>'; return; }
+      el.innerHTML = docs.map(d => {
       const m = d.data();
       const imgEl = m.imageUrl
         ? `<div class="item-img"><img src="${m.imageUrl}" onerror="this.parentElement.innerHTML='${m.emoji||'🍽️'}'"></div>`
@@ -1284,7 +1286,8 @@
           <button class="del-btn" onclick="delMenu('${d.id}')">🗑</button>
         </div>
       </div>`;
-    }).join('');
+      }).join('');
+    } catch(e) { toast('메뉴 로드 오류: '+e.message); }
   }
 
   window.openMenuForm = () => {
