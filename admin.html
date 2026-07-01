@@ -152,6 +152,8 @@
   <div class="tab" onclick="switchTab('settings')">⚙️ 설정</div>
   <div class="tab" onclick="switchTab('slide')">🎞️ 슬라이드</div>
   <div class="tab" onclick="switchTab('orders')" id="tab-orders">📦 주문 관리</div>
+  <div class="tab" onclick="switchTab('clean')">🧹 청소 현황</div>
+  <div class="tab" onclick="switchTab('breakfast')">🥐 조식 신청</div>
 </div>
 
 <!-- 메뉴 패널 -->
@@ -387,6 +389,35 @@
   <div id="orders-list" style="display:flex;flex-direction:column;gap:12px"></div>
 </div>
 
+<!-- 청소 현황 패널 -->
+<div class="panel" id="panel-clean">
+  <div class="section-header">
+    <h2>🧹 객실 청소 현황</h2>
+    <div style="display:flex;gap:8px">
+      <span id="clean-stats" style="font-size:13px;color:#4A6A82"></span>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button onclick="filterClean('all')" id="cleanF-all" style="padding:6px 14px;border-radius:6px;border:1px solid #C8A45A;background:rgba(200,164,90,.15);color:#C8A45A;font-size:12px;cursor:pointer;font-family:inherit">전체</button>
+    <button onclick="filterClean('dirty')" id="cleanF-dirty" style="padding:6px 14px;border-radius:6px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:12px;cursor:pointer;font-family:inherit">🔴 청소 필요</button>
+    <button onclick="filterClean('clean')" id="cleanF-clean" style="padding:6px 14px;border-radius:6px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:12px;cursor:pointer;font-family:inherit">🟢 청소 완료</button>
+    <button onclick="filterClean('inspection')" id="cleanF-inspection" style="padding:6px 14px;border-radius:6px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:12px;cursor:pointer;font-family:inherit">🟡 점검중</button>
+  </div>
+  <div id="clean-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px"></div>
+</div>
+
+<!-- 조식 신청 패널 -->
+<div class="panel" id="panel-breakfast">
+  <div class="section-header">
+    <h2>🥐 조식 신청 현황</h2>
+    <div id="breakfast-date" style="font-size:13px;color:#4A6A82"></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <span id="breakfast-stats" style="font-size:13px;padding:6px 14px;border-radius:6px;background:rgba(200,164,90,.1);color:#C8A45A;border:1px solid rgba(200,164,90,.3)"></span>
+  </div>
+  <div id="breakfast-list" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -415,10 +446,10 @@
 
   // ── Tab ──────────────────────────────────────────────
   window.switchTab = (tab) => {
-    const tabs = ['menu','spot','room','settings','slide','orders'];
+    const tabs = ['menu','spot','room','settings','slide','orders','clean','breakfast'];
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
     tabs.forEach(id => document.getElementById('panel-'+id).classList.toggle('active', id===tab));
-    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab })[tab]?.();
+    ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab, clean: initCleanTab, breakfast: initBreakfastTab })[tab]?.();
   };
 
   // ── Orders Tab ───────────────────────────────────────
@@ -474,6 +505,98 @@
 
   window.advanceOrder = async (id, nextStatus) => {
     await updateDoc(doc(db,'orders',id), { status: nextStatus });
+  };
+
+  // ── Clean Tab ────────────────────────────────────────
+  let cleanUnsub = null, cleanFilter = 'all', cleanData = {};
+  const CLEAN_LABEL = { clean:'🟢 청소 완료', dirty:'🔴 청소 필요', inspection:'🟡 점검중' };
+  const CLEAN_COLOR = { clean:'#4ADE80', dirty:'#EF4444', inspection:'#F59E0B' };
+  const CLEAN_BG    = { clean:'rgba(74,222,128,.1)', dirty:'rgba(239,68,68,.1)', inspection:'rgba(245,158,11,.1)' };
+  const CLEAN_NEXT  = { dirty:'clean', clean:'dirty', inspection:'clean' };
+
+  function initCleanTab(){
+    if(cleanUnsub) return;
+    cleanUnsub = onSnapshot(collection(db,'hotel_room_status'), snap=>{
+      cleanData = {};
+      snap.forEach(d=>{ cleanData[d.id]={...d.data(), id:d.id}; });
+      renderCleanGrid();
+    });
+  }
+
+  window.filterClean = f=>{
+    cleanFilter=f;
+    ['all','dirty','clean','inspection'].forEach(k=>{
+      const btn=document.getElementById('cleanF-'+k);
+      if(btn){ btn.style.borderColor=k===f?'#C8A45A':'#1C2E45'; btn.style.background=k===f?'rgba(200,164,90,.15)':'transparent'; btn.style.color=k===f?'#C8A45A':'#4A6A82'; }
+    });
+    renderCleanGrid();
+  };
+
+  function renderCleanGrid(){
+    const el=document.getElementById('clean-grid'); if(!el) return;
+    const rooms=[];
+    for(let i=101;i<=150;i++) rooms.push(String(i));
+    const dirty=rooms.filter(r=>!cleanData[r]||cleanData[r].status==='dirty').length;
+    const clean=rooms.filter(r=>cleanData[r]?.status==='clean').length;
+    const insp=rooms.filter(r=>cleanData[r]?.status==='inspection').length;
+    document.getElementById('clean-stats').textContent=`🔴 ${dirty}개 / 🟢 ${clean}개 / 🟡 ${insp}개`;
+    const filtered=cleanFilter==='all'?rooms:rooms.filter(r=>{
+      const s=cleanData[r]?.status||'dirty';
+      return s===cleanFilter;
+    });
+    el.innerHTML=filtered.map(r=>{
+      const s=cleanData[r]?.status||'dirty';
+      const t=cleanData[r]?.updatedAt;
+      const timeStr=t?new Date(t.toDate?t.toDate():t).toLocaleTimeString('ko',{hour:'2-digit',minute:'2-digit'}):'';
+      return `<div style="background:#0A1628;border:1px solid ${CLEAN_COLOR[s]}44;border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:${CLEAN_COLOR[s]}">${r}</div>
+        <div style="font-size:12px;margin:6px 0;padding:3px 8px;border-radius:6px;background:${CLEAN_BG[s]};color:${CLEAN_COLOR[s]};display:inline-block">${CLEAN_LABEL[s]}</div>
+        ${timeStr?`<div style="font-size:10px;color:#4A6A82;margin-bottom:6px">${timeStr}</div>`:'<div style="margin-bottom:6px"></div>'}
+        <button onclick="cycleClean('${r}')" style="width:100%;padding:5px;border-radius:6px;border:1px solid ${CLEAN_COLOR[s]}55;background:${CLEAN_BG[s]};color:${CLEAN_COLOR[s]};font-size:11px;cursor:pointer;font-family:inherit">
+          → ${CLEAN_LABEL[CLEAN_NEXT[s]]}
+        </button>
+      </div>`;
+    }).join('');
+  }
+
+  window.cycleClean = async r=>{
+    const cur=cleanData[r]?.status||'dirty';
+    const next=CLEAN_NEXT[cur];
+    await setDoc(doc(db,'hotel_room_status',r),{status:next,updatedAt:serverTimestamp()},{merge:true});
+  };
+
+  // ── Breakfast Tab ─────────────────────────────────────
+  let breakfastUnsub = null;
+  const TODAY_STR = new Date().toISOString().split('T')[0];
+
+  function initBreakfastTab(){
+    document.getElementById('breakfast-date').textContent = TODAY_STR + ' 조식';
+    if(breakfastUnsub) return;
+    const q = query(collection(db,'hotel_breakfast'), where('date','==',TODAY_STR), orderBy('ts','desc'));
+    breakfastUnsub = onSnapshot(q, snap=>{
+      const list=snap.docs.map(d=>({id:d.id,...d.data()}));
+      const total=list.reduce((s,r)=>s+(r.guestCount||1),0);
+      document.getElementById('breakfast-stats').textContent=`신청 ${list.length}객실 · 총 ${total}명`;
+      document.getElementById('breakfast-list').innerHTML=list.length===0
+        ?'<div style="text-align:center;color:#4A6A82;padding:20px">오늘 조식 신청 없음</div>'
+        :list.map(r=>`
+          <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px">
+            <div style="font-size:28px;font-weight:900;color:#C8A45A;min-width:52px;text-align:center">${r.roomId}</div>
+            <div style="flex:1">
+              <div style="font-weight:600">${r.roomId}호 · ${r.guestCount||1}명</div>
+              <div style="font-size:12px;color:#4A6A82;margin-top:2px">${r.ts?.toDate?r.ts.toDate().toLocaleTimeString('ko',{hour:'2-digit',minute:'2-digit'}):''} 신청</div>
+              ${r.note?`<div style="font-size:12px;color:#C8A45A;margin-top:2px">📝 ${r.note}</div>`:''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;background:${r.status==='confirmed'?'rgba(74,222,128,.1)':'rgba(200,164,90,.1)'};color:${r.status==='confirmed'?'#4ADE80':'#C8A45A'};border:1px solid ${r.status==='confirmed'?'rgba(74,222,128,.3)':'rgba(200,164,90,.3)'}">${r.status==='confirmed'?'확인됨':'대기'}</span>
+              ${r.status!=='confirmed'?`<button onclick="confirmBreakfast('${r.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(74,222,128,.3);background:rgba(74,222,128,.1);color:#4ADE80;font-size:11px;cursor:pointer;font-family:inherit">확인</button>`:''}
+            </div>
+          </div>`).join('');
+    });
+  }
+
+  window.confirmBreakfast = async id=>{
+    await updateDoc(doc(db,'hotel_breakfast',id),{status:'confirmed'});
   };
 
   // ── Order open ───────────────────────────────────────

@@ -171,6 +171,33 @@
 <!-- 나가기 버튼 — 좌측 하단 고정 -->
 <button class="exit-btn" onclick="window.history.length > 1 ? window.history.back() : window.close()">나가기</button>
 
+<!-- 조식 신청 버튼 — 우측 하단 고정 -->
+<button class="exit-btn" id="breakfastBtn" onclick="openBreakfastModal()" style="left:auto;right:28px;color:rgba(200,164,90,0.6);border-color:rgba(200,164,90,0.2)">🥐 조식 신청</button>
+
+<!-- 조식 신청 모달 -->
+<div id="breakfastModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:flex-end;justify-content:center;backdrop-filter:blur(12px)">
+  <div style="background:linear-gradient(160deg,#0A1628,#0F1E35);border:1px solid rgba(200,164,90,.3);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;animation:slideUp .3s ease">
+    <div style="font-size:22px;font-weight:700;color:#C8A45A;text-align:center;margin-bottom:6px">🥐 조식 신청</div>
+    <div style="font-size:13px;color:#4A6A82;text-align:center;margin-bottom:20px">내일 아침 조식을 신청합니다</div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">객실 번호</label>
+      <input id="bfRoom" type="number" placeholder="예: 105" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:16px;outline:none;font-family:inherit">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">인원수</label>
+      <div style="display:flex;gap:8px">
+        ${[1,2,3,4].map(n=>`<button onclick="selectBfCount(${n})" id="bfCnt-${n}" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">${n}명</button>`).join('')}
+      </div>
+    </div>
+    <div style="margin-bottom:18px">
+      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">요청사항 (선택)</label>
+      <input id="bfNote" placeholder="알레르기, 기타 요청사항" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+    </div>
+    <button onclick="submitBreakfast()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#C8A45A;color:#000;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">신청하기</button>
+    <button onclick="closeBreakfastModal()" style="width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:14px;cursor:pointer;font-family:inherit">취소</button>
+  </div>
+</div>
+
 <!-- 언어 선택 — 우측 상단 고정 -->
 <div class="lang-fixed">
   <button class="lang-btn active" onclick="setLang('ko')">한</button>
@@ -477,6 +504,43 @@
     // 체크아웃 시각에 자동 숨김
     const msToEnd = checkout - now;
     if (msToEnd > 0) setTimeout(() => banner.classList.remove('show'), msToEnd + 500);
+  }
+
+  // ── Breakfast ─────────────────────────────────────────
+  let bfGuestCount = 1;
+  const TODAY_BF = new Date().toISOString().split('T')[0];
+
+  window.openBreakfastModal = ()=>{
+    bfGuestCount=1;
+    document.getElementById('bfRoom').value='';
+    document.getElementById('bfNote').value='';
+    [1,2,3,4].forEach(n=>{ const b=document.getElementById('bfCnt-'+n); if(b){ b.style.background=n===1?'rgba(200,164,90,.15)':'transparent'; b.style.color=n===1?'#C8A45A':'#4A6A82'; b.style.borderColor=n===1?'rgba(200,164,90,.4)':'#1C2E45'; } });
+    document.getElementById('breakfastModal').style.display='flex';
+  };
+  window.closeBreakfastModal = ()=>{ document.getElementById('breakfastModal').style.display='none'; };
+  window.selectBfCount = n=>{
+    bfGuestCount=n;
+    [1,2,3,4].forEach(k=>{ const b=document.getElementById('bfCnt-'+k); if(b){ b.style.background=k===n?'rgba(200,164,90,.15)':'transparent'; b.style.color=k===n?'#C8A45A':'#4A6A82'; b.style.borderColor=k===n?'rgba(200,164,90,.4)':'#1C2E45'; } });
+  };
+  window.submitBreakfast = async ()=>{
+    const room=document.getElementById('bfRoom').value.trim();
+    const note=document.getElementById('bfNote').value.trim();
+    if(!room){ alert('객실 번호를 입력해주세요.'); return; }
+    try{
+      await addDoc(collection(db,'hotel_breakfast'),{
+        roomId:room, guestCount:bfGuestCount, note:note||'',
+        date:TODAY_BF, status:'pending',
+        ts:serverTimestamp()
+      });
+      closeBreakfastModal();
+      showToastTV('🥐 조식 신청이 완료되었습니다!');
+    }catch(e){ alert('신청 실패: '+e.message); }
+  };
+  function showToastTV(msg){
+    let t=document.getElementById('tvToast');
+    if(!t){ t=document.createElement('div'); t.id='tvToast'; t.style.cssText='position:fixed;top:40px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.9);border:1px solid rgba(200,164,90,.4);border-radius:12px;padding:12px 24px;color:#C8A45A;font-size:15px;font-weight:600;z-index:400;letter-spacing:.05em'; document.body.appendChild(t); }
+    t.textContent=msg; t.style.display='block';
+    setTimeout(()=>{ t.style.display='none'; },3000);
   }
 
   function applyBgImage(url) {
