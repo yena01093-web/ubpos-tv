@@ -1076,7 +1076,7 @@
     document.getElementById('music-genre-inputs').innerHTML = MUSIC_GENRES.filter(g=>g.key!=='none').map(g=>`
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="width:90px;font-size:13px;flex-shrink:0;">${g.label}</span>
-        <input id="mgid-${g.key}" type="text" value="${musicCfg.genres[g.key]||''}" placeholder="YouTube 영상 ID"
+        <input id="mgid-${g.key}" type="text" value="${musicCfg.genres[g.key]||''}" placeholder="YouTube URL 붙여넣기"
           style="flex:1;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:7px 10px;color:#e2e8f0;font-size:12px;outline:none;font-family:inherit;">
       </div>`).join('');
     // default selector
@@ -1110,9 +1110,16 @@
     });
   }
 
+  function extractYouTubeId(input) {
+    const s = input.trim();
+    if(/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+    const m = s.match(/(?:youtu\.be\/|[?&]v=|embed\/)([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : s;
+  }
+
   window.saveMusicSettings = async () => {
     const genres={};
-    MUSIC_GENRES.filter(g=>g.key!=='none').forEach(g=>{ const v=document.getElementById('mgid-'+g.key)?.value.trim(); if(v) genres[g.key]=v; });
+    MUSIC_GENRES.filter(g=>g.key!=='none').forEach(g=>{ const v=document.getElementById('mgid-'+g.key)?.value.trim(); if(v) genres[g.key]=extractYouTubeId(v); });
     const rooms={};
     document.querySelectorAll('#music-room-overrides select[data-room]').forEach(s=>{ if(s.value) rooms[s.dataset.room]=s.value; });
     const defaultGenre = document.getElementById('music-default-genre').value;
