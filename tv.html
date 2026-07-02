@@ -432,8 +432,6 @@
   const defaultSlides = [
     { eyebrow:"ROOM SERVICE", title:"별이 빛나는 밤,\n와인 한 잔", desc:"은은한 조명 아래 특별한 밤을 더 특별하게.", price:"₩ 25,000", emoji:"🍷", sub:"" },
     { eyebrow:"ROOM SERVICE", title:"제천 수제\n크래프트 맥주", desc:"지역 브루어리에서 직접 만든 신선한 맥주.", price:"₩ 8,000", emoji:"🍺", sub:"" },
-    { eyebrow:"JECHEON TOUR", title:"Cheongpung Lake", desc:"충북의 아름다운 호수. 유람선과 케이블카 운영.", price:"", emoji:"🏞️", sub:"🚗 10 min drive" },
-    { eyebrow:"JECHEON TOUR", title:"Uirimji Reservoir", desc:"삼한시대에 만들어진 우리나라 최초의 저수지.", price:"", emoji:"🌿", sub:"🚗 5 min drive" },
   ];
 
   // ── Load data ─────────────────────────────────────────
@@ -463,9 +461,7 @@
         .map(s => ({ eyebrow:"JECHEON TOUR", title:s.name, desc:'', price:'', emoji:'📍', sub:'', imageUrl:s.imageUrl||'' }));
 
       const spotSlides = fixedSpotSlides.length ? fixedSpotSlides
-        : spotSnap.empty
-          ? defaultSlides.filter(s => s.eyebrow.includes('TOUR'))
-          : spotSnap.docs.map(d => { const s=d.data(); return { eyebrow:"JECHEON TOUR", title:s.name, desc:s.desc, price:"", emoji:s.emoji||'📍', sub:s.distance||'', imageUrl:s.imageUrl||'' }; });
+        : spotSnap.docs.map(d => { const s=d.data(); return { eyebrow:"JECHEON TOUR", title:s.name, desc:s.desc, price:"", emoji:s.emoji||'📍', sub:s.distance||'', imageUrl:s.imageUrl||'' }; });
 
       const catEyebrow = { '추천안주':'RECOMMENDED', '주류':'ROOM SERVICE', '관광지':'JECHEON TOUR', '기타':'SPECIAL' };
       const slideSnap = await getDocs(collection(db,'slides'));
