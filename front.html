@@ -54,6 +54,10 @@
   .s-cancelled { background: rgba(239,68,68,0.15); color: #F87171; }
   .btn-confirm { background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
   .btn-cancel { background: rgba(239,68,68,0.15); color: #F87171; border: 1px solid rgba(239,68,68,0.3); }
+  .s-checkin-due { background: rgba(96,165,250,0.15); color: #60A5FA; }
+  .s-checkout-due { background: rgba(245,158,11,0.15); color: #F59E0B; }
+  .btn-checkin { background: rgba(96,165,250,0.15); color: #60A5FA; border: 1px solid rgba(96,165,250,0.3); }
+  .btn-checkout { background: rgba(245,158,11,0.15); color: #F59E0B; border: 1px solid rgba(245,158,11,0.3); }
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
 
@@ -91,6 +95,13 @@
   </div>
 
   <div class="dash-header" style="margin-top:36px;">
+    <h2>🚪 오늘 체크인 · 체크아웃 <span class="count" id="res-count">(0)</span></h2>
+  </div>
+  <div class="orders" id="reservations">
+    <div class="empty">오늘 예정된 체크인/체크아웃이 없습니다</div>
+  </div>
+
+  <div class="dash-header" style="margin-top:36px;">
     <h2>🥐 조식 신청 <span class="count" id="breakfast-count">(0)</span></h2>
     <div style="font-size:13px;color:#4A6A82" id="breakfast-date"></div>
   </div>
@@ -103,7 +114,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy, where }
+  import { getFirestore, collection, onSnapshot, doc, updateDoc, setDoc, query, orderBy, where, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -167,6 +178,51 @@
     await updateDoc(doc(db,'orders',id), { status });
     const msgs = { heating:'🔥 히팅 시작!', delivering:'🛵 배달 시작!', done:'✅ 완료 처리' };
     toast(msgs[status]);
+  };
+
+  // ── 오늘 체크인 · 체크아웃 ─────────────────────────────
+  const rq = query(collection(db,'hotel_reservations'), orderBy('createdAt','desc'));
+  onSnapshot(rq, (snap) => {
+    const today = new Date().toLocaleDateString('sv-SE');
+    const all = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const arrivals = all.filter(r => r.status === 'booked' && r.checkin === today);
+    const departures = all.filter(r => r.status === 'checkedin' && r.checkout === today);
+    const list = [...arrivals.map(r=>({...r,_kind:'in'})), ...departures.map(r=>({...r,_kind:'out'}))];
+    document.getElementById('res-count').textContent = `(${list.length})`;
+    const el = document.getElementById('reservations');
+    if (!list.length) { el.innerHTML = '<div class="empty">오늘 예정된 체크인/체크아웃이 없습니다</div>'; return; }
+    el.innerHTML = list.map(r => {
+      const isIn = r._kind === 'in';
+      return `<div class="order-card new">
+        <div class="order-top">
+          <div style="display:flex;align-items:center;">
+            <span class="room-tag">Room ${r.roomId}</span>
+            <span class="guest-name">${r.name||''} 고객님</span>
+          </div>
+          <span class="status-badge ${isIn?'s-checkin-due':'s-checkout-due'}">${isIn?'🔵 체크인 예정':'🟠 체크아웃 예정'}</span>
+        </div>
+        <div class="order-footer">
+          <div class="order-time">${r.checkin||''} ~ ${r.checkout||''} · ${r.guests||1}명</div>
+          <div class="order-actions">
+            ${isIn
+              ? `<button class="action-btn btn-checkin" onclick="doCheckin('${r.id}','${r.roomId}')">✅ 체크인</button>`
+              : `<button class="action-btn btn-checkout" onclick="doCheckout('${r.id}','${r.roomId}')">🚪 체크아웃</button>`}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  });
+
+  window.doCheckin = async (id, roomId) => {
+    await updateDoc(doc(db,'hotel_reservations',id), { status:'checkedin', checkinAt:serverTimestamp() });
+    if (roomId) await setDoc(doc(db,'rooms',roomId), { active:true, updatedAt:serverTimestamp() }, { merge:true });
+    toast('✅ 체크인 완료 — 객실 룸서비스 활성화됨');
+  };
+
+  window.doCheckout = async (id, roomId) => {
+    await updateDoc(doc(db,'hotel_reservations',id), { status:'checkedout', checkoutAt:serverTimestamp() });
+    if (roomId) await setDoc(doc(db,'rooms',roomId), { active:false, totalAmount:0, lastCheckout:serverTimestamp(), updatedAt:serverTimestamp() }, { merge:true });
+    toast('🚪 체크아웃 완료 — 객실 룸서비스 비활성화 + 정산됨');
   };
 
   // ── 조식 신청 ────────────────────────────────────────

@@ -1113,14 +1113,18 @@
 
   async function doResCheckin(id){
     try{
+      const r = reservations.find(x=>x.id===id);
       await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedin',checkinAt:serverTimestamp()});
-      closeResModal(); toast('✅ 체크인 처리 완료');
+      if(r?.roomId) await setDoc(doc(db,'rooms',r.roomId),{active:true,updatedAt:serverTimestamp()},{merge:true});
+      closeResModal(); toast('✅ 체크인 처리 완료 — 객실 룸서비스 활성화됨');
     }catch(e){ toast('체크인 오류: '+e.message); }
   }
   async function doResCheckout(id){
     try{
+      const r = reservations.find(x=>x.id===id);
       await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedout',checkoutAt:serverTimestamp()});
-      closeResModal(); toast('🚪 체크아웃 처리 완료');
+      if(r?.roomId) await setDoc(doc(db,'rooms',r.roomId),{active:false,totalAmount:0,lastCheckout:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
+      closeResModal(); toast('🚪 체크아웃 처리 완료 — 객실 룸서비스 비활성화 + 정산됨');
     }catch(e){ toast('체크아웃 오류: '+e.message); }
   }
   async function doResCancel(id){
@@ -1178,12 +1182,26 @@
         roomId, type, price: unitPrice*nights, note, breakfastType,
         status:'booked', createdAt:serverTimestamp()
       });
+      if(breakfastType!=='none'){
+        const bfDate=addDaysStr(checkin,1);
+        await addDoc(collection(db,'hotel_breakfast'),{
+          roomId, guestCount:parseInt(guests), mealType:breakfastType, note:'',
+          date:bfDate, status:'pending', source:'reservation',
+          ts:serverTimestamp()
+        });
+      }
       ['rn-name','rn-phone','rn-room','rn-note'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
       document.getElementById('rn-breakfast').value='none';
       toast(`✅ ${name}님 ${roomId}호 예약 완료!`);
       resSubTab('rooms');
     }catch(e){ toast('오류: '+e.message); }
   };
+
+  function addDaysStr(dateStr, n){
+    const d=new Date(dateStr+'T00:00:00');
+    d.setDate(d.getDate()+n);
+    return d.toLocaleDateString('sv-SE');
+  }
 
   // ── Order open ───────────────────────────────────────
   async function syncOrderToggle() {
