@@ -655,6 +655,14 @@
         </div>
       </div>
       <div>
+        <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">조식</label>
+        <select id="rn-breakfast" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+          <option value="none">신청 안함</option>
+          <option value="korean">🍚 한식</option>
+          <option value="western">🍳 양식</option>
+        </select>
+      </div>
+      <div>
         <label style="font-size:11px;color:#4A6A82;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">메모</label>
         <input id="rn-note" placeholder="요청사항, 특이사항 등" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
       </div>
@@ -895,7 +903,7 @@
           <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px">
             <div style="font-size:28px;font-weight:900;color:#C8A45A;min-width:52px;text-align:center">${r.roomId}</div>
             <div style="flex:1">
-              <div style="font-weight:600">${r.roomId}호 · ${r.guestCount||1}명</div>
+              <div style="font-weight:600">${r.roomId}호 · ${r.guestCount||1}명 · ${r.mealType==='western'?'🍳 양식':'🍚 한식'}</div>
               <div style="font-size:12px;color:#4A6A82;margin-top:2px">${r.ts?.toDate?r.ts.toDate().toLocaleTimeString('ko',{hour:'2-digit',minute:'2-digit'}):''} 신청</div>
               ${r.note?`<div style="font-size:12px;color:#C8A45A;margin-top:2px">📝 ${r.note}</div>`:''}
             </div>
@@ -1008,7 +1016,7 @@
         <div style="font-size:20px;font-weight:900;color:${col};min-width:44px;text-align:center">${r.roomId||'?'}</div>
         <div style="flex:1">
           <div style="font-weight:600;font-size:15px">${r.name||'이름없음'} <span style="font-size:12px;color:#4A6A82">${r.phone||''}</span></div>
-          <div style="font-size:12px;color:#4A6A82;margin-top:2px">${r.checkin||''} ~ ${r.checkout||''} · ${nights}박 · ${r.guests||1}명</div>
+          <div style="font-size:12px;color:#4A6A82;margin-top:2px">${r.checkin||''} ~ ${r.checkout||''} · ${nights}박 · ${r.guests||1}명${r.breakfastType&&r.breakfastType!=='none'?` · ${r.breakfastType==='western'?'🍳 양식':'🍚 한식'}`:''}</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:12px;font-weight:700;color:${col};padding:3px 10px;background:${col}22;border:1px solid ${col}44;border-radius:6px;display:inline-block">${RES_STATUS_LABEL[r.status]||r.status}</div>
@@ -1031,6 +1039,7 @@
       ${row('체크인', r.checkin||'-')}
       ${row('체크아웃', r.checkout||'-')}
       ${row('인원', `${r.guests||1}명 · ${nights}박`)}
+      ${row('조식', r.breakfastType==='korean'?'🍚 한식':r.breakfastType==='western'?'🍳 양식':'신청 안함')}
       ${r.note?row('메모',r.note):''}
       <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:16px;font-weight:700;color:#C8A45A"><span>결제금액</span><span>${(r.price||0).toLocaleString()}원</span></div>
       <div style="text-align:center;margin-top:4px"><span style="font-size:12px;font-weight:700;color:${col};padding:4px 14px;background:${col}22;border:1px solid ${col}44;border-radius:8px">${RES_STATUS_LABEL[r.status]||r.status}</span></div>`;
@@ -1117,6 +1126,7 @@
     const type=typeEl.value;
     const unitPrice=parseInt(typeEl.options[typeEl.selectedIndex].dataset.price);
     const note=document.getElementById('rn-note').value.trim();
+    const breakfastType=document.getElementById('rn-breakfast').value;
     if(!name||!phone||!checkin||!checkout||!roomId){ toast('필수 항목을 모두 입력해주세요'); return; }
     if(checkin>=checkout){ toast('체크아웃은 체크인 이후여야 합니다'); return; }
     const nights=Math.max(1,Math.ceil((new Date(checkout)-new Date(checkin))/(864e5)));
@@ -1125,10 +1135,11 @@
     try{
       await addDoc(collection(db,'hotel_reservations'),{
         name, phone, checkin, checkout, guests:parseInt(guests),
-        roomId, type, price: unitPrice*nights, note,
+        roomId, type, price: unitPrice*nights, note, breakfastType,
         status:'booked', createdAt:serverTimestamp()
       });
       ['rn-name','rn-phone','rn-room','rn-note'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+      document.getElementById('rn-breakfast').value='none';
       toast(`✅ ${name}님 ${roomId}호 예약 완료!`);
       resSubTab('rooms');
     }catch(e){ toast('오류: '+e.message); }

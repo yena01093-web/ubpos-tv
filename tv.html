@@ -242,6 +242,13 @@
         <button onclick="selectBfCount(4)" id="bfCnt-4" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">4명</button>
       </div>
     </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="mealTypeLabel">조식 종류</label>
+      <div style="display:flex;gap:8px">
+        <button onclick="selectBfType('korean')" id="bfType-korean" data-i18n="mealTypeKorean" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:15px;cursor:pointer;font-family:inherit;transition:.2s">한식</button>
+        <button onclick="selectBfType('western')" id="bfType-western" data-i18n="mealTypeWestern" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:15px;cursor:pointer;font-family:inherit;transition:.2s">양식</button>
+      </div>
+    </div>
     <div style="margin-bottom:18px">
       <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="requestLabel">요청사항 (선택)</label>
       <input id="bfNote" data-i18n-placeholder="requestPlaceholder" placeholder="알레르기, 기타 요청사항" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
@@ -453,6 +460,7 @@
       breakfastBtn:'🥐 조식 신청', breakfastSub:'내일 아침 조식을 신청합니다',
       roomNumberLabel:'객실 번호', roomNumberPlaceholder:'예: 105',
       guestCountLabel:'인원수', requestLabel:'요청사항 (선택)', requestPlaceholder:'알레르기, 기타 요청사항',
+      mealTypeLabel:'조식 종류', mealTypeKorean:'한식', mealTypeWestern:'양식',
       submitBtn:'신청하기', cancelBtn:'취소',
       bfRoomRequired:'객실 번호를 입력해주세요.', bfSuccessToast:'🥐 조식 신청이 완료되었습니다!', bfFailPrefix:'신청 실패: ',
     },
@@ -476,6 +484,7 @@
       breakfastBtn:'🥐 Breakfast', breakfastSub:'Request breakfast for tomorrow morning',
       roomNumberLabel:'Room Number', roomNumberPlaceholder:'e.g. 105',
       guestCountLabel:'Number of Guests', requestLabel:'Special Requests (optional)', requestPlaceholder:'Allergies, other requests',
+      mealTypeLabel:'Meal Type', mealTypeKorean:'Korean', mealTypeWestern:'Western',
       submitBtn:'Submit', cancelBtn:'Cancel',
       bfRoomRequired:'Please enter your room number.', bfSuccessToast:'🥐 Breakfast request completed!', bfFailPrefix:'Request failed: ',
     },
@@ -499,6 +508,7 @@
       breakfastBtn:'🥐 早餐申请', breakfastSub:'预订明天早上的早餐',
       roomNumberLabel:'客房号码', roomNumberPlaceholder:'例如：105',
       guestCountLabel:'人数', requestLabel:'特殊要求（选填）', requestPlaceholder:'过敏信息、其他要求',
+      mealTypeLabel:'早餐类型', mealTypeKorean:'韩式', mealTypeWestern:'西式',
       submitBtn:'提交申请', cancelBtn:'取消',
       bfRoomRequired:'请输入客房号码。', bfSuccessToast:'🥐 早餐申请已完成！', bfFailPrefix:'申请失败：',
     },
@@ -522,6 +532,7 @@
       breakfastBtn:'🥐 朝食申込', breakfastSub:'明日の朝食を申し込みます',
       roomNumberLabel:'客室番号', roomNumberPlaceholder:'例：105',
       guestCountLabel:'人数', requestLabel:'ご要望（任意）', requestPlaceholder:'アレルギー、その他のご要望',
+      mealTypeLabel:'朝食の種類', mealTypeKorean:'韓定食', mealTypeWestern:'洋食',
       submitBtn:'申し込む', cancelBtn:'キャンセル',
       bfRoomRequired:'客室番号を入力してください。', bfSuccessToast:'🥐 朝食のお申し込みが完了しました！', bfFailPrefix:'申し込み失敗：',
     }
@@ -1048,13 +1059,23 @@
 
   // ── Breakfast ─────────────────────────────────────────
   let bfGuestCount = 1;
+  let bfMealType = 'korean';
   const todayBF = () => new Date().toLocaleDateString('sv-SE');
+
+  function updateBfTypeButtons() {
+    ['korean','western'].forEach(k => {
+      const b = document.getElementById('bfType-'+k);
+      if (b) { b.style.background=k===bfMealType?'rgba(200,164,90,.15)':'transparent'; b.style.color=k===bfMealType?'#C8A45A':'#4A6A82'; b.style.borderColor=k===bfMealType?'rgba(200,164,90,.4)':'#1C2E45'; }
+    });
+  }
 
   window.openBreakfastModal = ()=>{
     bfGuestCount=1;
+    bfMealType='korean';
     document.getElementById('bfRoom').value='';
     document.getElementById('bfNote').value='';
     [1,2,3,4].forEach(n=>{ const b=document.getElementById('bfCnt-'+n); if(b){ b.style.background=n===1?'rgba(200,164,90,.15)':'transparent'; b.style.color=n===1?'#C8A45A':'#4A6A82'; b.style.borderColor=n===1?'rgba(200,164,90,.4)':'#1C2E45'; } });
+    updateBfTypeButtons();
     document.getElementById('breakfastModal').style.display='flex';
   };
   window.closeBreakfastModal = ()=>{ document.getElementById('breakfastModal').style.display='none'; };
@@ -1062,13 +1083,17 @@
     bfGuestCount=n;
     [1,2,3,4].forEach(k=>{ const b=document.getElementById('bfCnt-'+k); if(b){ b.style.background=k===n?'rgba(200,164,90,.15)':'transparent'; b.style.color=k===n?'#C8A45A':'#4A6A82'; b.style.borderColor=k===n?'rgba(200,164,90,.4)':'#1C2E45'; } });
   };
+  window.selectBfType = type=>{
+    bfMealType=type;
+    updateBfTypeButtons();
+  };
   window.submitBreakfast = async ()=>{
     const room=document.getElementById('bfRoom').value.trim();
     const note=document.getElementById('bfNote').value.trim();
     if(!room){ alert(t('bfRoomRequired')); return; }
     try{
       await addDoc(collection(db,'hotel_breakfast'),{
-        roomId:room, guestCount:bfGuestCount, note:note||'',
+        roomId:room, guestCount:bfGuestCount, mealType:bfMealType, note:note||'',
         date:todayBF(), status:'pending',
         ts:serverTimestamp()
       });
