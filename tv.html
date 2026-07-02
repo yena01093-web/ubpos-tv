@@ -146,6 +146,16 @@
 </head>
 <body tabindex="0">
 
+<!-- WiFi QR 고정 -->
+<div class="qr-fixed" id="wifi-qr-card" style="bottom:198px;display:none;">
+  <img class="qr-img" id="wifi-qr-img" alt="WiFi QR" src="">
+  <div class="qr-text">
+    <div class="qr-eyebrow" style="color:#4ADE80;">FREE WI-FI</div>
+    <div class="qr-title" id="wifi-ssid-display">Wi-Fi</div>
+    <div class="qr-sub">스캔하면 자동 연결</div>
+  </div>
+</div>
+
 <!-- QR 고정 -->
 <div class="qr-fixed">
   <img class="qr-img" id="room-qr-img" alt="주문 QR" src="">
@@ -505,6 +515,20 @@
     } catch(e) {}
   }
 
+  async function loadWifiQr() {
+    try {
+      const snap = await getDoc(doc(db,'settings','wifi'));
+      if(!snap.exists()) return;
+      const { ssid, password, security } = snap.data();
+      if(!ssid) return;
+      const data = `WIFI:T:${security||'WPA'};S:${ssid};P:${password||''};;`;
+      document.getElementById('wifi-qr-img').src =
+        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=${encodeURIComponent(data)}`;
+      document.getElementById('wifi-ssid-display').textContent = ssid;
+      document.getElementById('wifi-qr-card').style.display = 'flex';
+    } catch(e) {}
+  }
+
   function startMusic(videoId) {
     if(!videoId || ytPlayer) return;
     const tag = document.createElement('script');
@@ -697,6 +721,7 @@
     startOrderStatusListener();
     applyLang();
     loadMusicSettings();
+    loadWifiQr();
   }, 2500);
 
   // ── Slide ─────────────────────────────────────────────

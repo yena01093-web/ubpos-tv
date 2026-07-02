@@ -310,6 +310,32 @@
         </div>
       </div>
     </div>
+    <div class="settings-card">
+      <h3>📶 Wi-Fi 정보</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;">
+        <div>
+          <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:4px;">네트워크 이름 (SSID)</label>
+          <input type="text" id="wifi-ssid" placeholder="JCHotel_Guest" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:4px;">비밀번호</label>
+          <input type="text" id="wifi-password" placeholder="비밀번호 입력" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:4px;">보안 방식</label>
+          <select id="wifi-security" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;">
+            <option value="WPA">WPA/WPA2 (일반)</option>
+            <option value="WEP">WEP</option>
+            <option value="nopass">비밀번호 없음</option>
+          </select>
+        </div>
+        <div id="wifi-qr-preview" style="display:none;margin-top:6px;text-align:center;">
+          <img id="wifi-qr-img" style="width:100px;height:100px;border-radius:8px;background:#fff;padding:4px;" alt="WiFi QR">
+          <div style="font-size:11px;color:#4A6A82;margin-top:4px;">TV 화면에 표시될 QR 미리보기</div>
+        </div>
+        <button class="save-btn" style="margin-top:4px;" onclick="saveWifiSettings()">📶 Wi-Fi 저장</button>
+      </div>
+    </div>
     <div class="settings-card" style="grid-column:1/-1;">
       <h3>🎵 배경음악</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
@@ -1040,6 +1066,7 @@
     if (featSnap.exists()) renderFeaturedPreview(featSnap.data());
     loadFeaturedOptions();
     loadMusicSettings();
+    loadWifiSettings();
   }
 
   function updateCheckoutStatus(enabled, time){
@@ -1148,6 +1175,45 @@
     try {
       await setDoc(doc(db,'settings','music'), { defaultGenre, genres, rooms, updatedAt:serverTimestamp() });
       toast('🎵 배경음악 설정 저장됨');
+    } catch(e) { toast('저장 오류: '+e.message); }
+  };
+
+  function renderWifiQrPreview() {
+    const ssid = document.getElementById('wifi-ssid').value.trim();
+    const pw   = document.getElementById('wifi-password').value.trim();
+    const sec  = document.getElementById('wifi-security').value;
+    const wrap = document.getElementById('wifi-qr-preview');
+    const img  = document.getElementById('wifi-qr-img');
+    if (!ssid) { wrap.style.display = 'none'; return; }
+    const data = `WIFI:T:${sec};S:${ssid};P:${pw};;`;
+    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data=${encodeURIComponent(data)}`;
+    wrap.style.display = 'block';
+  }
+  ['wifi-ssid','wifi-password','wifi-security'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', renderWifiQrPreview);
+    document.getElementById(id)?.addEventListener('change', renderWifiQrPreview);
+  });
+
+  async function loadWifiSettings() {
+    try {
+      const snap = await getDoc(doc(db,'settings','wifi'));
+      if (!snap.exists()) return;
+      const d = snap.data();
+      document.getElementById('wifi-ssid').value = d.ssid || '';
+      document.getElementById('wifi-password').value = d.password || '';
+      document.getElementById('wifi-security').value = d.security || 'WPA';
+      renderWifiQrPreview();
+    } catch(e) {}
+  }
+
+  window.saveWifiSettings = async () => {
+    const ssid     = document.getElementById('wifi-ssid').value.trim();
+    const password = document.getElementById('wifi-password').value.trim();
+    const security = document.getElementById('wifi-security').value;
+    if (!ssid) { toast('SSID를 입력해주세요'); return; }
+    try {
+      await setDoc(doc(db,'settings','wifi'), { ssid, password, security, updatedAt: serverTimestamp() });
+      toast('📶 Wi-Fi 설정 저장됨');
     } catch(e) { toast('저장 오류: '+e.message); }
   };
 
