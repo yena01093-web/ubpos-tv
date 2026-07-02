@@ -153,11 +153,11 @@
 </header>
 
 <div class="tabs">
-  <div class="tab" onclick="switchTab('reservation')">📅 예약 관리</div>
+  <div class="tab active" onclick="switchTab('reservation')">📅 예약 관리</div>
   <div class="tab" onclick="switchTab('breakfast')">🥐 조식 신청</div>
   <div class="tab" onclick="switchTab('room')">🏨 객실 관리</div>
   <div class="tab" onclick="switchTab('orders')" id="tab-orders">📦 주문 관리</div>
-  <div class="tab active" onclick="switchTab('menu')">🍷 메뉴 관리</div>
+  <div class="tab" onclick="switchTab('menu')">🍷 메뉴 관리</div>
   <div class="tab" onclick="switchTab('spot')">⛰️ 관광지 관리</div>
   <div class="tab" onclick="switchTab('slide')">🎞️ 슬라이드</div>
   <div class="tab" onclick="switchTab('clean')">🧹 청소 현황</div>
@@ -166,7 +166,7 @@
 </div>
 
 <!-- 메뉴 패널 -->
-<div class="panel active" id="panel-menu">
+<div class="panel" id="panel-menu">
   <div class="section-header">
     <h2>메뉴 관리</h2>
     <button class="add-btn" onclick="openMenuForm()">+ 메뉴 추가</button>
@@ -575,7 +575,7 @@
 </div>
 
 <!-- 예약 관리 패널 -->
-<div class="panel" id="panel-reservation">
+<div class="panel active" id="panel-reservation">
   <!-- 오늘 현황 -->
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">
     <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px;text-align:center">
@@ -2081,7 +2081,7 @@
     if (snap.exists()) { const d = snap.data(); globalOrderOpen = d.orderOpen !== false; updateOrderUI(globalOrderOpen); }
   });
   loadCatSettings();
-  loadMenus();
+  initReservationTab();
 </script>
 </body>
 </html>
