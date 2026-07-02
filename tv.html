@@ -105,6 +105,21 @@
 
   /* 완료 */
   #screen-complete { background: #0A1628; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+  #screen-spots { background: #0F1E35; flex-direction: column; }
+  .spots-header { padding: 22px 60px; border-bottom: 1px solid rgba(200,164,90,0.1); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .spots-title { font-size: 22px; font-weight: 700; color: #C8A45A; letter-spacing: 0.12em; }
+  .spots-tabs { display: flex; gap: 10px; padding: 16px 60px 0; flex-shrink: 0; }
+  .spots-tab { padding: 8px 24px; border-radius: 20px; font-size: 13px; border: 1px solid rgba(255,255,255,0.08); color: #5A7082; cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; font-family: inherit; background: transparent; }
+  .spots-tab.active { background: rgba(200,164,90,0.15); border-color: rgba(200,164,90,0.5); color: #C8A45A; font-weight: 700; }
+  .spots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 20px 60px 40px; overflow-y: auto; flex: 1; align-content: start; }
+  .spot-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(200,164,90,0.1); border-radius: 14px; overflow: hidden; }
+  .spot-card-img { width: 100%; height: 150px; object-fit: cover; display: block; }
+  .spot-card-img-ph { width: 100%; height: 150px; background: #0A1628; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+  .spot-card-body { padding: 14px 16px; }
+  .spot-card-region { font-size: 10px; letter-spacing: 0.25em; color: #C8A45A; text-transform: uppercase; margin-bottom: 5px; }
+  .spot-card-name { font-size: 17px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px; line-height: 1.3; }
+  .spot-card-desc { font-size: 12px; color: #5A7082; line-height: 1.6; }
+  .spot-card-dist { font-size: 12px; color: #4A6A82; margin-top: 8px; }
   .complete-icon { font-size: 80px; }
   .complete-title { font-size: 36px; font-weight: 700; color: #C8A45A; }
   .complete-msg { font-size: 17px; color: #5A7082; text-align: center; line-height: 1.8; }
@@ -270,9 +285,15 @@
   <div class="bottom-bar">
     <div class="weather-widget" id="weather">🌙 JECHEON</div>
     <div class="slide-dots" id="slide-dots"></div>
-    <div class="bottom-hint">
-      <span class="btn-hint">OK</span>
-      <span data-i18n="orderNow">ORDER NOW</span>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <div class="bottom-hint" onclick="showSpotsScreen()" style="cursor:pointer;">
+        <span class="btn-hint">★</span>
+        <span>관광지</span>
+      </div>
+      <div class="bottom-hint">
+        <span class="btn-hint">OK</span>
+        <span data-i18n="orderNow">ORDER NOW</span>
+      </div>
     </div>
   </div>
 </div>
@@ -304,6 +325,22 @@
   <div class="complete-icon">✅</div>
   <div class="complete-title" data-i18n="orderCompleteTitle">Order Received</div>
   <div class="complete-msg" data-i18n="orderCompleteMsg">We will deliver to your room shortly.<br>Thank you for your patience.</div>
+</div>
+
+<!-- 관광지 화면 -->
+<div class="screen" id="screen-spots">
+  <div class="spots-header">
+    <div class="spots-title">🗺️ TRAVEL GUIDE</div>
+    <div class="order-back" onclick="goMain()">← BACK</div>
+  </div>
+  <div class="spots-tabs">
+    <button class="spots-tab active" id="stab-all" onclick="filterSpots('all')">전체</button>
+    <button class="spots-tab" id="stab-제천" onclick="filterSpots('제천')">제천</button>
+    <button class="spots-tab" id="stab-단양" onclick="filterSpots('단양')">단양</button>
+  </div>
+  <div class="spots-grid" id="spots-grid">
+    <div style="color:#4A6A82;padding:40px;grid-column:1/-1;text-align:center;">로딩 중...</div>
+  </div>
 </div>
 
 <!-- 팝업 -->
@@ -513,6 +550,54 @@
       if(genre === 'none' || !d.genres?.[genre]) return;
       startMusic(d.genres[genre]);
     } catch(e) {}
+  }
+
+  // ── Spots screen ─────────────────────────────────────
+  let _spotsData = [];
+  let _spotsFilter = 'all';
+
+  window.showSpotsScreen = async () => {
+    showScreen('spots');
+    if (!_spotsData.length) await _loadSpots();
+    renderSpots();
+  };
+
+  async function _loadSpots() {
+    try {
+      const snap = await getDocs(query(collection(db,'spots'), orderBy('createdAt','asc')));
+      _spotsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) {}
+  }
+
+  window.filterSpots = (region) => {
+    _spotsFilter = region;
+    document.querySelectorAll('.spots-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('stab-' + (region==='all'?'all':region))?.classList.add('active');
+    renderSpots();
+  };
+
+  function renderSpots() {
+    const grid = document.getElementById('spots-grid');
+    if (!grid) return;
+    const list = _spotsFilter === 'all' ? _spotsData : _spotsData.filter(s => s.region === _spotsFilter);
+    if (!list.length) {
+      grid.innerHTML = '<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">등록된 관광지가 없습니다</div>';
+      return;
+    }
+    grid.innerHTML = list.map(s => {
+      const imgEl = s.imageUrl
+        ? `<img class="spot-card-img" src="${s.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${s.emoji||'📍'}</div>'">`
+        : `<div class="spot-card-img-ph">${s.emoji||'📍'}</div>`;
+      return `<div class="spot-card">
+        ${imgEl}
+        <div class="spot-card-body">
+          ${s.region ? `<div class="spot-card-region">${s.region}</div>` : ''}
+          <div class="spot-card-name">${s.name}</div>
+          ${s.desc ? `<div class="spot-card-desc">${s.desc}</div>` : ''}
+          ${s.distance ? `<div class="spot-card-dist">${s.distance}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
   }
 
   async function loadWifiQr() {
@@ -926,6 +1011,14 @@
       }
       if (e.key===' ') submitOrder();
       if (e.key==='Backspace'||e.key==='Escape') { showScreen('main'); startSlide(); }
+    }
+
+    if (currentScreen==='spots') {
+      if (e.key==='Backspace'||e.key==='Escape') { showScreen('main'); startSlide(); }
+    }
+
+    if (currentScreen==='main') {
+      if (e.key==='t'||e.key==='T') showSpotsScreen();
     }
 
     if (currentScreen==='complete') {
