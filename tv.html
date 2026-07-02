@@ -109,6 +109,8 @@
   .spots-header { padding: 22px 60px; border-bottom: 1px solid rgba(200,164,90,0.1); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .spots-title { font-size: 22px; font-weight: 700; color: #C8A45A; letter-spacing: 0.12em; }
   .spots-tabs { display: flex; gap: 10px; padding: 16px 60px 0; flex-shrink: 0; }
+  .spots-mode-tab { padding: 9px 22px; border-radius: 10px; font-size: 15px; font-weight: 700; border: 1px solid rgba(255,255,255,0.08); color: #5A7082; cursor: pointer; transition: all 0.2s; font-family: inherit; background: transparent; letter-spacing: 0.03em; }
+  .spots-mode-tab.active { background: rgba(200,164,90,0.18); border-color: rgba(200,164,90,0.5); color: #C8A45A; }
   .spots-tab { padding: 8px 24px; border-radius: 20px; font-size: 13px; border: 1px solid rgba(255,255,255,0.08); color: #5A7082; cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; font-family: inherit; background: transparent; }
   .spots-tab.active { background: rgba(200,164,90,0.15); border-color: rgba(200,164,90,0.5); color: #C8A45A; font-weight: 700; }
   .spots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 20px 60px 40px; overflow-y: auto; flex: 1; align-content: start; }
@@ -120,6 +122,8 @@
   .spot-card-name { font-size: 17px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px; line-height: 1.3; }
   .spot-card-desc { font-size: 12px; color: #5A7082; line-height: 1.6; }
   .spot-card-dist { font-size: 12px; color: #4A6A82; margin-top: 8px; }
+  .spot-card-phone { font-size: 13px; color: #C8A45A; margin-top: 6px; letter-spacing: 0.05em; }
+  .spot-card-cat { display: inline-block; font-size: 10px; letter-spacing: 0.2em; padding: 2px 8px; border-radius: 4px; background: rgba(200,164,90,0.12); color: #C8A45A; margin-bottom: 5px; text-transform: uppercase; }
   .complete-icon { font-size: 80px; }
   .complete-title { font-size: 36px; font-weight: 700; color: #C8A45A; }
   .complete-msg { font-size: 17px; color: #5A7082; text-align: center; line-height: 1.8; }
@@ -327,17 +331,16 @@
   <div class="complete-msg" data-i18n="orderCompleteMsg">We will deliver to your room shortly.<br>Thank you for your patience.</div>
 </div>
 
-<!-- 관광지 화면 -->
+<!-- 관광지/맛집 화면 -->
 <div class="screen" id="screen-spots">
   <div class="spots-header">
-    <div class="spots-title">🗺️ TRAVEL GUIDE</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="spots-mode-tab active" id="smode-spots" onclick="setSpotsMode('spots')">🗺️ 관광지</button>
+      <button class="spots-mode-tab" id="smode-restaurants" onclick="setSpotsMode('restaurants')">🍽️ 맛집</button>
+    </div>
     <div class="order-back" onclick="goMain()">← BACK</div>
   </div>
-  <div class="spots-tabs">
-    <button class="spots-tab active" id="stab-all" onclick="filterSpots('all')">전체</button>
-    <button class="spots-tab" id="stab-제천" onclick="filterSpots('제천')">제천</button>
-    <button class="spots-tab" id="stab-단양" onclick="filterSpots('단양')">단양</button>
-  </div>
+  <div class="spots-tabs" id="spots-sub-tabs"></div>
   <div class="spots-grid" id="spots-grid">
     <div style="color:#4A6A82;padding:40px;grid-column:1/-1;text-align:center;">로딩 중...</div>
   </div>
@@ -552,14 +555,15 @@
     } catch(e) {}
   }
 
-  // ── Spots screen ─────────────────────────────────────
-  let _spotsData = [];
-  let _spotsFilter = 'all';
+  // ── Spots / Restaurants screen ────────────────────────
+  let _spotsData = [], _restsData = [];
+  let _spotsFilter = 'all', _restsFilter = 'all';
+  let _spotsMode = 'spots';
 
   window.showSpotsScreen = async () => {
     showScreen('spots');
-    if (!_spotsData.length) await _loadSpots();
-    renderSpots();
+    _spotsMode = 'spots';
+    await setSpotsMode('spots');
   };
 
   async function _loadSpots() {
@@ -569,35 +573,82 @@
     } catch(e) {}
   }
 
-  window.filterSpots = (region) => {
-    _spotsFilter = region;
-    document.querySelectorAll('.spots-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('stab-' + (region==='all'?'all':region))?.classList.add('active');
-    renderSpots();
+  async function _loadRestaurants() {
+    try {
+      const snap = await getDocs(query(collection(db,'restaurants'), orderBy('createdAt','asc')));
+      _restsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) {}
+  }
+
+  window.setSpotsMode = async (mode) => {
+    _spotsMode = mode;
+    document.querySelectorAll('.spots-mode-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('smode-' + mode)?.classList.add('active');
+    if (mode === 'spots') {
+      _spotsFilter = 'all';
+      if (!_spotsData.length) await _loadSpots();
+      document.getElementById('spots-sub-tabs').innerHTML =
+        ['all:전체','제천:제천','단양:단양'].map((x,i) => {
+          const [val,label] = x.split(':');
+          return `<button class="spots-tab${i===0?' active':''}" onclick="filterSpots('${val}')">${label}</button>`;
+        }).join('');
+    } else {
+      _restsFilter = 'all';
+      if (!_restsData.length) await _loadRestaurants();
+      document.getElementById('spots-sub-tabs').innerHTML =
+        ['all:전체','한식:🍚 한식','카페:☕ 카페','술집:🍺 술집','기타:기타'].map((x,i) => {
+          const [val,label] = x.split(':');
+          return `<button class="spots-tab${i===0?' active':''}" onclick="filterRests('${val}')">${label}</button>`;
+        }).join('');
+    }
+    renderSpotsGrid();
   };
 
-  function renderSpots() {
+  window.filterSpots = (region) => {
+    _spotsFilter = region;
+    document.querySelectorAll('#spots-sub-tabs .spots-tab').forEach(t =>
+      t.classList.toggle('active', t.textContent.trim()===(region==='all'?'전체':region))
+    );
+    renderSpotsGrid();
+  };
+
+  window.filterRests = (cat) => {
+    _restsFilter = cat;
+    document.querySelectorAll('#spots-sub-tabs .spots-tab').forEach(t =>
+      t.classList.toggle('active', cat==='all' ? t.textContent.trim()==='전체' : t.textContent.includes(cat))
+    );
+    renderSpotsGrid();
+  };
+
+  function renderSpotsGrid() {
     const grid = document.getElementById('spots-grid');
     if (!grid) return;
-    const list = _spotsFilter === 'all' ? _spotsData : _spotsData.filter(s => s.region === _spotsFilter);
-    if (!list.length) {
-      grid.innerHTML = '<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">등록된 관광지가 없습니다</div>';
-      return;
-    }
-    grid.innerHTML = list.map(s => {
-      const imgEl = s.imageUrl
-        ? `<img class="spot-card-img" src="${s.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${s.emoji||'📍'}</div>'">`
-        : `<div class="spot-card-img-ph">${s.emoji||'📍'}</div>`;
-      return `<div class="spot-card">
-        ${imgEl}
-        <div class="spot-card-body">
-          ${s.region ? `<div class="spot-card-region">${s.region}</div>` : ''}
+    if (_spotsMode === 'spots') {
+      const list = _spotsFilter==='all' ? _spotsData : _spotsData.filter(s=>s.region===_spotsFilter);
+      if (!list.length) { grid.innerHTML='<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">등록된 관광지가 없습니다</div>'; return; }
+      grid.innerHTML = list.map(s => {
+        const img = s.imageUrl ? `<img class="spot-card-img" src="${s.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${s.emoji||'📍'}</div>'">` : `<div class="spot-card-img-ph">${s.emoji||'📍'}</div>`;
+        return `<div class="spot-card">${img}<div class="spot-card-body">
+          ${s.region?`<div class="spot-card-region">${s.region}</div>`:''}
           <div class="spot-card-name">${s.name}</div>
-          ${s.desc ? `<div class="spot-card-desc">${s.desc}</div>` : ''}
-          ${s.distance ? `<div class="spot-card-dist">${s.distance}</div>` : ''}
-        </div>
-      </div>`;
-    }).join('');
+          ${s.desc?`<div class="spot-card-desc">${s.desc}</div>`:''}
+          ${s.distance?`<div class="spot-card-dist">${s.distance}</div>`:''}
+        </div></div>`;
+      }).join('');
+    } else {
+      const list = _restsFilter==='all' ? _restsData : _restsData.filter(r=>r.category===_restsFilter);
+      if (!list.length) { grid.innerHTML='<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">등록된 맛집이 없습니다</div>'; return; }
+      grid.innerHTML = list.map(r => {
+        const img = r.imageUrl ? `<img class="spot-card-img" src="${r.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${r.emoji||'🍽️'}</div>'">` : `<div class="spot-card-img-ph">${r.emoji||'🍽️'}</div>`;
+        return `<div class="spot-card">${img}<div class="spot-card-body">
+          ${r.category?`<div class="spot-card-cat">${r.category}</div>`:''}
+          <div class="spot-card-name">${r.name}</div>
+          ${r.desc?`<div class="spot-card-desc">${r.desc}</div>`:''}
+          ${r.distance?`<div class="spot-card-dist">${r.distance}</div>`:''}
+          ${r.phone?`<div class="spot-card-phone">📞 ${r.phone}</div>`:''}
+        </div></div>`;
+      }).join('');
+    }
   }
 
   async function loadWifiQr() {

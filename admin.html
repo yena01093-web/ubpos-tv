@@ -192,6 +192,22 @@
     <div style="color:#4A6A82;font-size:14px;padding:20px;">로딩 중...</div>
   </div>
 
+  <!-- 맛집 추천 -->
+  <div class="section-header" style="margin-top:36px;">
+    <h2>🍽️ 맛집 추천</h2>
+    <button class="add-btn" onclick="openRestForm()">+ 맛집 추가</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="cat-btn active" id="rest-filter-all" onclick="filterRestAdmin('all')">전체</button>
+    <button class="cat-btn" id="rest-filter-한식" onclick="filterRestAdmin('한식')">🍚 한식</button>
+    <button class="cat-btn" id="rest-filter-카페" onclick="filterRestAdmin('카페')">☕ 카페</button>
+    <button class="cat-btn" id="rest-filter-술집" onclick="filterRestAdmin('술집')">🍺 술집</button>
+    <button class="cat-btn" id="rest-filter-기타" onclick="filterRestAdmin('기타')">기타</button>
+  </div>
+  <div class="items" id="restaurant-list">
+    <div style="color:#4A6A82;font-size:14px;padding:20px;">로딩 중...</div>
+  </div>
+
   <!-- 슬라이드 슬롯 (기존) -->
   <div class="section-header" style="margin-top:36px;">
     <h2 style="font-size:15px;color:#4A6A82;">슬라이드 슬롯 (메인화면 회전)</h2>
@@ -438,6 +454,38 @@
     <div class="form-btns">
       <button class="form-cancel" onclick="closeSpotForm()">취소</button>
       <button class="form-submit" onclick="saveSpot()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 맛집 폼 -->
+<div class="form-overlay" id="form-restaurant">
+  <div class="form-box">
+    <div class="form-title" id="rest-form-title">맛집 추가</div>
+    <div class="form-group">
+      <label>사진 URL</label>
+      <div class="imgbb-tip">📷 <a href="https://imgbb.com" target="_blank">imgbb.com</a> → 이미지 업로드 → Direct link 복사</div>
+      <input type="text" id="r-imageUrl" placeholder="https://i.ibb.co/..." oninput="previewRestImg()">
+      <div class="img-preview" id="r-img-preview">🍽️</div>
+    </div>
+    <div class="form-group"><label>이모지 (이미지 없을 때)</label><input type="text" id="r-emoji" placeholder="🍜" maxlength="2"></div>
+    <div class="form-group"><label>가게 이름 *</label><input type="text" id="r-name" placeholder="제천 한우 식당"></div>
+    <div class="form-group">
+      <label>카테고리</label>
+      <select id="r-category" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;">
+        <option value="한식">🍚 한식</option>
+        <option value="카페">☕ 카페</option>
+        <option value="술집">🍺 술집</option>
+        <option value="분식">🍢 분식</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div class="form-group"><label>설명</label><textarea id="r-desc" rows="2" placeholder="제천 한우를 사용한 현지 맛집"></textarea></div>
+    <div class="form-group"><label>거리/소요시간</label><input type="text" id="r-distance" placeholder="🚗 차로 5분"></div>
+    <div class="form-group"><label>전화번호</label><input type="text" id="r-phone" placeholder="043-000-0000"></div>
+    <div class="form-btns">
+      <button class="form-cancel" onclick="closeRestForm()">취소</button>
+      <button class="form-submit" onclick="saveRestaurant()">저장</button>
     </div>
   </div>
 </div>
@@ -1392,6 +1440,7 @@
   // ── Spot Slots ───────────────────────────────────────
   async function loadSpotSlots() {
     loadSpots();
+    loadRestaurants();
     const grid = document.getElementById('spot-slot-grid');
     const snap = await getDocs(collection(db, 'spot_slots'));
     const dataMap = {};
@@ -1699,6 +1748,105 @@
   window.delSpot = async (id) => {
     if (!confirm('삭제할까요?')) return;
     await deleteDoc(doc(db,'spots',id)); loadSpots(); toast('🗑 삭제 완료');
+  };
+
+  // ── Restaurants ───────────────────────────────────────
+  let _restsAll = [], _restFilter = 'all', editingRestId = null;
+
+  window.filterRestAdmin = (f) => {
+    _restFilter = f;
+    document.querySelectorAll('[id^="rest-filter-"]').forEach(b => b.classList.remove('active'));
+    document.getElementById('rest-filter-' + f)?.classList.add('active');
+    renderRestList();
+  };
+
+  function renderRestList() {
+    const el = document.getElementById('restaurant-list');
+    const list = _restFilter==='all' ? _restsAll : _restsAll.filter(x=>x.s.category===_restFilter);
+    if (!list.length) { el.innerHTML='<div class="empty-msg">맛집이 없습니다</div>'; return; }
+    const catColors = {'한식':'#F59E0B','카페':'#8B5CF6','술집':'#3B82F6','분식':'#EC4899','기타':'#6B7280'};
+    el.innerHTML = list.map(({id,s}) => {
+      const imgEl = s.imageUrl ? `<div class="item-img"><img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='${s.emoji||'🍽️'}'"></div>` : `<div class="item-img">${s.emoji||'🍽️'}</div>`;
+      const c = catColors[s.category]||'#6B7280';
+      return `<div class="item-row">
+        ${imgEl}
+        <div class="item-info">
+          <div class="item-name">${s.name} <span style="font-size:11px;background:${c}22;color:${c};border-radius:4px;padding:2px 7px;margin-left:4px;">${s.category||''}</span></div>
+          <div class="item-desc">${s.desc||''} ${s.phone?`<span style="color:#C8A45A;margin-left:6px;">📞 ${s.phone}</span>`:''}</div>
+        </div>
+        <div class="item-price" style="font-size:13px;color:#4A6A82;">${s.distance||''}</div>
+        <div class="item-actions">
+          <button class="edit-btn" onclick="editRest('${id}')">✏️</button>
+          <button class="del-btn" onclick="delRest('${id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function loadRestaurants() {
+    const snap = await getDocs(query(collection(db,'restaurants'), orderBy('createdAt','asc')));
+    _restsAll = snap.docs.map(d => ({ id: d.id, s: d.data() }));
+    renderRestList();
+  }
+
+  window.openRestForm = () => {
+    editingRestId = null;
+    document.getElementById('rest-form-title').textContent = '맛집 추가';
+    ['r-imageUrl','r-emoji','r-name','r-desc','r-distance','r-phone'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('r-category').value = '한식';
+    document.getElementById('r-img-preview').innerHTML = '🍽️';
+    document.getElementById('form-restaurant').classList.add('show');
+  };
+
+  window.editRest = async (id) => {
+    const snap = await getDoc(doc(db,'restaurants',id));
+    if (!snap.exists()) return;
+    const s = snap.data();
+    editingRestId = id;
+    document.getElementById('rest-form-title').textContent = '맛집 수정';
+    document.getElementById('r-imageUrl').value = s.imageUrl||'';
+    document.getElementById('r-emoji').value = s.emoji||'';
+    document.getElementById('r-name').value = s.name;
+    document.getElementById('r-category').value = s.category||'한식';
+    document.getElementById('r-desc').value = s.desc||'';
+    document.getElementById('r-distance').value = s.distance||'';
+    document.getElementById('r-phone').value = s.phone||'';
+    document.getElementById('r-img-preview').innerHTML = s.imageUrl ? `<img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='🍽️'">` : (s.emoji||'🍽️');
+    document.getElementById('form-restaurant').classList.add('show');
+  };
+
+  window.closeRestForm = () => document.getElementById('form-restaurant').classList.remove('show');
+
+  window.previewRestImg = () => {
+    const url = document.getElementById('r-imageUrl').value.trim();
+    document.getElementById('r-img-preview').innerHTML = url ? `<img src="${url}" onerror="this.parentElement.innerHTML='❌ URL 오류'">` : '🍽️';
+  };
+
+  window.saveRestaurant = async () => {
+    const name = document.getElementById('r-name').value.trim();
+    if (!name) { toast('이름을 입력해주세요'); return; }
+    const data = {
+      emoji: document.getElementById('r-emoji').value||'🍽️',
+      name,
+      category: document.getElementById('r-category').value,
+      desc: document.getElementById('r-desc').value.trim(),
+      distance: document.getElementById('r-distance').value.trim(),
+      phone: document.getElementById('r-phone').value.trim(),
+      imageUrl: document.getElementById('r-imageUrl').value.trim(),
+    };
+    if (editingRestId) {
+      await updateDoc(doc(db,'restaurants',editingRestId), { ...data, updatedAt: serverTimestamp() });
+      toast('✅ 수정 완료');
+    } else {
+      await addDoc(collection(db,'restaurants'), { ...data, createdAt: serverTimestamp() });
+      toast('✅ 추가 완료');
+    }
+    closeRestForm(); loadRestaurants();
+  };
+
+  window.delRest = async (id) => {
+    if (!confirm('삭제할까요?')) return;
+    await deleteDoc(doc(db,'restaurants',id)); loadRestaurants(); toast('🗑 삭제 완료');
   };
 
   // ── Rooms ─────────────────────────────────────────────
