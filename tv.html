@@ -58,7 +58,7 @@
   .checkout-banner-time { font-size: 22px; font-weight: 300; color: #fff; font-family: 'Cormorant Garamond', serif; letter-spacing: 0.1em; }
 
   /* 하단 바 */
-  .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 60px 20px 120px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 60px 20px 190px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
   .weather-widget { font-size: 14px; color: #5A7082; }
   .slide-dots { display: flex; gap: 8px; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: #2A4060; transition: all 0.3s; }
@@ -225,7 +225,7 @@
 <button class="exit-btn" id="breakfastBtn" data-i18n="breakfastBtn" onclick="openBreakfastModal()" style="left:auto;right:28px;color:rgba(200,164,90,0.6);border-color:rgba(200,164,90,0.2)">🥐 조식 신청</button>
 
 <!-- 배경음악 버튼 -->
-<button id="music-btn" onclick="toggleMusicMute()" style="display:none;position:fixed;bottom:28px;right:148px;z-index:210;padding:7px 14px;background:rgba(10,22,40,0.45);border:1px solid rgba(200,164,90,0.2);border-radius:20px;color:rgba(200,164,90,0.6);font-size:13px;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:all .25s;">🎵</button>
+<button id="music-btn" onclick="toggleMusicMute()" style="display:none;position:fixed;bottom:28px;left:135px;z-index:210;padding:7px 14px;background:rgba(10,22,40,0.45);border:1px solid rgba(200,164,90,0.2);border-radius:20px;color:rgba(200,164,90,0.6);font-size:13px;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:all .25s;">🎵</button>
 
 <!-- 조식 신청 모달 -->
 <div id="breakfastModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:flex-end;justify-content:center;backdrop-filter:blur(12px)">
