@@ -902,8 +902,17 @@
   let breakfastUnsub = null, breakfastQueryDate = null;
   function todayStr(){ return new Date().toLocaleDateString('sv-SE'); }
 
+  // 조식 마감(오전 10시) 이후에는 자동으로 "내일 신청" 목록으로 넘어감
+  const BREAKFAST_CUTOFF_HOUR = 10;
+  function breakfastDayStr(){
+    const now = new Date();
+    const d = new Date(now);
+    if (now.getHours() >= BREAKFAST_CUTOFF_HOUR) d.setDate(d.getDate()+1);
+    return d.toLocaleDateString('sv-SE');
+  }
+
   function initBreakfastTab(){
-    const today = todayStr();
+    const today = breakfastDayStr();
     document.getElementById('breakfast-date').textContent = today + ' 조식';
     if(breakfastQueryDate === today) return;
     if(breakfastUnsub){ breakfastUnsub(); breakfastUnsub=null; }
@@ -2097,6 +2106,8 @@
   });
   loadCatSettings();
   initReservationTab();
+  // 자정이 지나면 조식 목록이 자동으로 오늘 날짜로 갱신되도록 주기적으로 확인
+  setInterval(initBreakfastTab, 60000);
 </script>
 </body>
 </html>

@@ -170,42 +170,59 @@
   };
 
   // ── 조식 신청 ────────────────────────────────────────
-  function todayStr() { return new Date().toLocaleDateString('sv-SE'); }
-  document.getElementById('breakfast-date').textContent = todayStr() + ' 조식';
+  // 조식 마감(오전 10시) 이후에는 자동으로 "내일 신청" 목록으로 넘어감
+  const BREAKFAST_CUTOFF_HOUR = 10;
+  function breakfastDayStr() {
+    const now = new Date();
+    const d = new Date(now);
+    if (now.getHours() >= BREAKFAST_CUTOFF_HOUR) d.setDate(d.getDate()+1);
+    return d.toLocaleDateString('sv-SE');
+  }
 
-  const bq = query(collection(db,'hotel_breakfast'), where('date','==',todayStr()));
-  onSnapshot(bq, (snap) => {
-    const list = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0));
-    const active = list.filter(r => r.status !== 'cancelled');
-    document.getElementById('breakfast-count').textContent = `(${active.length})`;
-    const el = document.getElementById('breakfasts');
-    if (!list.length) { el.innerHTML = '<div class="empty">오늘 조식 신청이 없습니다</div>'; return; }
-    el.innerHTML = list.map(r => {
-      const time = r.ts?.toDate?.() ? r.ts.toDate().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}) : '';
-      const cancelled = r.status === 'cancelled';
-      const confirmed = r.status === 'confirmed';
-      const cardClass = cancelled ? 'cancelled' : confirmed ? 'confirmed' : 'new';
-      const badgeClass = cancelled ? 's-cancelled' : confirmed ? 's-confirmed' : 's-pending';
-      const badgeText = cancelled ? '❌ 취소됨' : confirmed ? '✅ 확인됨' : '🟡 대기';
-      return `<div class="order-card ${cardClass}">
-        <div class="order-top">
-          <div style="display:flex;align-items:center;">
-            <span class="room-tag">Room ${r.roomId}</span>
-            <span class="guest-name">${r.guestCount||1}명 · ${r.mealType==='western'?'🍳 양식':'🍚 한식'}</span>
+  let breakfastUnsub = null, breakfastDate = null;
+  function subscribeBreakfast() {
+    const today = breakfastDayStr();
+    if (breakfastDate === today) return;
+    breakfastDate = today;
+    document.getElementById('breakfast-date').textContent = today + ' 조식';
+    if (breakfastUnsub) breakfastUnsub();
+    const bq = query(collection(db,'hotel_breakfast'), where('date','==',today));
+    breakfastUnsub = onSnapshot(bq, (snap) => {
+      const list = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0));
+      const active = list.filter(r => r.status !== 'cancelled');
+      document.getElementById('breakfast-count').textContent = `(${active.length})`;
+      const el = document.getElementById('breakfasts');
+      if (!list.length) { el.innerHTML = '<div class="empty">오늘 조식 신청이 없습니다</div>'; return; }
+      el.innerHTML = list.map(r => {
+        const time = r.ts?.toDate?.() ? r.ts.toDate().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}) : '';
+        const cancelled = r.status === 'cancelled';
+        const confirmed = r.status === 'confirmed';
+        const cardClass = cancelled ? 'cancelled' : confirmed ? 'confirmed' : 'new';
+        const badgeClass = cancelled ? 's-cancelled' : confirmed ? 's-confirmed' : 's-pending';
+        const badgeText = cancelled ? '❌ 취소됨' : confirmed ? '✅ 확인됨' : '🟡 대기';
+        return `<div class="order-card ${cardClass}">
+          <div class="order-top">
+            <div style="display:flex;align-items:center;">
+              <span class="room-tag">Room ${r.roomId}</span>
+              <span class="guest-name">${r.guestCount||1}명 · ${r.mealType==='western'?'🍳 양식':'🍚 한식'}</span>
+            </div>
+            <span class="status-badge ${badgeClass}">${badgeText}</span>
           </div>
-          <span class="status-badge ${badgeClass}">${badgeText}</span>
-        </div>
-        ${r.note ? `<div class="memo-box">요청사항: <span>${r.note}</span></div>` : ''}
-        <div class="order-footer">
-          <div class="order-time">신청: ${time}</div>
-          <div class="order-actions">
-            ${r.status==='pending' ? `<button class="action-btn btn-confirm" onclick="confirmBreakfast('${r.id}')">✅ 확인</button>` : ''}
-            ${!cancelled ? `<button class="action-btn btn-cancel" onclick="cancelBreakfast('${r.id}')">✖ 취소</button>` : ''}
+          ${r.note ? `<div class="memo-box">요청사항: <span>${r.note}</span></div>` : ''}
+          <div class="order-footer">
+            <div class="order-time">신청: ${time}</div>
+            <div class="order-actions">
+              ${r.status==='pending' ? `<button class="action-btn btn-confirm" onclick="confirmBreakfast('${r.id}')">✅ 확인</button>` : ''}
+              ${!cancelled ? `<button class="action-btn btn-cancel" onclick="cancelBreakfast('${r.id}')">✖ 취소</button>` : ''}
+            </div>
           </div>
-        </div>
-      </div>`;
-    }).join('');
-  });
+        </div>`;
+      }).join('');
+    });
+  }
+  subscribeBreakfast();
+  // 자정이 지나면 자동으로 오늘 날짜 목록으로 갱신
+  setInterval(subscribeBreakfast, 60000);
 
   window.confirmBreakfast = async (id) => {
     await updateDoc(doc(db,'hotel_breakfast',id), { status:'confirmed' });
