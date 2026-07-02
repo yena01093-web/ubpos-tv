@@ -417,7 +417,11 @@
   let currentCat = 'drink';
   let catIndex = 0;
   let CATS = ['drink','food','package'];
-  let catMeta = { drink:{label:'주류 & 음료',emoji:'🍷'}, food:{label:'5분 퀵안주',emoji:'🍕'}, package:{label:'패키지',emoji:'📦'} };
+  let catMeta = {
+    drink:{label:'주류 & 음료',emoji:'🍷',label_en:'Drinks',label_zh:'酒水饮料',label_ja:'お酒・ドリンク'},
+    food:{label:'5분 퀵안주',emoji:'🍕',label_en:'Quick Snacks',label_zh:'快速小食',label_ja:'おつまみ'},
+    package:{label:'패키지',emoji:'📦',label_en:'Packages',label_zh:'套餐组合',label_ja:'セットメニュー'},
+  };
   let menuFocusRow = 0;
   let menuFocusCol = 0;
   let popupFocus = 0;
@@ -535,6 +539,12 @@
     if (!m) return '';
     const f = { en:'desc_en', zh:'desc_zh', ja:'desc_ja' }[lang];
     return (f && m[f]) ? m[f] : (m.desc || '');
+  }
+
+  function catLabel(key) {
+    const m = catMeta[key] || { label:key };
+    const f = { en:'label_en', zh:'label_zh', ja:'label_ja' }[lang];
+    return (f && m[f]) ? m[f] : m.label;
   }
 
   function cartInfoText(n) {
@@ -1011,7 +1021,7 @@
     if (!container) return;
     container.innerHTML = CATS.map((key,i) => {
       const m = catMeta[key] || {label:key, emoji:'📁'};
-      return `<div class="cat-tab ${i===0?'focused':''}" data-cat="${key}">${m.emoji} ${m.label}</div>`;
+      return `<div class="cat-tab ${i===0?'focused':''}" data-cat="${key}">${m.emoji} ${catLabel(key)}</div>`;
     }).join('');
     container.querySelectorAll('.cat-tab').forEach((tab,i) => {
       tab.addEventListener('click', () => {
@@ -1162,7 +1172,7 @@
     tabs.forEach((tab,i) => {
       tab.classList.toggle('focused', i===catIndex);
       const m = catMeta[CATS[i]] || {label:CATS[i], emoji:'📁'};
-      tab.innerHTML = `${m.emoji} ${m.label}`;
+      tab.innerHTML = `${m.emoji} ${catLabel(CATS[i])}`;
     });
   }
 

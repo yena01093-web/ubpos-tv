@@ -517,6 +517,14 @@
     <div class="form-title">카테고리 편집</div>
     <div class="form-group"><label>이모지</label><input type="text" id="cat-edit-emoji" placeholder="🍷" maxlength="2"></div>
     <div class="form-group"><label>카테고리 이름 *</label><input type="text" id="cat-edit-label" placeholder="주류 & 음료"></div>
+    <div class="form-group">
+      <label>다국어 이름 (선택 — 비우면 TV에서 한국어로 표시)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="cat-edit-label-en" placeholder="EN">
+        <input type="text" id="cat-edit-label-zh" placeholder="中">
+        <input type="text" id="cat-edit-label-ja" placeholder="日">
+      </div>
+    </div>
     <div class="form-group"><label>순서</label><select id="cat-edit-order" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;"></select></div>
     <div class="form-btns">
       <button class="form-cancel" onclick="closeCatEdit()">취소</button>
@@ -1550,6 +1558,9 @@
     const m = catMeta[key] || {};
     document.getElementById('cat-edit-emoji').value = m.emoji || '';
     document.getElementById('cat-edit-label').value = m.label || '';
+    document.getElementById('cat-edit-label-en').value = m.label_en || '';
+    document.getElementById('cat-edit-label-zh').value = m.label_zh || '';
+    document.getElementById('cat-edit-label-ja').value = m.label_ja || '';
     const sel = document.getElementById('cat-edit-order');
     sel.innerHTML = catOrder.map((k,i) => `<option value="${i}" ${k===key?'selected':''}>${i+1}번째</option>`).join('');
     document.getElementById('form-cat').classList.add('show');
@@ -1561,7 +1572,12 @@
     const emoji = document.getElementById('cat-edit-emoji').value.trim();
     const label = document.getElementById('cat-edit-label').value.trim();
     if (!label) { toast('이름을 입력해주세요'); return; }
-    catMeta[editingCatKey] = { label, emoji: emoji || catMeta[editingCatKey]?.emoji || '📁' };
+    catMeta[editingCatKey] = {
+      label, emoji: emoji || catMeta[editingCatKey]?.emoji || '📁',
+      label_en: document.getElementById('cat-edit-label-en').value.trim(),
+      label_zh: document.getElementById('cat-edit-label-zh').value.trim(),
+      label_ja: document.getElementById('cat-edit-label-ja').value.trim(),
+    };
     const newPos = parseInt(document.getElementById('cat-edit-order').value);
     const curPos = catOrder.indexOf(editingCatKey);
     if (newPos !== curPos) { catOrder.splice(curPos,1); catOrder.splice(newPos,0,editingCatKey); }
