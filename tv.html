@@ -73,6 +73,7 @@
   /* 나가기 버튼 */
   .exit-btn { position: fixed; bottom: 28px; left: 28px; z-index: 210; padding: 7px 16px; background: rgba(10,22,40,0.45); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: rgba(255,255,255,0.35); font-size: 12px; letter-spacing: 0.12em; cursor: pointer; font-family: inherit; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.25s; }
   .exit-btn:hover { background: rgba(10,22,40,0.7); border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
+  #breakfastBtn.bf-applied { color: rgba(74,222,128,0.9) !important; border-color: rgba(74,222,128,0.4) !important; background: rgba(74,222,128,0.1) !important; }
   .bottom-hint { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A7082; }
   .btn-hint { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #2A4060; border-radius: 6px; font-size: 12px; }
   .bottom-hint.tourism-hint { background: rgba(200,164,90,0.14); border: 1px solid rgba(200,164,90,0.4); border-radius: 20px; padding: 7px 16px 7px 10px; color: #C8A45A; font-weight: 700; font-size: 14px; }
@@ -231,6 +232,7 @@
   <div style="background:linear-gradient(160deg,#0A1628,#0F1E35);border:1px solid rgba(200,164,90,.3);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;animation:slideUp .3s ease">
     <div style="font-size:22px;font-weight:700;color:#C8A45A;text-align:center;margin-bottom:6px" data-i18n="breakfastBtn">🥐 조식 신청</div>
     <div style="font-size:13px;color:#4A6A82;text-align:center;margin-bottom:20px" data-i18n="breakfastSub">내일 아침 조식을 신청합니다</div>
+    <div id="bfExistingNotice" style="display:none;font-size:13px;color:#4ADE80;text-align:center;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:8px;padding:8px;margin-bottom:16px" data-i18n="bfAlreadyApplied">✓ 이미 신청하셨습니다. 아래에서 내용을 바꾸면 신청 내용이 수정됩니다.</div>
     <div style="margin-bottom:14px">
       <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="roomNumberLabel">객실 번호</label>
       <input id="bfRoom" type="number" readonly data-i18n-placeholder="roomNumberPlaceholder" placeholder="예: 105" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#C8A45A;font-size:16px;font-weight:700;outline:none;font-family:inherit;cursor:default">
@@ -255,7 +257,7 @@
       <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="requestLabel">요청사항 (선택)</label>
       <input id="bfNote" data-i18n-placeholder="requestPlaceholder" placeholder="알레르기, 기타 요청사항" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
     </div>
-    <button onclick="submitBreakfast()" data-i18n="submitBtn" style="width:100%;padding:14px;border-radius:10px;border:none;background:#C8A45A;color:#000;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">신청하기</button>
+    <button onclick="submitBreakfast()" id="bfSubmitBtn" data-i18n="submitBtn" style="width:100%;padding:14px;border-radius:10px;border:none;background:#C8A45A;color:#000;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">신청하기</button>
     <button onclick="closeBreakfastModal()" data-i18n="cancelBtn" style="width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:14px;cursor:pointer;font-family:inherit">취소</button>
   </div>
 </div>
@@ -463,6 +465,7 @@
       roomNumberLabel:'객실 번호', roomNumberPlaceholder:'예: 105',
       guestCountLabel:'인원수', requestLabel:'요청사항 (선택)', requestPlaceholder:'알레르기, 기타 요청사항',
       mealTypeLabel:'조식 종류', mealTypeKorean:'한식', mealTypeWestern:'양식',
+      breakfastApplied:'🥐 조식 신청됨 ✓', bfAlreadyApplied:'✓ 이미 신청하셨습니다. 아래에서 내용을 바꾸면 신청 내용이 수정됩니다.', updateBtn:'수정하기',
       submitBtn:'신청하기', cancelBtn:'취소',
       bfRoomRequired:'객실 번호를 입력해주세요.', bfSuccessToast:'🥐 조식 신청이 완료되었습니다!', bfFailPrefix:'신청 실패: ',
     },
@@ -487,6 +490,7 @@
       roomNumberLabel:'Room Number', roomNumberPlaceholder:'e.g. 105',
       guestCountLabel:'Number of Guests', requestLabel:'Special Requests (optional)', requestPlaceholder:'Allergies, other requests',
       mealTypeLabel:'Meal Type', mealTypeKorean:'Korean', mealTypeWestern:'Western',
+      breakfastApplied:'🥐 Breakfast Requested ✓', bfAlreadyApplied:'✓ You already requested breakfast. Changing anything below will update your request.', updateBtn:'Update',
       submitBtn:'Submit', cancelBtn:'Cancel',
       bfRoomRequired:'Please enter your room number.', bfSuccessToast:'🥐 Breakfast request completed!', bfFailPrefix:'Request failed: ',
     },
@@ -511,6 +515,7 @@
       roomNumberLabel:'客房号码', roomNumberPlaceholder:'例如：105',
       guestCountLabel:'人数', requestLabel:'特殊要求（选填）', requestPlaceholder:'过敏信息、其他要求',
       mealTypeLabel:'早餐类型', mealTypeKorean:'韩式', mealTypeWestern:'西式',
+      breakfastApplied:'🥐 已申请早餐 ✓', bfAlreadyApplied:'✓ 您已申请早餐。修改下方内容将更新您的申请。', updateBtn:'修改',
       submitBtn:'提交申请', cancelBtn:'取消',
       bfRoomRequired:'请输入客房号码。', bfSuccessToast:'🥐 早餐申请已完成！', bfFailPrefix:'申请失败：',
     },
@@ -535,6 +540,7 @@
       roomNumberLabel:'客室番号', roomNumberPlaceholder:'例：105',
       guestCountLabel:'人数', requestLabel:'ご要望（任意）', requestPlaceholder:'アレルギー、その他のご要望',
       mealTypeLabel:'朝食の種類', mealTypeKorean:'韓定食', mealTypeWestern:'洋食',
+      breakfastApplied:'🥐 朝食申込済み ✓', bfAlreadyApplied:'✓ すでに朝食をお申し込みです。以下を変更すると申込内容が更新されます。', updateBtn:'変更する',
       submitBtn:'申し込む', cancelBtn:'キャンセル',
       bfRoomRequired:'客室番号を入力してください。', bfSuccessToast:'🥐 朝食のお申し込みが完了しました！', bfFailPrefix:'申し込み失敗：',
     }
@@ -651,6 +657,8 @@
     updateCart();
     // 조식 신청 모달 인원수 버튼
     renderBfCountLabels();
+    // 조식 신청 버튼 상태(이미 신청됨 여부) 텍스트 갱신
+    updateBreakfastBtnState();
     // 추천 메뉴 배너
     renderFeaturedName();
     // 체크아웃 배너가 떠있으면 오전/오후 표기 갱신
@@ -1078,6 +1086,29 @@
   // 조식 신청은 항상 "내일 아침" 조식을 신청하는 것이므로 다음날 날짜로 저장
   const tomorrowBF = () => { const d = new Date(); d.setDate(d.getDate()+1); return d.toLocaleDateString('sv-SE'); };
 
+  // 이 방의 "내일 조식" 신청이 이미 있는지 실시간으로 추적 — 있으면 버튼에 표시하고 재신청 시 기존 건을 수정
+  let bfExistingRequest = null;
+  function startBreakfastStatusListener() {
+    const q = query(collection(db,'hotel_breakfast'), where('roomId','==',ROOM));
+    onSnapshot(q, snap => {
+      const targetDate = tomorrowBF();
+      const docs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      bfExistingRequest = docs.find(r => r.date===targetDate && r.status!=='cancelled') || null;
+      updateBreakfastBtnState();
+    });
+  }
+  function updateBreakfastBtnState() {
+    const btn = document.getElementById('breakfastBtn');
+    if (!btn) return;
+    if (bfExistingRequest) {
+      btn.classList.add('bf-applied');
+      btn.textContent = t('breakfastApplied');
+    } else {
+      btn.classList.remove('bf-applied');
+      btn.textContent = t('breakfastBtn');
+    }
+  }
+
   function updateBfTypeButtons() {
     ['korean','western'].forEach(k => {
       const b = document.getElementById('bfType-'+k);
@@ -1086,11 +1117,13 @@
   }
 
   window.openBreakfastModal = ()=>{
-    bfGuestCount=1;
-    bfMealType='korean';
+    bfGuestCount = bfExistingRequest?.guestCount || 1;
+    bfMealType = bfExistingRequest?.mealType || 'korean';
     document.getElementById('bfRoom').value=ROOM;
-    document.getElementById('bfNote').value='';
-    [1,2,3,4].forEach(n=>{ const b=document.getElementById('bfCnt-'+n); if(b){ b.style.background=n===1?'rgba(200,164,90,.15)':'transparent'; b.style.color=n===1?'#C8A45A':'#4A6A82'; b.style.borderColor=n===1?'rgba(200,164,90,.4)':'#1C2E45'; } });
+    document.getElementById('bfNote').value = bfExistingRequest?.note || '';
+    document.getElementById('bfExistingNotice').style.display = bfExistingRequest ? 'block' : 'none';
+    document.getElementById('bfSubmitBtn').textContent = bfExistingRequest ? t('updateBtn') : t('submitBtn');
+    [1,2,3,4].forEach(n=>{ const b=document.getElementById('bfCnt-'+n); if(b){ b.style.background=n===bfGuestCount?'rgba(200,164,90,.15)':'transparent'; b.style.color=n===bfGuestCount?'#C8A45A':'#4A6A82'; b.style.borderColor=n===bfGuestCount?'rgba(200,164,90,.4)':'#1C2E45'; } });
     updateBfTypeButtons();
     document.getElementById('breakfastModal').style.display='flex';
   };
@@ -1108,11 +1141,17 @@
     const note=document.getElementById('bfNote').value.trim();
     if(!room){ alert(t('bfRoomRequired')); return; }
     try{
-      await addDoc(collection(db,'hotel_breakfast'),{
-        roomId:room, guestCount:bfGuestCount, mealType:bfMealType, note:note||'',
-        date:tomorrowBF(), status:'pending',
-        ts:serverTimestamp()
-      });
+      if (bfExistingRequest) {
+        await updateDoc(doc(db,'hotel_breakfast',bfExistingRequest.id), {
+          guestCount:bfGuestCount, mealType:bfMealType, note:note||'', status:'pending', ts:serverTimestamp()
+        });
+      } else {
+        await addDoc(collection(db,'hotel_breakfast'),{
+          roomId:room, guestCount:bfGuestCount, mealType:bfMealType, note:note||'',
+          date:tomorrowBF(), status:'pending',
+          ts:serverTimestamp()
+        });
+      }
       closeBreakfastModal();
       showToastTV(t('bfSuccessToast'));
     }catch(e){ alert(t('bfFailPrefix')+e.message); }
@@ -1232,6 +1271,7 @@
     await Promise.all([loadData(), loadGlobalSettings(), checkRoomStatus(), loadFeatured(), loadCatSettings()]);
     showScreen('main'); startSlide(); loadWeather();
     startOrderStatusListener();
+    startBreakfastStatusListener();
     applyLang();
     loadMusicSettings();
     loadWifiQr();
