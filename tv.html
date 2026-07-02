@@ -75,6 +75,8 @@
   .exit-btn:hover { background: rgba(10,22,40,0.7); border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
   .bottom-hint { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A7082; }
   .btn-hint { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #2A4060; border-radius: 6px; font-size: 12px; }
+  .bottom-hint.tourism-hint { background: rgba(200,164,90,0.14); border: 1px solid rgba(200,164,90,0.4); border-radius: 20px; padding: 7px 16px 7px 10px; color: #C8A45A; font-weight: 700; font-size: 14px; }
+  .bottom-hint.tourism-hint .btn-hint { background: rgba(200,164,90,0.12); border-color: rgba(200,164,90,0.55); color: #C8A45A; }
 
   /* 주문 화면 */
   #screen-order { background: #0F1E35; flex-direction: column; }
@@ -313,7 +315,7 @@
     <div class="weather-widget" id="weather">🌙 JECHEON</div>
     <div class="slide-dots" id="slide-dots"></div>
     <div style="display:flex;gap:16px;align-items:center;">
-      <div class="bottom-hint" onclick="showSpotsScreen()" style="cursor:pointer;">
+      <div class="bottom-hint tourism-hint" onclick="showSpotsScreen()" style="cursor:pointer;">
         <span class="btn-hint">★</span>
         <span data-i18n="tourism">관광지</span>
       </div>

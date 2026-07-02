@@ -153,16 +153,16 @@
 </header>
 
 <div class="tabs">
+  <div class="tab" onclick="switchTab('reservation')">📅 예약 관리</div>
+  <div class="tab" onclick="switchTab('breakfast')">🥐 조식 신청</div>
+  <div class="tab" onclick="switchTab('room')">🏨 객실 관리</div>
+  <div class="tab" onclick="switchTab('orders')" id="tab-orders">📦 주문 관리</div>
   <div class="tab active" onclick="switchTab('menu')">🍷 메뉴 관리</div>
   <div class="tab" onclick="switchTab('spot')">⛰️ 관광지 관리</div>
-  <div class="tab" onclick="switchTab('room')">🏨 객실 관리</div>
-  <div class="tab" onclick="switchTab('settings')">⚙️ 설정</div>
   <div class="tab" onclick="switchTab('slide')">🎞️ 슬라이드</div>
-  <div class="tab" onclick="switchTab('orders')" id="tab-orders">📦 주문 관리</div>
   <div class="tab" onclick="switchTab('clean')">🧹 청소 현황</div>
-  <div class="tab" onclick="switchTab('breakfast')">🥐 조식 신청</div>
-  <div class="tab" onclick="switchTab('reservation')">📅 예약 관리</div>
   <div class="tab" onclick="switchTab('qr')">🔖 QR 코드</div>
+  <div class="tab" onclick="switchTab('settings')">⚙️ 설정</div>
 </div>
 
 <!-- 메뉴 패널 -->
@@ -772,7 +772,7 @@
 
   // ── Tab ──────────────────────────────────────────────
   window.switchTab = (tab) => {
-    const tabs = ['menu','spot','room','settings','slide','orders','clean','breakfast','reservation','qr'];
+    const tabs = ['reservation','breakfast','room','orders','menu','spot','slide','clean','qr','settings'];
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
     tabs.forEach(id => document.getElementById('panel-'+id).classList.toggle('active', id===tab));
     ({ menu: loadMenus, spot: loadSpotSlots, room: loadRooms, settings: loadSettings, slide: loadSlides, orders: initOrdersTab, clean: initCleanTab, breakfast: initBreakfastTab, reservation: initReservationTab, qr: initQrTab })[tab]?.();
