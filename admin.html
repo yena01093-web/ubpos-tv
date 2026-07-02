@@ -458,6 +458,14 @@
     <div class="form-group"><label>이모지 (이미지 없을 때 표시)</label><input type="text" id="s-emoji" placeholder="⛰️" maxlength="2"></div>
     <div class="form-group"><label>관광지 이름 *</label><input type="text" id="s-name" placeholder="청풍호"></div>
     <div class="form-group">
+      <label>다국어 이름 (선택 — TV 메인 슬라이드에 반영)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="s-name-en" placeholder="EN">
+        <input type="text" id="s-name-zh" placeholder="中">
+        <input type="text" id="s-name-ja" placeholder="日">
+      </div>
+    </div>
+    <div class="form-group">
       <label>지역</label>
       <select id="s-region" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:9px 13px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;">
         <option value="제천">제천</option>
@@ -466,6 +474,14 @@
       </select>
     </div>
     <div class="form-group"><label>설명</label><textarea id="s-desc" rows="2" placeholder="충북의 아름다운 호수, 유람선 운영"></textarea></div>
+    <div class="form-group">
+      <label>다국어 설명 (선택)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="s-desc-en" placeholder="EN">
+        <input type="text" id="s-desc-zh" placeholder="中">
+        <input type="text" id="s-desc-ja" placeholder="日">
+      </div>
+    </div>
     <div class="form-group"><label>거리/소요시간</label><input type="text" id="s-distance" placeholder="🚗 차로 10분"></div>
     <div class="form-group">
       <label>🎬 유튜브 URL (TV 영상 재생용)</label>
@@ -1430,6 +1446,11 @@
           </label>
         </div>
         <input class="slot-name-input" id="slot-name-${i}" type="text" placeholder="슬라이드 이름" value="${d.name||''}">
+        <div class="slot-url-row" style="margin-bottom:8px;">
+          <input class="slot-url-input" id="slot-name-en-${i}" type="text" placeholder="EN" value="${d.name_en||''}">
+          <input class="slot-url-input" id="slot-name-zh-${i}" type="text" placeholder="中" value="${d.name_zh||''}">
+          <input class="slot-url-input" id="slot-name-ja-${i}" type="text" placeholder="日" value="${d.name_ja||''}">
+        </div>
         <div class="slot-url-row">
           <input class="slot-url-input" id="slot-url-${i}" type="text" placeholder="https://i.ibb.co/..." value="${d.imageUrl||''}" oninput="previewSlot(${i})">
         </div>
@@ -1462,7 +1483,10 @@
     const imageUrl = document.getElementById(`slot-url-${i}`).value.trim();
     const category = document.getElementById(`slot-cat-${i}`).value;
     const active = document.getElementById(`slot-active-${i}`).checked;
-    await setDoc(doc(db, 'slides', slotId), { slotId: i, name, imageUrl, category, active, updatedAt: serverTimestamp() });
+    const name_en = document.getElementById(`slot-name-en-${i}`).value.trim();
+    const name_zh = document.getElementById(`slot-name-zh-${i}`).value.trim();
+    const name_ja = document.getElementById(`slot-name-ja-${i}`).value.trim();
+    await setDoc(doc(db, 'slides', slotId), { slotId: i, name, imageUrl, category, active, name_en, name_zh, name_ja, updatedAt: serverTimestamp() });
     toast(`✅ 슬롯 ${i} 저장됨`);
   };
 
@@ -1492,6 +1516,11 @@
           </label>
         </div>
         <input class="slot-name-input" id="sslot-name-${i}" type="text" placeholder="관광지 이름" value="${d.name||''}">
+        <div class="slot-url-row" style="margin-bottom:8px;">
+          <input class="slot-url-input" id="sslot-name-en-${i}" type="text" placeholder="EN" value="${d.name_en||''}">
+          <input class="slot-url-input" id="sslot-name-zh-${i}" type="text" placeholder="中" value="${d.name_zh||''}">
+          <input class="slot-url-input" id="sslot-name-ja-${i}" type="text" placeholder="日" value="${d.name_ja||''}">
+        </div>
         <div class="slot-url-row">
           <input class="slot-url-input" id="sslot-url-${i}" type="text" placeholder="https://i.ibb.co/..." value="${d.imageUrl||''}" oninput="previewSpotSlot(${i})">
         </div>
@@ -1518,7 +1547,10 @@
     const name = document.getElementById(`sslot-name-${i}`).value.trim();
     const imageUrl = document.getElementById(`sslot-url-${i}`).value.trim();
     const active = document.getElementById(`sslot-active-${i}`).checked;
-    await setDoc(doc(db, 'spot_slots', `slot_${i}`), { slotId: i, name, imageUrl, active, updatedAt: serverTimestamp() });
+    const name_en = document.getElementById(`sslot-name-en-${i}`).value.trim();
+    const name_zh = document.getElementById(`sslot-name-zh-${i}`).value.trim();
+    const name_ja = document.getElementById(`sslot-name-ja-${i}`).value.trim();
+    await setDoc(doc(db, 'spot_slots', `slot_${i}`), { slotId: i, name, imageUrl, active, name_en, name_zh, name_ja, updatedAt: serverTimestamp() });
     toast(`✅ 관광지 슬롯 ${i} 저장됨`);
   };
 
@@ -1738,10 +1770,12 @@
     renderSpotList();
   }
 
+  const SPOT_LANG_FIELDS = ['s-name-en','s-name-zh','s-name-ja','s-desc-en','s-desc-zh','s-desc-ja'];
+
   window.openSpotForm = () => {
     editingSpotId = null;
     document.getElementById('spot-form-title').textContent = '관광지 추가';
-    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance','s-youtube'].forEach(id => document.getElementById(id).value='');
+    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance','s-youtube', ...SPOT_LANG_FIELDS].forEach(id => document.getElementById(id).value='');
     document.getElementById('s-region').value = '제천';
     document.getElementById('s-img-preview').innerHTML = '📍';
     document.getElementById('form-spot').classList.add('show');
@@ -1760,6 +1794,12 @@
     document.getElementById('s-desc').value = s.desc||'';
     document.getElementById('s-distance').value = s.distance||'';
     document.getElementById('s-youtube').value = s.youtubeUrl||'';
+    document.getElementById('s-name-en').value = s.name_en||'';
+    document.getElementById('s-name-zh').value = s.name_zh||'';
+    document.getElementById('s-name-ja').value = s.name_ja||'';
+    document.getElementById('s-desc-en').value = s.desc_en||'';
+    document.getElementById('s-desc-zh').value = s.desc_zh||'';
+    document.getElementById('s-desc-ja').value = s.desc_ja||'';
     document.getElementById('s-img-preview').innerHTML = s.imageUrl
       ? `<img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='📍'">`
       : (s.emoji||'📍');
@@ -1788,6 +1828,12 @@
       imageUrl: document.getElementById('s-imageUrl').value.trim(),
       youtubeUrl,
       videoId: youtubeUrl ? extractYouTubeId(youtubeUrl) : '',
+      name_en: document.getElementById('s-name-en').value.trim(),
+      name_zh: document.getElementById('s-name-zh').value.trim(),
+      name_ja: document.getElementById('s-name-ja').value.trim(),
+      desc_en: document.getElementById('s-desc-en').value.trim(),
+      desc_zh: document.getElementById('s-desc-zh').value.trim(),
+      desc_ja: document.getElementById('s-desc-ja').value.trim(),
     };
     if (editingSpotId) {
       await updateDoc(doc(db,'spots',editingSpotId), { ...data, updatedAt: serverTimestamp() });
@@ -1796,7 +1842,7 @@
       await addDoc(collection(db,'spots'), { ...data, createdAt: serverTimestamp() });
       toast('✅ 추가 완료');
     }
-    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance','s-youtube'].forEach(id => document.getElementById(id).value='');
+    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance','s-youtube', ...SPOT_LANG_FIELDS].forEach(id => document.getElementById(id).value='');
     closeSpotForm(); loadSpots();
   };
 
