@@ -113,8 +113,24 @@
   .spots-mode-tab.active { background: rgba(200,164,90,0.18); border-color: rgba(200,164,90,0.5); color: #C8A45A; }
   .spots-tab { padding: 8px 24px; border-radius: 20px; font-size: 13px; border: 1px solid rgba(255,255,255,0.08); color: #5A7082; cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; font-family: inherit; background: transparent; }
   .spots-tab.active { background: rgba(200,164,90,0.15); border-color: rgba(200,164,90,0.5); color: #C8A45A; font-weight: 700; }
-  .spots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 20px 60px 40px; overflow-y: auto; flex: 1; align-content: start; }
-  .spot-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(200,164,90,0.1); border-radius: 14px; overflow: hidden; }
+  /* 관광지 영상 플레이어 */
+  .spots-video-wrap { flex-shrink: 0; width: 100%; height: 0; overflow: hidden; transition: height 0.4s ease; background: #000; position: relative; }
+  .spots-video-wrap.active { height: 52vh; }
+  #spots-yt-el { width: 100%; height: 100%; }
+  .spots-video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 18px 60px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; align-items: flex-end; justify-content: space-between; pointer-events: none; }
+  .spots-video-title { font-size: 22px; font-weight: 700; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+  .spots-video-meta { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 4px; letter-spacing: 0.05em; }
+  .spots-video-next { pointer-events: auto; background: rgba(200,164,90,0.2); border: 1px solid rgba(200,164,90,0.5); color: #C8A45A; padding: 8px 20px; border-radius: 20px; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .spots-video-next:hover { background: rgba(200,164,90,0.35); }
+  /* 영상 재생 중 카드 스트립 모드 */
+  .spots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 20px 60px 40px; overflow-y: auto; flex: 1; align-content: start; transition: all 0.3s; }
+  .spots-grid.strip { grid-template-columns: repeat(auto-fill, 170px); overflow-y: hidden; overflow-x: auto; padding: 14px 60px; flex: 0; height: 160px; }
+  .spots-grid.strip .spot-card-img, .spots-grid.strip .spot-card-img-ph { height: 75px; }
+  .spots-grid.strip .spot-card-body { padding: 7px 10px; }
+  .spots-grid.strip .spot-card-name { font-size: 12px; margin-bottom: 0; }
+  .spots-grid.strip .spot-card-desc, .spots-grid.strip .spot-card-dist, .spots-grid.strip .spot-card-region { display: none; }
+  .spot-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(200,164,90,0.1); border-radius: 14px; overflow: hidden; transition: border-color 0.3s; }
+  .spot-card.playing { border-color: #C8A45A; box-shadow: 0 0 0 1px rgba(200,164,90,0.5); }
   .spot-card-img { width: 100%; height: 150px; object-fit: cover; display: block; }
   .spot-card-img-ph { width: 100%; height: 150px; background: #0A1628; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
   .spot-card-body { padding: 14px 16px; }
@@ -341,6 +357,17 @@
     <div class="order-back" onclick="goMain()">← BACK</div>
   </div>
   <div class="spots-tabs" id="spots-sub-tabs"></div>
+  <!-- 관광지 영상 플레이어 -->
+  <div class="spots-video-wrap" id="spots-video-wrap">
+    <div id="spots-yt-el"></div>
+    <div class="spots-video-overlay">
+      <div>
+        <div class="spots-video-title" id="spots-video-title"></div>
+        <div class="spots-video-meta" id="spots-video-meta"></div>
+      </div>
+      <button class="spots-video-next" onclick="nextSpotsVideo()">다음 영상 ▶</button>
+    </div>
+  </div>
   <div class="spots-grid" id="spots-grid">
     <div style="color:#4A6A82;padding:40px;grid-column:1/-1;text-align:center;">로딩 중...</div>
   </div>
@@ -610,6 +637,19 @@
       t.classList.toggle('active', t.textContent.trim()===(region==='all'?'전체':region))
     );
     renderSpotsGrid();
+    // 영상 처리
+    if (region === 'all') {
+      stopSpotsVideo();
+    } else {
+      const videos = _spotsData.filter(s => s.region === region && s.videoId).map(s => ({ videoId: s.videoId, name: s.name, region: s.region }));
+      if (videos.length) {
+        document.getElementById('spots-video-wrap').classList.add('active');
+        document.getElementById('spots-grid').classList.add('strip');
+        startSpotsVideos(videos);
+      } else {
+        stopSpotsVideo();
+      }
+    }
   };
 
   window.filterRests = (cat) => {
@@ -665,29 +705,100 @@
     } catch(e) {}
   }
 
+  // ── 공용 YouTube IFrame API 로더 ─────────────────────
+  const _ytCbs = [];
+  window.onYouTubeIframeAPIReady = () => { _ytCbs.splice(0).forEach(f => f()); };
+  function _onYtReady(cb) {
+    if (window.YT?.Player) { cb(); return; }
+    _ytCbs.push(cb);
+    if (!document.querySelector('script[src*="iframe_api"]')) {
+      const t = document.createElement('script');
+      t.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(t);
+    }
+  }
+
   function startMusic(videoId) {
     if(!videoId || ytPlayer) return;
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(tag);
     const div = document.createElement('div');
     div.id = 'yt-player-el';
     div.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;pointer-events:none;';
     document.body.appendChild(div);
-    window.onYouTubeIframeAPIReady = () => {
+    _onYtReady(() => {
       ytPlayer = new YT.Player('yt-player-el', {
         videoId,
         playerVars: { autoplay:1, loop:1, playlist:videoId, controls:0, fs:0, iv_load_policy:3, disablekb:1, mute:1 },
         events: {
           onReady(e) {
             e.target.playVideo();
-            // 소리 켜기 시도 (브라우저 정책상 안 되면 뮤트 유지)
             setTimeout(()=>{ try{ e.target.unMute(); e.target.setVolume(25); musicMuted=false; }catch(_){musicMuted=true;} updateMusicBtn(); }, 500);
             document.getElementById('music-btn').style.display='flex';
           }
         }
       });
-    };
+    });
+  }
+
+  // ── 관광지 영상 플레이어 ──────────────────────────────
+  let spotsYtPlayer = null;
+  let spotsVideos = []; // [{videoId, name, region}]
+  let spotsVideoIdx = 0;
+  let spotsVideoTimer = null;
+  const SPOTS_VIDEO_DURATION = 90000; // 90초
+
+  function startSpotsVideos(videos) {
+    spotsVideos = videos;
+    spotsVideoIdx = 0;
+    updateSpotsVideoInfo();
+    _onYtReady(() => {
+      if (spotsYtPlayer) {
+        spotsYtPlayer.loadVideoById(videos[0].videoId);
+        scheduleNextSpotsVideo();
+        return;
+      }
+      spotsYtPlayer = new YT.Player('spots-yt-el', {
+        videoId: videos[0].videoId,
+        playerVars: { autoplay:1, controls:0, rel:0, iv_load_policy:3, disablekb:1, modestbranding:1, mute:1 },
+        events: {
+          onReady(e) {
+            e.target.playVideo();
+            setTimeout(()=>{ try{ e.target.unMute(); e.target.setVolume(60); }catch(_){} }, 500);
+            scheduleNextSpotsVideo();
+          },
+          onStateChange(e) {
+            if (e.data === YT.PlayerState.ENDED) nextSpotsVideo();
+          }
+        }
+      });
+    });
+  }
+
+  function scheduleNextSpotsVideo() {
+    clearTimeout(spotsVideoTimer);
+    if (spotsVideos.length > 1) spotsVideoTimer = setTimeout(nextSpotsVideo, SPOTS_VIDEO_DURATION);
+  }
+
+  window.nextSpotsVideo = () => {
+    if (!spotsVideos.length) return;
+    spotsVideoIdx = (spotsVideoIdx + 1) % spotsVideos.length;
+    spotsYtPlayer?.loadVideoById(spotsVideos[spotsVideoIdx].videoId);
+    updateSpotsVideoInfo();
+    scheduleNextSpotsVideo();
+  };
+
+  function updateSpotsVideoInfo() {
+    const v = spotsVideos[spotsVideoIdx];
+    if (!v) return;
+    document.getElementById('spots-video-title').textContent = v.name;
+    document.getElementById('spots-video-meta').textContent = `${v.region} · ${spotsVideoIdx + 1} / ${spotsVideos.length}`;
+    document.querySelectorAll('.spot-card').forEach((c, i) => c.classList.toggle('playing', i === spotsVideoIdx));
+  }
+
+  function stopSpotsVideo() {
+    clearTimeout(spotsVideoTimer);
+    try { spotsYtPlayer?.stopVideo(); } catch(_) {}
+    document.getElementById('spots-video-wrap').classList.remove('active');
+    document.getElementById('spots-grid').classList.remove('strip');
   }
 
   function updateMusicBtn() {
@@ -1011,7 +1122,7 @@
     setTimeout(() => { showScreen('main'); startSlide(); }, 8000);
   }
 
-  window.goMain = () => { showScreen('main'); startSlide(); };
+  window.goMain = () => { stopSpotsVideo(); showScreen('main'); startSlide(); };
   window.submitOrder = submitOrder;
   window.popupYes = () => { document.getElementById('popup-extra').classList.remove('show'); showOrder(); };
   window.popupNo = () => { document.getElementById('popup-extra').classList.remove('show'); showScreen('main'); startSlide(); };

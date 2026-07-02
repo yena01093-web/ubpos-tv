@@ -451,6 +451,11 @@
     </div>
     <div class="form-group"><label>설명</label><textarea id="s-desc" rows="2" placeholder="충북의 아름다운 호수, 유람선 운영"></textarea></div>
     <div class="form-group"><label>거리/소요시간</label><input type="text" id="s-distance" placeholder="🚗 차로 10분"></div>
+    <div class="form-group">
+      <label>🎬 유튜브 URL (TV 영상 재생용)</label>
+      <input type="text" id="s-youtube" placeholder="https://www.youtube.com/watch?v=...">
+      <div style="font-size:11px;color:#4A6A82;margin-top:4px;">제천/단양 탭 선택 시 해당 지역 관광지 영상이 자동 재생됩니다</div>
+    </div>
     <div class="form-btns">
       <button class="form-cancel" onclick="closeSpotForm()">취소</button>
       <button class="form-submit" onclick="saveSpot()">저장</button>
@@ -1669,7 +1674,7 @@
       return `<div class="item-row">
         ${imgEl}
         <div class="item-info">
-          <div class="item-name">${s.name} <span style="font-size:11px;background:${rColor}22;color:${rColor};border-radius:4px;padding:2px 7px;margin-left:6px;">${s.region||''}</span></div>
+          <div class="item-name">${s.name} <span style="font-size:11px;background:${rColor}22;color:${rColor};border-radius:4px;padding:2px 7px;margin-left:6px;">${s.region||''}</span>${s.videoId?'<span style="font-size:11px;background:rgba(239,68,68,0.15);color:#F87171;border-radius:4px;padding:2px 7px;margin-left:4px;">▶ 영상</span>':''}</div>
           <div class="item-desc">${s.desc||''}</div>
         </div>
         <div class="item-price" style="font-size:13px;color:#4A6A82;">${s.distance||''}</div>
@@ -1690,7 +1695,7 @@
   window.openSpotForm = () => {
     editingSpotId = null;
     document.getElementById('spot-form-title').textContent = '관광지 추가';
-    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance'].forEach(id => document.getElementById(id).value='');
+    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance','s-youtube'].forEach(id => document.getElementById(id).value='');
     document.getElementById('s-region').value = '제천';
     document.getElementById('s-img-preview').innerHTML = '📍';
     document.getElementById('form-spot').classList.add('show');
@@ -1708,6 +1713,7 @@
     document.getElementById('s-region').value = s.region||'제천';
     document.getElementById('s-desc').value = s.desc||'';
     document.getElementById('s-distance').value = s.distance||'';
+    document.getElementById('s-youtube').value = s.youtubeUrl||'';
     document.getElementById('s-img-preview').innerHTML = s.imageUrl
       ? `<img src="${s.imageUrl}" onerror="this.parentElement.innerHTML='📍'">`
       : (s.emoji||'📍');
@@ -1726,6 +1732,7 @@
   window.saveSpot = async () => {
     const name = document.getElementById('s-name').value.trim();
     if (!name) { toast('이름을 입력해주세요'); return; }
+    const youtubeUrl = document.getElementById('s-youtube').value.trim();
     const data = {
       emoji: document.getElementById('s-emoji').value||'📍',
       name,
@@ -1733,6 +1740,8 @@
       desc: document.getElementById('s-desc').value.trim(),
       distance: document.getElementById('s-distance').value.trim(),
       imageUrl: document.getElementById('s-imageUrl').value.trim(),
+      youtubeUrl,
+      videoId: youtubeUrl ? extractYouTubeId(youtubeUrl) : '',
     };
     if (editingSpotId) {
       await updateDoc(doc(db,'spots',editingSpotId), { ...data, updatedAt: serverTimestamp() });
@@ -1741,7 +1750,7 @@
       await addDoc(collection(db,'spots'), { ...data, createdAt: serverTimestamp() });
       toast('✅ 추가 완료');
     }
-    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance'].forEach(id => document.getElementById(id).value='');
+    ['s-imageUrl','s-emoji','s-name','s-desc','s-distance','s-youtube'].forEach(id => document.getElementById(id).value='');
     closeSpotForm(); loadSpots();
   };
 
