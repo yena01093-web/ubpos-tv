@@ -231,7 +231,7 @@
     <div style="font-size:13px;color:#4A6A82;text-align:center;margin-bottom:20px" data-i18n="breakfastSub">내일 아침 조식을 신청합니다</div>
     <div style="margin-bottom:14px">
       <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="roomNumberLabel">객실 번호</label>
-      <input id="bfRoom" type="number" data-i18n-placeholder="roomNumberPlaceholder" placeholder="예: 105" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:16px;outline:none;font-family:inherit">
+      <input id="bfRoom" type="number" readonly data-i18n-placeholder="roomNumberPlaceholder" placeholder="예: 105" style="width:100%;background:#0A1628;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#C8A45A;font-size:16px;font-weight:700;outline:none;font-family:inherit;cursor:default">
     </div>
     <div style="margin-bottom:14px">
       <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="guestCountLabel">인원수</label>
@@ -615,13 +615,14 @@
     return map[lang] || map.ko;
   }
 
-  const REGION_LABELS = { '제천':{ko:'제천',en:'Jecheon',zh:'堤川',ja:'堤川'}, '단양':{ko:'단양',en:'Danyang',zh:'丹阳',ja:'丹陽'} };
+  const REGION_LABELS = { '제천':{ko:'제천',en:'Jecheon',zh:'堤川',ja:'堤川'}, '단양':{ko:'단양',en:'Danyang',zh:'丹阳',ja:'丹陽'}, '기타':{ko:'기타',en:'Other',zh:'其他',ja:'その他'} };
   function regionLabel(val) { return REGION_LABELS[val]?.[lang] || val; }
 
   const REST_CAT_LABELS = {
     '한식': {ko:'🍚 한식', en:'🍚 Korean', zh:'🍚 韩式料理', ja:'🍚 韓国料理'},
     '카페': {ko:'☕ 카페', en:'☕ Cafe', zh:'☕ 咖啡厅', ja:'☕ カフェ'},
     '술집': {ko:'🍺 술집', en:'🍺 Bar', zh:'🍺 酒吧', ja:'🍺 居酒屋'},
+    '분식': {ko:'🍢 분식', en:'🍢 Bunsik (Snacks)', zh:'🍢 小吃', ja:'🍢 粉食(スナック)'},
     '기타': {ko:'기타', en:'Other', zh:'其他', ja:'その他'},
   };
   function restCatLabel(val) { return REST_CAT_LABELS[val]?.[lang] || val; }
@@ -841,7 +842,7 @@
         return `<button class="spots-tab${val===_spotsFilter?' active':''}" data-val="${val}" onclick="filterSpots('${val}')">${label}</button>`;
       }).join('');
     } else {
-      const vals = ['all','한식','카페','술집','기타'];
+      const vals = ['all','한식','카페','술집','분식','기타'];
       container.innerHTML = vals.map(val => {
         const label = val==='all' ? t('regionAll') : restCatLabel(val);
         return `<button class="spots-tab${val===_restsFilter?' active':''}" data-val="${val}" onclick="filterRests('${val}')">${label}</button>`;
@@ -887,25 +888,37 @@
       grid.innerHTML = list.map(s => {
         const img = s.imageUrl ? `<img class="spot-card-img" src="${s.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${s.emoji||'📍'}</div>'">` : `<div class="spot-card-img-ph">${s.emoji||'📍'}</div>`;
         return `<div class="spot-card">${img}<div class="spot-card-body">
-          ${s.region?`<div class="spot-card-region">${s.region}</div>`:''}
-          <div class="spot-card-name">${s.name}</div>
-          ${s.desc?`<div class="spot-card-desc">${s.desc}</div>`:''}
+          ${s.region?`<div class="spot-card-region">${regionLabel(s.region)}</div>`:''}
+          <div class="spot-card-name">${menuName(s)}</div>
+          ${s.desc?`<div class="spot-card-desc">${menuDesc(s)}</div>`:''}
           ${s.distance?`<div class="spot-card-dist">${s.distance}</div>`:''}
         </div></div>`;
       }).join('');
+      grid.querySelectorAll('.spot-card').forEach((card,i) => {
+        const s = list[i];
+        if (!hasExplicitTranslation(s,'name')) autoTranslateInto(card.querySelector('.spot-card-name'), s.name);
+        if (s.desc && !hasExplicitTranslation(s,'desc')) autoTranslateInto(card.querySelector('.spot-card-desc'), s.desc);
+        if (s.distance) autoTranslateInto(card.querySelector('.spot-card-dist'), s.distance);
+      });
     } else {
       const list = _restsFilter==='all' ? _restsData : _restsData.filter(r=>r.category===_restsFilter);
       if (!list.length) { grid.innerHTML=`<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">${t('noRestaurants')}</div>`; return; }
       grid.innerHTML = list.map(r => {
         const img = r.imageUrl ? `<img class="spot-card-img" src="${r.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${r.emoji||'🍽️'}</div>'">` : `<div class="spot-card-img-ph">${r.emoji||'🍽️'}</div>`;
         return `<div class="spot-card">${img}<div class="spot-card-body">
-          ${r.category?`<div class="spot-card-cat">${r.category}</div>`:''}
-          <div class="spot-card-name">${r.name}</div>
-          ${r.desc?`<div class="spot-card-desc">${r.desc}</div>`:''}
+          ${r.category?`<div class="spot-card-cat">${restCatLabel(r.category)}</div>`:''}
+          <div class="spot-card-name">${menuName(r)}</div>
+          ${r.desc?`<div class="spot-card-desc">${menuDesc(r)}</div>`:''}
           ${r.distance?`<div class="spot-card-dist">${r.distance}</div>`:''}
           ${r.phone?`<div class="spot-card-phone">📞 ${r.phone}</div>`:''}
         </div></div>`;
       }).join('');
+      grid.querySelectorAll('.spot-card').forEach((card,i) => {
+        const r = list[i];
+        if (!hasExplicitTranslation(r,'name')) autoTranslateInto(card.querySelector('.spot-card-name'), r.name);
+        if (r.desc && !hasExplicitTranslation(r,'desc')) autoTranslateInto(card.querySelector('.spot-card-desc'), r.desc);
+        if (r.distance) autoTranslateInto(card.querySelector('.spot-card-dist'), r.distance);
+      });
     }
   }
 
@@ -1072,7 +1085,7 @@
   window.openBreakfastModal = ()=>{
     bfGuestCount=1;
     bfMealType='korean';
-    document.getElementById('bfRoom').value='';
+    document.getElementById('bfRoom').value=ROOM;
     document.getElementById('bfNote').value='';
     [1,2,3,4].forEach(n=>{ const b=document.getElementById('bfCnt-'+n); if(b){ b.style.background=n===1?'rgba(200,164,90,.15)':'transparent'; b.style.color=n===1?'#C8A45A':'#4A6A82'; b.style.borderColor=n===1?'rgba(200,164,90,.4)':'#1C2E45'; } });
     updateBfTypeButtons();
