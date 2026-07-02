@@ -48,9 +48,12 @@
   .btn-done { background: #1C2E45; color: #4A6A82; border: 1px solid #1C2E45; }
   .empty { text-align: center; padding: 80px; color: #4A6A82; font-size: 15px; }
   .order-card.confirmed { opacity: 0.5; border-color: #1C2E45; }
+  .order-card.cancelled { opacity: 0.4; border-color: #1C2E45; }
   .s-pending { background: rgba(200,164,90,0.15); color: #C8A45A; }
   .s-confirmed { background: rgba(74,222,128,0.15); color: #4ADE80; }
+  .s-cancelled { background: rgba(239,68,68,0.15); color: #F87171; }
   .btn-confirm { background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
+  .btn-cancel { background: rgba(239,68,68,0.15); color: #F87171; border: 1px solid rgba(239,68,68,0.3); }
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
 
@@ -173,25 +176,31 @@
   const bq = query(collection(db,'hotel_breakfast'), where('date','==',todayStr()));
   onSnapshot(bq, (snap) => {
     const list = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0));
-    document.getElementById('breakfast-count').textContent = `(${list.length})`;
+    const active = list.filter(r => r.status !== 'cancelled');
+    document.getElementById('breakfast-count').textContent = `(${active.length})`;
     const el = document.getElementById('breakfasts');
     if (!list.length) { el.innerHTML = '<div class="empty">오늘 조식 신청이 없습니다</div>'; return; }
     el.innerHTML = list.map(r => {
       const time = r.ts?.toDate?.() ? r.ts.toDate().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}) : '';
+      const cancelled = r.status === 'cancelled';
       const confirmed = r.status === 'confirmed';
-      return `<div class="order-card ${confirmed?'confirmed':'new'}">
+      const cardClass = cancelled ? 'cancelled' : confirmed ? 'confirmed' : 'new';
+      const badgeClass = cancelled ? 's-cancelled' : confirmed ? 's-confirmed' : 's-pending';
+      const badgeText = cancelled ? '❌ 취소됨' : confirmed ? '✅ 확인됨' : '🟡 대기';
+      return `<div class="order-card ${cardClass}">
         <div class="order-top">
           <div style="display:flex;align-items:center;">
             <span class="room-tag">Room ${r.roomId}</span>
             <span class="guest-name">${r.guestCount||1}명 · ${r.mealType==='western'?'🍳 양식':'🍚 한식'}</span>
           </div>
-          <span class="status-badge ${confirmed?'s-confirmed':'s-pending'}">${confirmed?'✅ 확인됨':'🟡 대기'}</span>
+          <span class="status-badge ${badgeClass}">${badgeText}</span>
         </div>
         ${r.note ? `<div class="memo-box">요청사항: <span>${r.note}</span></div>` : ''}
         <div class="order-footer">
           <div class="order-time">신청: ${time}</div>
           <div class="order-actions">
-            ${!confirmed ? `<button class="action-btn btn-confirm" onclick="confirmBreakfast('${r.id}')">✅ 확인</button>` : ''}
+            ${r.status==='pending' ? `<button class="action-btn btn-confirm" onclick="confirmBreakfast('${r.id}')">✅ 확인</button>` : ''}
+            ${!cancelled ? `<button class="action-btn btn-cancel" onclick="cancelBreakfast('${r.id}')">✖ 취소</button>` : ''}
           </div>
         </div>
       </div>`;
@@ -201,6 +210,11 @@
   window.confirmBreakfast = async (id) => {
     await updateDoc(doc(db,'hotel_breakfast',id), { status:'confirmed' });
     toast('✅ 조식 신청 확인');
+  };
+
+  window.cancelBreakfast = async (id) => {
+    await updateDoc(doc(db,'hotel_breakfast',id), { status:'cancelled' });
+    toast('❌ 조식 신청 취소');
   };
 
   function timeAgo(date) {

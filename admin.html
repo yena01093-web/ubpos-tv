@@ -911,12 +911,17 @@
     const q = query(collection(db,'hotel_breakfast'), where('date','==',today));
     breakfastUnsub = onSnapshot(q, snap=>{
       const list=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0));
-      const total=list.reduce((s,r)=>s+(r.guestCount||1),0);
-      document.getElementById('breakfast-stats').textContent=`신청 ${list.length}객실 · 총 ${total}명`;
+      const active=list.filter(r=>r.status!=='cancelled');
+      const total=active.reduce((s,r)=>s+(r.guestCount||1),0);
+      document.getElementById('breakfast-stats').textContent=`신청 ${active.length}객실 · 총 ${total}명`;
       document.getElementById('breakfast-list').innerHTML=list.length===0
         ?'<div style="text-align:center;color:#4A6A82;padding:20px">오늘 조식 신청 없음</div>'
-        :list.map(r=>`
-          <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px">
+        :list.map(r=>{
+          const cancelled=r.status==='cancelled';
+          const statusLabel=cancelled?'취소됨':r.status==='confirmed'?'확인됨':'대기';
+          const statusColor=cancelled?'#EF4444':r.status==='confirmed'?'#4ADE80':'#C8A45A';
+          return `
+          <div style="background:#0A1628;border:1px solid #1C2E45;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px;${cancelled?'opacity:.45':''}">
             <div style="font-size:28px;font-weight:900;color:#C8A45A;min-width:52px;text-align:center">${r.roomId}</div>
             <div style="flex:1">
               <div style="font-weight:600">${r.roomId}호 · ${r.guestCount||1}명 · ${r.mealType==='western'?'🍳 양식':'🍚 한식'}</div>
@@ -924,16 +929,26 @@
               ${r.note?`<div style="font-size:12px;color:#C8A45A;margin-top:2px">📝 ${r.note}</div>`:''}
             </div>
             <div style="display:flex;flex-direction:column;gap:6px">
-              <span style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;background:${r.status==='confirmed'?'rgba(74,222,128,.1)':'rgba(200,164,90,.1)'};color:${r.status==='confirmed'?'#4ADE80':'#C8A45A'};border:1px solid ${r.status==='confirmed'?'rgba(74,222,128,.3)':'rgba(200,164,90,.3)'}">${r.status==='confirmed'?'확인됨':'대기'}</span>
-              ${r.status!=='confirmed'?`<button onclick="confirmBreakfast('${r.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(74,222,128,.3);background:rgba(74,222,128,.1);color:#4ADE80;font-size:11px;cursor:pointer;font-family:inherit">확인</button>`:''}
+              <span style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;background:${statusColor}1a;color:${statusColor};border:1px solid ${statusColor}4d">${statusLabel}</span>
+              ${r.status==='pending'?`<button onclick="confirmBreakfast('${r.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(74,222,128,.3);background:rgba(74,222,128,.1);color:#4ADE80;font-size:11px;cursor:pointer;font-family:inherit">확인</button>`:''}
+              ${!cancelled?`<button onclick="cancelBreakfast('${r.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1);color:#EF4444;font-size:11px;cursor:pointer;font-family:inherit">취소</button>`:''}
             </div>
-          </div>`).join('');
+          </div>`;
+        }).join('');
     });
   }
 
   window.confirmBreakfast = async id=>{
     try{
       await updateDoc(doc(db,'hotel_breakfast',id),{status:'confirmed'});
+    }catch(e){ toast('오류: '+e.message); }
+  };
+
+  window.cancelBreakfast = async id=>{
+    if(!confirm('조식 신청을 취소할까요?')) return;
+    try{
+      await updateDoc(doc(db,'hotel_breakfast',id),{status:'cancelled'});
+      toast('❌ 조식 신청 취소됨');
     }catch(e){ toast('오류: '+e.message); }
   };
 
