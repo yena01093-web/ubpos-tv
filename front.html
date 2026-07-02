@@ -13,7 +13,7 @@
   .live::before { content:''; width:8px; height:8px; background:#4ADE80; border-radius:50%; animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .main { padding: 28px 32px; max-width: 960px; }
-  .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .dash-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
   h2 { font-size: 20px; font-weight: 700; }
   .count { color: #C8A45A; margin-left: 8px; }
   .orders { display: flex; flex-direction: column; gap: 14px; }
@@ -22,7 +22,7 @@
   .order-card.heating { border-color: #EF4444; }
   .order-card.delivering { border-color: #3B82F6; }
   .order-card.done { opacity: 0.4; border-color: #1C2E45; }
-  .order-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .order-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
   .room-tag { background: #C8A45A; color: #000; font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 6px; }
   .guest-name { font-size: 16px; font-weight: 700; margin-left: 10px; }
   .pay-badge { font-size: 11px; padding: 3px 10px; border-radius: 4px; font-weight: 700; }
@@ -53,6 +53,21 @@
   .btn-confirm { background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0A1628; border: 1px solid #C8A45A; color: #e2e8f0; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
+
+  /* 모바일 */
+  @media (max-width: 640px) {
+    header { padding: 12px 16px; }
+    .logo { font-size: 15px; }
+    .live { font-size: 11px; }
+    header #clock { display: none; }
+    .main { padding: 16px; max-width: 100%; }
+    h2 { font-size: 17px; }
+    .order-card { padding: 14px 16px; }
+    .guest-name { font-size: 14px; margin-left: 6px; }
+    .order-actions { width: 100%; }
+    .action-btn { flex: 1; min-width: 0; padding: 10px 8px; }
+    .toast { width: calc(100% - 32px); white-space: normal; text-align: center; }
+  }
 </style>
 </head>
 <body>
