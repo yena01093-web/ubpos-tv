@@ -419,7 +419,23 @@
       </select>
     </div>
     <div class="form-group"><label>메뉴 이름 *</label><input type="text" id="m-name" placeholder="제천 수제 크래프트 맥주"></div>
+    <div class="form-group">
+      <label>다국어 이름 (선택 — 비우면 TV에서 한국어로 표시)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="m-name-en" placeholder="EN">
+        <input type="text" id="m-name-zh" placeholder="中">
+        <input type="text" id="m-name-ja" placeholder="日">
+      </div>
+    </div>
     <div class="form-group"><label>설명</label><input type="text" id="m-desc" placeholder="캔 500ml + 얼음컵 제공"></div>
+    <div class="form-group">
+      <label>다국어 설명 (선택)</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="m-desc-en" placeholder="EN">
+        <input type="text" id="m-desc-zh" placeholder="中">
+        <input type="text" id="m-desc-ja" placeholder="日">
+      </div>
+    </div>
     <div class="form-group"><label>가격 (원) *</label><input type="number" id="m-price" placeholder="8000"></div>
     <div class="form-group"><label>구성품 (패키지용 — 줄바꿈 구분)</label><textarea id="m-components" rows="3" placeholder="수제맥주 1캔&#10;안주 1종&#10;얼음컵 2개"></textarea></div>
     <div class="form-btns">
@@ -1584,10 +1600,12 @@
     } catch(e) { toast('메뉴 로드 오류: '+e.message); }
   }
 
+  const MENU_LANG_FIELDS = ['m-name-en','m-name-zh','m-name-ja','m-desc-en','m-desc-zh','m-desc-ja'];
+
   window.openMenuForm = () => {
     editingMenuId = null;
     document.getElementById('menu-form-title').textContent = '메뉴 추가';
-    ['m-imageUrl','m-emoji','m-name','m-desc','m-price','m-components'].forEach(id => document.getElementById(id).value='');
+    ['m-imageUrl','m-emoji','m-name','m-desc','m-price','m-components', ...MENU_LANG_FIELDS].forEach(id => document.getElementById(id).value='');
     document.getElementById('m-cat').value = currentCat;
     document.getElementById('m-img-preview').innerHTML = '🍽️';
     document.getElementById('form-menu').classList.add('show');
@@ -1606,6 +1624,12 @@
     document.getElementById('m-desc').value = m.desc||'';
     document.getElementById('m-price').value = m.price;
     document.getElementById('m-components').value = (m.components||[]).join('\n');
+    document.getElementById('m-name-en').value = m.name_en||'';
+    document.getElementById('m-name-zh').value = m.name_zh||'';
+    document.getElementById('m-name-ja').value = m.name_ja||'';
+    document.getElementById('m-desc-en').value = m.desc_en||'';
+    document.getElementById('m-desc-zh').value = m.desc_zh||'';
+    document.getElementById('m-desc-ja').value = m.desc_ja||'';
     document.getElementById('m-img-preview').innerHTML = m.imageUrl ? `<img src="${m.imageUrl}">` : (m.emoji||'🍽️');
     document.getElementById('form-menu').classList.add('show');
   };
@@ -1629,6 +1653,12 @@
       emoji: document.getElementById('m-emoji').value||'🍽️',
       imageUrl: document.getElementById('m-imageUrl').value.trim(),
       components: compRaw ? compRaw.split('\n').map(s=>s.trim()).filter(Boolean) : [],
+      name_en: document.getElementById('m-name-en').value.trim(),
+      name_zh: document.getElementById('m-name-zh').value.trim(),
+      name_ja: document.getElementById('m-name-ja').value.trim(),
+      desc_en: document.getElementById('m-desc-en').value.trim(),
+      desc_zh: document.getElementById('m-desc-zh').value.trim(),
+      desc_ja: document.getElementById('m-desc-ja').value.trim(),
       updatedAt: serverTimestamp()
     };
     if (editingMenuId) {

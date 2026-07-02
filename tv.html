@@ -187,7 +187,7 @@
   <div class="qr-text">
     <div class="qr-eyebrow" style="color:#4ADE80;">FREE WI-FI</div>
     <div class="qr-title" id="wifi-ssid-display">Wi-Fi</div>
-    <div class="qr-sub">스캔하면 자동 연결</div>
+    <div class="qr-sub" data-i18n="wifiScanConnect">스캔하면 자동 연결</div>
   </div>
 </div>
 
@@ -216,10 +216,10 @@
 </div>
 
 <!-- 나가기 버튼 — 좌측 하단 고정 -->
-<button class="exit-btn" onclick="window.history.length > 1 ? window.history.back() : window.close()">나가기</button>
+<button class="exit-btn" data-i18n="exit" onclick="window.history.length > 1 ? window.history.back() : window.close()">나가기</button>
 
 <!-- 조식 신청 버튼 — 우측 하단 고정 -->
-<button class="exit-btn" id="breakfastBtn" onclick="openBreakfastModal()" style="left:auto;right:28px;color:rgba(200,164,90,0.6);border-color:rgba(200,164,90,0.2)">🥐 조식 신청</button>
+<button class="exit-btn" id="breakfastBtn" data-i18n="breakfastBtn" onclick="openBreakfastModal()" style="left:auto;right:28px;color:rgba(200,164,90,0.6);border-color:rgba(200,164,90,0.2)">🥐 조식 신청</button>
 
 <!-- 배경음악 버튼 -->
 <button id="music-btn" onclick="toggleMusicMute()" style="display:none;position:fixed;bottom:28px;right:148px;z-index:210;padding:7px 14px;background:rgba(10,22,40,0.45);border:1px solid rgba(200,164,90,0.2);border-radius:20px;color:rgba(200,164,90,0.6);font-size:13px;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:all .25s;">🎵</button>
@@ -227,14 +227,14 @@
 <!-- 조식 신청 모달 -->
 <div id="breakfastModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:flex-end;justify-content:center;backdrop-filter:blur(12px)">
   <div style="background:linear-gradient(160deg,#0A1628,#0F1E35);border:1px solid rgba(200,164,90,.3);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;animation:slideUp .3s ease">
-    <div style="font-size:22px;font-weight:700;color:#C8A45A;text-align:center;margin-bottom:6px">🥐 조식 신청</div>
-    <div style="font-size:13px;color:#4A6A82;text-align:center;margin-bottom:20px">내일 아침 조식을 신청합니다</div>
+    <div style="font-size:22px;font-weight:700;color:#C8A45A;text-align:center;margin-bottom:6px" data-i18n="breakfastBtn">🥐 조식 신청</div>
+    <div style="font-size:13px;color:#4A6A82;text-align:center;margin-bottom:20px" data-i18n="breakfastSub">내일 아침 조식을 신청합니다</div>
     <div style="margin-bottom:14px">
-      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">객실 번호</label>
-      <input id="bfRoom" type="number" placeholder="예: 105" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:16px;outline:none;font-family:inherit">
+      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="roomNumberLabel">객실 번호</label>
+      <input id="bfRoom" type="number" data-i18n-placeholder="roomNumberPlaceholder" placeholder="예: 105" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:16px;outline:none;font-family:inherit">
     </div>
     <div style="margin-bottom:14px">
-      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">인원수</label>
+      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="guestCountLabel">인원수</label>
       <div style="display:flex;gap:8px">
         <button onclick="selectBfCount(1)" id="bfCnt-1" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">1명</button>
         <button onclick="selectBfCount(2)" id="bfCnt-2" style="flex:1;padding:10px;border-radius:8px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:16px;cursor:pointer;font-family:inherit;transition:.2s">2명</button>
@@ -243,11 +243,11 @@
       </div>
     </div>
     <div style="margin-bottom:18px">
-      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">요청사항 (선택)</label>
-      <input id="bfNote" placeholder="알레르기, 기타 요청사항" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
+      <label style="font-size:12px;color:#4A6A82;display:block;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase" data-i18n="requestLabel">요청사항 (선택)</label>
+      <input id="bfNote" data-i18n-placeholder="requestPlaceholder" placeholder="알레르기, 기타 요청사항" style="width:100%;background:#0F1E35;border:1px solid #1C2E45;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit">
     </div>
-    <button onclick="submitBreakfast()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#C8A45A;color:#000;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">신청하기</button>
-    <button onclick="closeBreakfastModal()" style="width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:14px;cursor:pointer;font-family:inherit">취소</button>
+    <button onclick="submitBreakfast()" data-i18n="submitBtn" style="width:100%;padding:14px;border-radius:10px;border:none;background:#C8A45A;color:#000;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">신청하기</button>
+    <button onclick="closeBreakfastModal()" data-i18n="cancelBtn" style="width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #1C2E45;background:transparent;color:#4A6A82;font-size:14px;cursor:pointer;font-family:inherit">취소</button>
   </div>
 </div>
 
@@ -264,7 +264,7 @@
 <div class="checkout-banner" id="checkout-banner">
   <div class="checkout-banner-icon">🛎</div>
   <div>
-    <div class="checkout-banner-text">체크아웃 시간 안내</div>
+    <div class="checkout-banner-text" data-i18n="checkoutNotice">체크아웃 시간 안내</div>
     <div class="checkout-banner-time" id="checkout-banner-time">오전 11:00</div>
   </div>
 </div>
@@ -308,7 +308,7 @@
     <div style="display:flex;gap:16px;align-items:center;">
       <div class="bottom-hint" onclick="showSpotsScreen()" style="cursor:pointer;">
         <span class="btn-hint">★</span>
-        <span>관광지</span>
+        <span data-i18n="tourism">관광지</span>
       </div>
       <div class="bottom-hint">
         <span class="btn-hint">OK</span>
@@ -351,10 +351,10 @@
 <div class="screen" id="screen-spots">
   <div class="spots-header">
     <div style="display:flex;gap:10px;align-items:center;">
-      <button class="spots-mode-tab active" id="smode-spots" onclick="setSpotsMode('spots')">🗺️ 관광지</button>
-      <button class="spots-mode-tab" id="smode-restaurants" onclick="setSpotsMode('restaurants')">🍽️ 맛집</button>
+      <button class="spots-mode-tab active" id="smode-spots" data-i18n="tabSpots" onclick="setSpotsMode('spots')">🗺️ 관광지</button>
+      <button class="spots-mode-tab" id="smode-restaurants" data-i18n="tabRests" onclick="setSpotsMode('restaurants')">🍽️ 맛집</button>
     </div>
-    <div class="order-back" onclick="goMain()">← BACK</div>
+    <div class="order-back" data-i18n="back" onclick="goMain()">← BACK</div>
   </div>
   <div class="spots-tabs" id="spots-sub-tabs"></div>
   <!-- 관광지 영상 플레이어 -->
@@ -365,11 +365,11 @@
         <div class="spots-video-title" id="spots-video-title"></div>
         <div class="spots-video-meta" id="spots-video-meta"></div>
       </div>
-      <button class="spots-video-next" onclick="nextSpotsVideo()">다음 영상 ▶</button>
+      <button class="spots-video-next" data-i18n="nextVideo" onclick="nextSpotsVideo()">다음 영상 ▶</button>
     </div>
   </div>
   <div class="spots-grid" id="spots-grid">
-    <div style="color:#4A6A82;padding:40px;grid-column:1/-1;text-align:center;">로딩 중...</div>
+    <div style="color:#4A6A82;padding:40px;grid-column:1/-1;text-align:center;" data-i18n="loading">로딩 중...</div>
   </div>
 </div>
 
@@ -441,6 +441,16 @@
       today:'오늘의 추천', orderNow:'ORDER NOW',
       statusNew:'접수됨', statusHeating:'준비 중', statusDelivering:'배달 중',
       soldOut:'품절', components:'구성품',
+      exit:'나가기', wifiScanConnect:'스캔하면 자동 연결', tourism:'관광지',
+      tabSpots:'🗺️ 관광지', tabRests:'🍽️ 맛집', nextVideo:'다음 영상 ▶',
+      loading:'로딩 중...', noSpots:'등록된 관광지가 없습니다', noRestaurants:'등록된 맛집이 없습니다',
+      regionAll:'전체',
+      checkoutNotice:'체크아웃 시간 안내',
+      breakfastBtn:'🥐 조식 신청', breakfastSub:'내일 아침 조식을 신청합니다',
+      roomNumberLabel:'객실 번호', roomNumberPlaceholder:'예: 105',
+      guestCountLabel:'인원수', requestLabel:'요청사항 (선택)', requestPlaceholder:'알레르기, 기타 요청사항',
+      submitBtn:'신청하기', cancelBtn:'취소',
+      bfRoomRequired:'객실 번호를 입력해주세요.', bfSuccessToast:'🥐 조식 신청이 완료되었습니다!', bfFailPrefix:'신청 실패: ',
     },
     en: {
       roomService:'📋 ROOM SERVICE ORDER', back:'← BACK', tabDrink:'🍷 Drinks', tabFood:'🍕 Quick Snacks', tabPackage:'📦 Packages',
@@ -454,6 +464,16 @@
       today:"Today's Special", orderNow:'ORDER NOW',
       statusNew:'Received', statusHeating:'Preparing', statusDelivering:'On the Way',
       soldOut:'Sold Out', components:'Includes',
+      exit:'Exit', wifiScanConnect:'Scan to connect automatically', tourism:'Attractions',
+      tabSpots:'🗺️ Attractions', tabRests:'🍽️ Restaurants', nextVideo:'Next Video ▶',
+      loading:'Loading...', noSpots:'No attractions registered', noRestaurants:'No restaurants registered',
+      regionAll:'All',
+      checkoutNotice:'Check-out Time Notice',
+      breakfastBtn:'🥐 Breakfast', breakfastSub:'Request breakfast for tomorrow morning',
+      roomNumberLabel:'Room Number', roomNumberPlaceholder:'e.g. 105',
+      guestCountLabel:'Number of Guests', requestLabel:'Special Requests (optional)', requestPlaceholder:'Allergies, other requests',
+      submitBtn:'Submit', cancelBtn:'Cancel',
+      bfRoomRequired:'Please enter your room number.', bfSuccessToast:'🥐 Breakfast request completed!', bfFailPrefix:'Request failed: ',
     },
     zh: {
       roomService:'📋 客房服务点餐', back:'← 返回', tabDrink:'🍷 酒水饮料', tabFood:'🍕 快速小食', tabPackage:'📦 套餐组合',
@@ -467,6 +487,16 @@
       today:'今日推荐', orderNow:'立即点餐',
       statusNew:'已接收', statusHeating:'准备中', statusDelivering:'配送中',
       soldOut:'售罄', components:'套餐内容',
+      exit:'离开', wifiScanConnect:'扫码自动连接', tourism:'景点',
+      tabSpots:'🗺️ 景点', tabRests:'🍽️ 美食', nextVideo:'下一个视频 ▶',
+      loading:'加载中...', noSpots:'暂无景点信息', noRestaurants:'暂无美食信息',
+      regionAll:'全部',
+      checkoutNotice:'退房时间提醒',
+      breakfastBtn:'🥐 早餐申请', breakfastSub:'预订明天早上的早餐',
+      roomNumberLabel:'客房号码', roomNumberPlaceholder:'例如：105',
+      guestCountLabel:'人数', requestLabel:'特殊要求（选填）', requestPlaceholder:'过敏信息、其他要求',
+      submitBtn:'提交申请', cancelBtn:'取消',
+      bfRoomRequired:'请输入客房号码。', bfSuccessToast:'🥐 早餐申请已完成！', bfFailPrefix:'申请失败：',
     },
     ja: {
       roomService:'📋 ルームサービス注文', back:'← 戻る', tabDrink:'🍷 お酒・ドリンク', tabFood:'🍕 おつまみ', tabPackage:'📦 セットメニュー',
@@ -480,23 +510,92 @@
       today:'本日のおすすめ', orderNow:'注文する',
       statusNew:'受付済み', statusHeating:'準備中', statusDelivering:'配達中',
       soldOut:'売り切れ', components:'セット内容',
+      exit:'退出', wifiScanConnect:'スキャンで自動接続', tourism:'観光地',
+      tabSpots:'🗺️ 観光地', tabRests:'🍽️ グルメ', nextVideo:'次の動画 ▶',
+      loading:'読み込み中...', noSpots:'登録された観光地がありません', noRestaurants:'登録されたグルメ情報がありません',
+      regionAll:'全て',
+      checkoutNotice:'チェックアウト時間のご案内',
+      breakfastBtn:'🥐 朝食申込', breakfastSub:'明日の朝食を申し込みます',
+      roomNumberLabel:'客室番号', roomNumberPlaceholder:'例：105',
+      guestCountLabel:'人数', requestLabel:'ご要望（任意）', requestPlaceholder:'アレルギー、その他のご要望',
+      submitBtn:'申し込む', cancelBtn:'キャンセル',
+      bfRoomRequired:'客室番号を入力してください。', bfSuccessToast:'🥐 朝食のお申し込みが完了しました！', bfFailPrefix:'申し込み失敗：',
     }
   };
 
   function t(key) { return T[lang]?.[key] ?? T.ko[key] ?? key; }
+
+  // 메뉴 이름/설명 — 언어별 필드(name_en 등)가 있으면 사용, 없으면 한국어로 폴백
+  function menuName(m) {
+    if (!m) return '';
+    const f = { en:'name_en', zh:'name_zh', ja:'name_ja' }[lang];
+    return (f && m[f]) ? m[f] : m.name;
+  }
+  function menuDesc(m) {
+    if (!m) return '';
+    const f = { en:'desc_en', zh:'desc_zh', ja:'desc_ja' }[lang];
+    return (f && m[f]) ? m[f] : (m.desc || '');
+  }
+
+  function cartInfoText(n) {
+    const map = { ko:`${n}개 선택됨`, en:`${n} item${n>1?'s':''} selected`, zh:`已选择${n}项`, ja:`${n}点選択中` };
+    return map[lang] || map.ko;
+  }
+
+  function bfCountLabel(n) {
+    const map = { ko:`${n}명`, en:`${n} ${n===1?'Guest':'Guests'}`, zh:`${n}人`, ja:`${n}名` };
+    return map[lang] || map.ko;
+  }
+  function renderBfCountLabels() {
+    [1,2,3,4].forEach(n => { const b = document.getElementById('bfCnt-'+n); if (b) b.textContent = bfCountLabel(n); });
+  }
+
+  function ampmLabel(h) {
+    const isAm = h < 12;
+    const map = { ko: isAm?'오전':'오후', en: isAm?'AM':'PM', zh: isAm?'上午':'下午', ja: isAm?'午前':'午後' };
+    return map[lang] || map.ko;
+  }
+
+  const REGION_LABELS = { '제천':{ko:'제천',en:'Jecheon',zh:'堤川',ja:'堤川'}, '단양':{ko:'단양',en:'Danyang',zh:'丹阳',ja:'丹陽'} };
+  function regionLabel(val) { return REGION_LABELS[val]?.[lang] || val; }
+
+  const REST_CAT_LABELS = {
+    '한식': {ko:'🍚 한식', en:'🍚 Korean', zh:'🍚 韩式料理', ja:'🍚 韓国料理'},
+    '카페': {ko:'☕ 카페', en:'☕ Cafe', zh:'☕ 咖啡厅', ja:'☕ カフェ'},
+    '술집': {ko:'🍺 술집', en:'🍺 Bar', zh:'🍺 酒吧', ja:'🍺 居酒屋'},
+    '기타': {ko:'기타', en:'Other', zh:'其他', ja:'その他'},
+  };
+  function restCatLabel(val) { return REST_CAT_LABELS[val]?.[lang] || val; }
 
   function applyLang() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
       if (key) el.innerHTML = t(key);
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.dataset.i18nPlaceholder;
+      if (key) el.placeholder = t(key);
+    });
     document.querySelectorAll('.lang-btn').forEach((btn,i) => {
       btn.classList.toggle('active', ['ko','en','zh','ja'][i] === lang);
     });
     // category tabs
     renderCats();
+    // 주문 화면 메뉴 카드 (이름/설명/품절/구성품 라벨 갱신)
+    if (currentScreen === 'order') renderMenuGrid();
     // cart
     updateCart();
+    // 조식 신청 모달 인원수 버튼
+    renderBfCountLabels();
+    // 추천 메뉴 배너
+    renderFeaturedName();
+    // 체크아웃 배너가 떠있으면 오전/오후 표기 갱신
+    if (_checkoutTime && document.getElementById('checkout-banner').classList.contains('show')) {
+      const [h,m] = _checkoutTime.split(':').map(Number);
+      renderCheckoutBannerTime(h,m);
+    }
+    // 관광지/맛집 화면 탭 & 그리드
+    if (currentScreen === 'spots') { renderSpotsSubTabs(); renderSpotsGrid(); }
   }
 
   window.setLang = (l) => {
@@ -514,7 +613,7 @@
   // ── Load data ─────────────────────────────────────────
   async function loadData() {
     try {
-      const menuSnap = await getDocs(collection(db,'menu_slots'));
+      const menuSnap = await getDocs(collection(db,'menus'));
       if (!menuSnap.empty) {
         allMenus = {};
         CATS.forEach(cat => { allMenus[cat] = []; });
@@ -524,11 +623,11 @@
             allMenus[m.category].push(m);
           }
         });
-        CATS.forEach(cat => { allMenus[cat].sort((a,b) => (a.slotId||0) - (b.slotId||0)); });
+        CATS.forEach(cat => { allMenus[cat].sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); });
       }
       const spotSnap = await getDocs(query(collection(db,'spots'), orderBy('createdAt','asc')));
       const menuSlides = [...allMenus.drink, ...allMenus.food].slice(0,2).map(m => ({
-        eyebrow:"ROOM SERVICE", title:m.name, desc:m.desc, price:m.price?`₩ ${Number(m.price).toLocaleString()}`:"", emoji:m.emoji||'🍽️', sub:"", imageUrl:m.imageUrl||''
+        eyebrow:"ROOM SERVICE", title:menuName(m), desc:menuDesc(m), price:m.price?`₩ ${Number(m.price).toLocaleString()}`:"", emoji:m.emoji||'🍽️', sub:"", imageUrl:m.imageUrl||''
       }));
       const spotSlotSnap = await getDocs(collection(db,'spot_slots'));
       const fixedSpotSlides = spotSlotSnap.docs
@@ -614,27 +713,36 @@
     if (mode === 'spots') {
       _spotsFilter = 'all';
       if (!_spotsData.length) await _loadSpots();
-      document.getElementById('spots-sub-tabs').innerHTML =
-        ['all:전체','제천:제천','단양:단양'].map((x,i) => {
-          const [val,label] = x.split(':');
-          return `<button class="spots-tab${i===0?' active':''}" onclick="filterSpots('${val}')">${label}</button>`;
-        }).join('');
     } else {
       _restsFilter = 'all';
       if (!_restsData.length) await _loadRestaurants();
-      document.getElementById('spots-sub-tabs').innerHTML =
-        ['all:전체','한식:🍚 한식','카페:☕ 카페','술집:🍺 술집','기타:기타'].map((x,i) => {
-          const [val,label] = x.split(':');
-          return `<button class="spots-tab${i===0?' active':''}" onclick="filterRests('${val}')">${label}</button>`;
-        }).join('');
     }
+    renderSpotsSubTabs();
     renderSpotsGrid();
   };
+
+  function renderSpotsSubTabs() {
+    const container = document.getElementById('spots-sub-tabs');
+    if (!container) return;
+    if (_spotsMode === 'spots') {
+      const vals = ['all','제천','단양'];
+      container.innerHTML = vals.map(val => {
+        const label = val==='all' ? t('regionAll') : regionLabel(val);
+        return `<button class="spots-tab${val===_spotsFilter?' active':''}" data-val="${val}" onclick="filterSpots('${val}')">${label}</button>`;
+      }).join('');
+    } else {
+      const vals = ['all','한식','카페','술집','기타'];
+      container.innerHTML = vals.map(val => {
+        const label = val==='all' ? t('regionAll') : restCatLabel(val);
+        return `<button class="spots-tab${val===_restsFilter?' active':''}" data-val="${val}" onclick="filterRests('${val}')">${label}</button>`;
+      }).join('');
+    }
+  }
 
   window.filterSpots = (region) => {
     _spotsFilter = region;
     document.querySelectorAll('#spots-sub-tabs .spots-tab').forEach(t =>
-      t.classList.toggle('active', t.textContent.trim()===(region==='all'?'전체':region))
+      t.classList.toggle('active', t.dataset.val === region)
     );
     renderSpotsGrid();
     // 영상 처리
@@ -655,7 +763,7 @@
   window.filterRests = (cat) => {
     _restsFilter = cat;
     document.querySelectorAll('#spots-sub-tabs .spots-tab').forEach(t =>
-      t.classList.toggle('active', cat==='all' ? t.textContent.trim()==='전체' : t.textContent.includes(cat))
+      t.classList.toggle('active', t.dataset.val === cat)
     );
     renderSpotsGrid();
   };
@@ -665,7 +773,7 @@
     if (!grid) return;
     if (_spotsMode === 'spots') {
       const list = _spotsFilter==='all' ? _spotsData : _spotsData.filter(s=>s.region===_spotsFilter);
-      if (!list.length) { grid.innerHTML='<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">등록된 관광지가 없습니다</div>'; return; }
+      if (!list.length) { grid.innerHTML=`<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">${t('noSpots')}</div>`; return; }
       grid.innerHTML = list.map(s => {
         const img = s.imageUrl ? `<img class="spot-card-img" src="${s.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${s.emoji||'📍'}</div>'">` : `<div class="spot-card-img-ph">${s.emoji||'📍'}</div>`;
         return `<div class="spot-card">${img}<div class="spot-card-body">
@@ -677,7 +785,7 @@
       }).join('');
     } else {
       const list = _restsFilter==='all' ? _restsData : _restsData.filter(r=>r.category===_restsFilter);
-      if (!list.length) { grid.innerHTML='<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">등록된 맛집이 없습니다</div>'; return; }
+      if (!list.length) { grid.innerHTML=`<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">${t('noRestaurants')}</div>`; return; }
       grid.innerHTML = list.map(r => {
         const img = r.imageUrl ? `<img class="spot-card-img" src="${r.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${r.emoji||'🍽️'}</div>'">` : `<div class="spot-card-img-ph">${r.emoji||'🍽️'}</div>`;
         return `<div class="spot-card">${img}<div class="spot-card-body">
@@ -790,7 +898,7 @@
     const v = spotsVideos[spotsVideoIdx];
     if (!v) return;
     document.getElementById('spots-video-title').textContent = v.name;
-    document.getElementById('spots-video-meta').textContent = `${v.region} · ${spotsVideoIdx + 1} / ${spotsVideos.length}`;
+    document.getElementById('spots-video-meta').textContent = `${regionLabel(v.region)} · ${spotsVideoIdx + 1} / ${spotsVideos.length}`;
     document.querySelectorAll('.spot-card').forEach((c, i) => c.classList.toggle('playing', i === spotsVideoIdx));
   }
 
@@ -813,18 +921,22 @@
     updateMusicBtn();
   };
 
+  let _checkoutTime = null;
+  function renderCheckoutBannerTime(h, m) {
+    const dh = h <= 12 ? h : h - 12;
+    document.getElementById('checkout-banner-time').textContent = `${ampmLabel(h)} ${dh}:${String(m).padStart(2,'0')}`;
+  }
+
   function scheduleCheckoutBanner(checkoutTime, noticeHours) {
+    _checkoutTime = checkoutTime;
     const [h, m] = checkoutTime.split(':').map(Number);
     const now = new Date();
     const checkout = new Date(now); checkout.setHours(h, m, 0, 0);
     const notice  = new Date(checkout); notice.setHours(notice.getHours() - noticeHours);
     const inWindow = now >= notice && now < checkout;
     const banner = document.getElementById('checkout-banner');
-    const timeEl = document.getElementById('checkout-banner-time');
     if (inWindow) {
-      const ampm = h < 12 ? '오전' : '오후';
-      const dh = h <= 12 ? h : h - 12;
-      timeEl.textContent = `${ampm} ${dh}:${String(m).padStart(2,'0')}`;
+      renderCheckoutBannerTime(h, m);
       banner.classList.add('show');
     }
     // 알림 시작 시각에 자동 표시
@@ -854,7 +966,7 @@
   window.submitBreakfast = async ()=>{
     const room=document.getElementById('bfRoom').value.trim();
     const note=document.getElementById('bfNote').value.trim();
-    if(!room){ alert('객실 번호를 입력해주세요.'); return; }
+    if(!room){ alert(t('bfRoomRequired')); return; }
     try{
       await addDoc(collection(db,'hotel_breakfast'),{
         roomId:room, guestCount:bfGuestCount, note:note||'',
@@ -862,8 +974,8 @@
         ts:serverTimestamp()
       });
       closeBreakfastModal();
-      showToastTV('🥐 조식 신청이 완료되었습니다!');
-    }catch(e){ alert('신청 실패: '+e.message); }
+      showToastTV(t('bfSuccessToast'));
+    }catch(e){ alert(t('bfFailPrefix')+e.message); }
   };
   function showToastTV(msg){
     let t=document.getElementById('tvToast');
@@ -910,17 +1022,27 @@
     });
   }
 
+  let featuredFallbackName = '';
   async function loadFeatured() {
     try {
       const snap = await getDoc(doc(db,'settings','featured'));
       if (!snap.exists() || !snap.data().menuId) { document.getElementById('featured-banner').classList.remove('show'); return; }
       const d = snap.data();
       featuredMenuId = d.menuId;
+      featuredFallbackName = d.menuName || '';
       document.getElementById('fb-emoji').textContent = d.menuEmoji || '✨';
-      document.getElementById('fb-name').textContent = d.menuName || '';
       document.getElementById('fb-price').textContent = d.menuPrice ? `₩${Number(d.menuPrice).toLocaleString()}` : '';
+      renderFeaturedName();
       document.getElementById('featured-banner').classList.add('show');
     } catch(e) {}
+  }
+
+  // 추천 메뉴 배너 이름 — 실제 메뉴 문서에서 언어별 이름을 찾아 표시, 없으면 저장된 이름으로 폴백
+  function renderFeaturedName() {
+    const el = document.getElementById('fb-name');
+    if (!el) return;
+    const found = [].concat(...Object.values(allMenus)).find(x => x.id === featuredMenuId);
+    el.textContent = found ? menuName(found) : featuredFallbackName;
   }
 
   function isNightRestricted(start, end) {
@@ -1058,8 +1180,8 @@
       return `<div class="menu-card ${m.soldOut?'sold':''} ${isFeat?'is-featured':''}" data-idx="${i}">
         ${isFeat?`<div class="featured-tag">✨ ${t('today')}</div>`:''}
         ${imgEl}
-        <div class="menu-name">${m.name}</div>
-        <div class="menu-desc-s">${m.desc||''}</div>
+        <div class="menu-name">${menuName(m)}</div>
+        <div class="menu-desc-s">${menuDesc(m)}</div>
         ${compHtml}
         <div class="menu-price">${m.soldOut?t('soldOut'):'₩ '+Number(m.price).toLocaleString()}</div>
       </div>`;
@@ -1081,7 +1203,7 @@
     const total = cart.reduce((s,i)=>s+i.price,0);
     const infoEl = document.getElementById('cart-info');
     const totalEl = document.getElementById('cart-total');
-    if (infoEl) infoEl.textContent = cart.length>0 ? `${cart.length}개 선택됨` : t('cartEmpty');
+    if (infoEl) infoEl.textContent = cart.length>0 ? cartInfoText(cart.length) : t('cartEmpty');
     if (totalEl) totalEl.textContent = total>0 ? `₩ ${total.toLocaleString()}` : '';
   }
 
