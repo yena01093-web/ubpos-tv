@@ -429,7 +429,7 @@
   let roomActive = true;
   let orderAllowed = true;
   let featuredMenuId = null;
-  let lang = localStorage.getItem('jcLang') || 'ko';
+  let lang = 'ko'; // 공용 TV — 이전 손님이 선택한 언어를 기억하지 않고 항상 한국어로 시작
 
   // ── i18n ─────────────────────────────────────────────
   const T = {
@@ -529,6 +529,44 @@
 
   function t(key) { return T[lang]?.[key] ?? T.ko[key] ?? key; }
 
+  // ── 자동 번역 (어드민이 직접 입력한 번역이 없을 때만 사용) ──────
+  // 백엔드/API 키가 없는 정적 페이지이므로 키가 필요 없는 비공식 Google 번역 엔드포인트 사용.
+  // 실패하거나 느릴 수 있어 항상 한국어 텍스트를 먼저 보여준 뒤 도착하면 교체하는 방식.
+  let _translateCache = {};
+  try { _translateCache = JSON.parse(localStorage.getItem('jcTranslateCache') || '{}'); } catch(e) {}
+
+  async function autoTranslate(text, targetLang) {
+    if (!text || targetLang === 'ko') return text;
+    const key = targetLang + ':' + text;
+    if (_translateCache[key]) return _translateCache[key];
+    try {
+      const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+      const data = await res.json();
+      const translated = (data?.[0] || []).map(seg => seg[0]).join('');
+      if (!translated) return text;
+      _translateCache[key] = translated;
+      try { localStorage.setItem('jcTranslateCache', JSON.stringify(_translateCache)); } catch(e) {}
+      return translated;
+    } catch(e) {
+      return text;
+    }
+  }
+
+  // koText를 el에 자동 번역해 채워넣는다. 언어가 그 사이 또 바뀌면 무시(경쟁 상태 방지).
+  function autoTranslateInto(el, koText, apply) {
+    if (!el || !koText || lang === 'ko') return;
+    const reqLang = lang;
+    autoTranslate(koText, reqLang).then(translated => {
+      if (lang !== reqLang) return;
+      (apply || ((e,t) => { e.textContent = t; }))(el, translated);
+    });
+  }
+
+  function hasExplicitTranslation(obj, base) {
+    const f = { en:base+'_en', zh:base+'_zh', ja:base+'_ja' }[lang];
+    return !!(f && obj?.[f]);
+  }
+
   // 메뉴 이름/설명 — 언어별 필드(name_en 등)가 있으면 사용, 없으면 한국어로 폴백
   function menuName(m) {
     if (!m) return '';
@@ -612,7 +650,6 @@
 
   window.setLang = (l) => {
     lang = l;
-    localStorage.setItem('jcLang', l);
     applyLang();
   };
 
@@ -647,16 +684,26 @@
 
   function rebuildSlides() {
     if (!_slideSources.length) {
-      slides = defaultSlides();
+      // 하드코딩된 기본 슬라이드는 이미 언어별로 번역돼 있어 자동 번역 불필요
+      slides = defaultSlides().map(s => ({ ...s, titleKo:s.title, descKo:s.desc, titleExplicit:true, descExplicit:true }));
     } else {
       slides = _slideSources.map(s => {
         if (s.kind === 'menu') {
-          return { eyebrow:'ROOM SERVICE', title:menuName(s.menu), desc:menuDesc(s.menu), price:s.price, emoji:s.emoji, sub:'', imageUrl:s.imageUrl };
+          return {
+            eyebrow:'ROOM SERVICE', title:menuName(s.menu), desc:menuDesc(s.menu), price:s.price, emoji:s.emoji, sub:'', imageUrl:s.imageUrl,
+            titleKo:s.menu.name, descKo:s.menu.desc||'', titleExplicit:hasExplicitTranslation(s.menu,'name'), descExplicit:hasExplicitTranslation(s.menu,'desc'),
+          };
         }
         if (s.kind === 'namedDesc') {
-          return { eyebrow:s.eyebrow, title:slideLangField(s,'name'), desc:slideLangField(s,'desc')||'', price:'', emoji:s.emoji, sub:s.sub||'', imageUrl:s.imageUrl };
+          return {
+            eyebrow:s.eyebrow, title:slideLangField(s,'name'), desc:slideLangField(s,'desc')||'', price:'', emoji:s.emoji, sub:s.sub||'', imageUrl:s.imageUrl,
+            titleKo:s.name, descKo:s.desc||'', titleExplicit:hasExplicitTranslation(s,'name'), descExplicit:hasExplicitTranslation(s,'desc'),
+          };
         }
-        return { eyebrow:s.eyebrow, title:slideLangField(s,'name'), desc:'', price:'', emoji:s.emoji, sub:'', imageUrl:s.imageUrl };
+        return {
+          eyebrow:s.eyebrow, title:slideLangField(s,'name'), desc:'', price:'', emoji:s.emoji, sub:'', imageUrl:s.imageUrl,
+          titleKo:s.name, descKo:'', titleExplicit:hasExplicitTranslation(s,'name'), descExplicit:true,
+        };
       });
     }
     slideIndex = Math.max(0, Math.min(slideIndex, slides.length-1));
@@ -1063,7 +1110,7 @@
     if (!container) return;
     container.innerHTML = CATS.map((key,i) => {
       const m = catMeta[key] || {label:key, emoji:'📁'};
-      return `<div class="cat-tab ${i===0?'focused':''}" data-cat="${key}">${m.emoji} ${catLabel(key)}</div>`;
+      return `<div class="cat-tab ${i===0?'focused':''}" data-cat="${key}">${m.emoji} <span class="cat-tab-label">${catLabel(key)}</span></div>`;
     }).join('');
     container.querySelectorAll('.cat-tab').forEach((tab,i) => {
       tab.addEventListener('click', () => {
@@ -1071,6 +1118,9 @@
         menuFocusRow=0; menuFocusCol=0;
         renderCats(); renderMenuGrid();
       });
+      const key = CATS[i];
+      const m = catMeta[key] || {label:key};
+      if (!hasExplicitTranslation(m,'label')) autoTranslateInto(tab.querySelector('.cat-tab-label'), m.label);
     });
   }
 
@@ -1095,6 +1145,7 @@
     if (!el) return;
     const found = [].concat(...Object.values(allMenus)).find(x => x.id === featuredMenuId);
     el.textContent = found ? menuName(found) : featuredFallbackName;
+    if (found && !hasExplicitTranslation(found,'name')) autoTranslateInto(el, found.name);
   }
 
   function isNightRestricted(start, end) {
@@ -1151,16 +1202,20 @@
     slideTimer = setInterval(() => { slideIndex=(slideIndex+1)%slides.length; renderSlide(slideIndex); }, 5000);
   }
 
+  let _slideRenderToken = 0;
   function renderSlide(i) {
     const s = slides[i] || defaultSlides()[0];
+    const myToken = ++_slideRenderToken;
     const area = document.querySelector('.slide-area');
     const imgArea = document.querySelector('.slide-image-area');
     area.style.opacity = '0';
     imgArea.style.opacity = '0';
     setTimeout(() => {
       document.getElementById('slide-eyebrow').textContent = s.eyebrow;
-      document.getElementById('slide-title').innerHTML = s.title.replace('\n','<br>');
-      document.getElementById('slide-desc').textContent = s.desc;
+      const titleEl = document.getElementById('slide-title');
+      const descEl = document.getElementById('slide-desc');
+      titleEl.innerHTML = s.title.replace('\n','<br>');
+      descEl.textContent = s.desc;
       document.getElementById('slide-price').textContent = s.price;
       document.getElementById('slide-sub').textContent = s.sub||'';
       const imgEl = document.getElementById('slide-image');
@@ -1169,6 +1224,10 @@
       renderDots();
       area.style.opacity = '1';
       imgArea.style.opacity = '1';
+      // 어드민이 번역을 입력하지 않은 경우 자동 번역으로 보완 (다른 슬라이드로 넘어갔으면 무시)
+      const guard = (apply) => (el,t) => { if (myToken === _slideRenderToken) apply(el,t); };
+      if (!s.titleExplicit) autoTranslateInto(titleEl, s.titleKo, guard((el,t) => { el.innerHTML = t.replace('\n','<br>'); }));
+      if (!s.descExplicit) autoTranslateInto(descEl, s.descKo, guard((el,t) => { el.textContent = t; }));
     }, 500);
   }
 
@@ -1214,7 +1273,8 @@
     tabs.forEach((tab,i) => {
       tab.classList.toggle('focused', i===catIndex);
       const m = catMeta[CATS[i]] || {label:CATS[i], emoji:'📁'};
-      tab.innerHTML = `${m.emoji} ${catLabel(CATS[i])}`;
+      tab.innerHTML = `${m.emoji} <span class="cat-tab-label">${catLabel(CATS[i])}</span>`;
+      if (!hasExplicitTranslation(m,'label')) autoTranslateInto(tab.querySelector('.cat-tab-label'), m.label);
     });
   }
 
@@ -1240,6 +1300,9 @@
     }).join('');
     grid.querySelectorAll('.menu-card').forEach((card,i) => {
       card.addEventListener('click', () => { menuFocusRow=Math.floor(i/COLS); menuFocusCol=i%COLS; updateFocus(); });
+      const m = items[i];
+      if (!hasExplicitTranslation(m,'name')) autoTranslateInto(card.querySelector('.menu-name'), m.name);
+      if (m.desc && !hasExplicitTranslation(m,'desc')) autoTranslateInto(card.querySelector('.menu-desc-s'), m.desc);
     });
     updateFocus(); updateCart();
   }
