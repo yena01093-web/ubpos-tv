@@ -1810,7 +1810,7 @@
 
   function renderSpotList() {
     const el = document.getElementById('spot-list');
-    const list = _spotFilter === 'all' ? _spotsAll : _spotsAll.filter(x => x.region === _spotFilter);
+    const list = _spotFilter === 'all' ? _spotsAll : _spotsAll.filter(x => x.s.region === _spotFilter);
     if (!list.length) { el.innerHTML = '<div class="empty-msg">관광지가 없습니다</div>'; return; }
     const regionColors = { '제천':'#3B82F6', '단양':'#10B981', '기타':'#6B7280' };
     el.innerHTML = list.map(({ id, s }) => {
