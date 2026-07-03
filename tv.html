@@ -175,34 +175,37 @@
   .closed-title { font-size: 26px; font-weight: 700; color: #EF4444; }
   .closed-msg { font-size: 15px; color: #5A7082; text-align: center; line-height: 1.8; }
 
-  /* QR 고정 — 카트 바(~76px)와 하단 바(~68px) 위에 위치 */
-  .qr-fixed { position: fixed; bottom: 90px; right: 28px; z-index: 200; display: flex; align-items: center; gap: 14px; padding: 14px 18px 14px 16px; background: rgba(10,22,40,0.55); border: 1px solid rgba(200,164,90,0.3); border-radius: 18px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06); }
-  .qr-fixed .qr-img { width: 90px; height: 90px; border-radius: 8px; background: #fff; padding: 6px; display: block; }
-  .qr-fixed .qr-text { display: flex; flex-direction: column; gap: 4px; }
-  .qr-fixed .qr-eyebrow { font-size: 10px; letter-spacing: 0.35em; color: #C8A45A; text-transform: uppercase; }
-  .qr-fixed .qr-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
-  .qr-fixed .qr-sub { font-size: 11px; color: #7A8FA6; }
+  /* QR 고정 — 카트 바(~76px)와 하단 바(~68px) 위에 위치, 여러 카드는 세로로 자동 스택 */
+  .qr-stack { position: fixed; bottom: 90px; right: 28px; z-index: 200; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+  .qr-fixed { display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 12px; background: rgba(10,22,40,0.55); border: 1px solid rgba(200,164,90,0.3); border-radius: 16px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06); }
+  .qr-fixed .qr-img { width: 60px; height: 60px; border-radius: 8px; background: #fff; padding: 5px; display: block; }
+  .qr-fixed .qr-text { display: flex; flex-direction: column; gap: 3px; }
+  .qr-fixed .qr-eyebrow { font-size: 9px; letter-spacing: 0.3em; color: #C8A45A; text-transform: uppercase; }
+  .qr-fixed .qr-title { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.25; }
+  .qr-fixed .qr-sub { font-size: 10px; color: #7A8FA6; }
 </style>
 </head>
 <body tabindex="0">
 
-<!-- WiFi QR 고정 -->
-<div class="qr-fixed" id="wifi-qr-card" style="bottom:198px;display:none;">
-  <img class="qr-img" id="wifi-qr-img" alt="WiFi QR" src="">
-  <div class="qr-text">
-    <div class="qr-eyebrow" style="color:#4ADE80;">FREE WI-FI</div>
-    <div class="qr-title" id="wifi-ssid-display">Wi-Fi</div>
-    <div class="qr-sub" data-i18n="wifiScanConnect">스캔하면 자동 연결</div>
+<div class="qr-stack">
+  <!-- WiFi QR 고정 -->
+  <div class="qr-fixed" id="wifi-qr-card" style="display:none;">
+    <img class="qr-img" id="wifi-qr-img" alt="WiFi QR" src="">
+    <div class="qr-text">
+      <div class="qr-eyebrow" style="color:#4ADE80;">FREE WI-FI</div>
+      <div class="qr-title" id="wifi-ssid-display">Wi-Fi</div>
+      <div class="qr-sub" data-i18n="wifiScanConnect">스캔하면 자동 연결</div>
+    </div>
   </div>
-</div>
 
-<!-- QR 고정 -->
-<div class="qr-fixed">
-  <img class="qr-img" id="room-qr-img" alt="주문 QR" src="">
-  <div class="qr-text">
-    <div class="qr-eyebrow" data-i18n="scanOrder">Scan to Order</div>
-    <div class="qr-title" data-i18n="mobileOrder">휴대폰으로<br>간편 주문</div>
-    <div class="qr-sub" data-i18n="scanQr">QR 스캔 후 바로 주문</div>
+  <!-- QR 고정 -->
+  <div class="qr-fixed">
+    <img class="qr-img" id="room-qr-img" alt="주문 QR" src="">
+    <div class="qr-text">
+      <div class="qr-eyebrow" data-i18n="scanOrder">Scan to Order</div>
+      <div class="qr-title" data-i18n="mobileOrder">휴대폰으로<br>간편 주문</div>
+      <div class="qr-sub" data-i18n="scanQr">QR 스캔 후 바로 주문</div>
+    </div>
   </div>
 </div>
 
