@@ -749,10 +749,6 @@
         });
         CATS.forEach(cat => { allMenus[cat].sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); });
       }
-      const menuSourceItems = [...allMenus.drink, ...allMenus.food].slice(0,2).map(m => ({
-        kind:'menu', menu:m, price:m.price?`₩ ${Number(m.price).toLocaleString()}`:"", emoji:m.emoji||'🍽️', imageUrl:m.imageUrl||''
-      }));
-
       const catEyebrow = { '추천안주':'RECOMMENDED', '주류':'ROOM SERVICE', '관광지':'JECHEON TOUR', '기타':'SPECIAL' };
       const slideSnap = await getDocs(collection(db,'slides'));
       const fixedSourceItems = slideSnap.docs
@@ -762,7 +758,8 @@
         .map(s => ({ kind:'named', eyebrow: catEyebrow[s.category]||'SPECIAL', name:s.name, name_en:s.name_en, name_zh:s.name_zh, name_ja:s.name_ja, emoji:'✨', imageUrl:s.imageUrl||'' }));
 
       // 관광지(spots/spot_slots)는 메인 슬라이드에 노출하지 않고 "관광지" 전용 화면에서만 표시
-      _slideSources = [...fixedSourceItems, ...menuSourceItems];
+      // 메뉴 항목(음료/안주)은 더 이상 자동으로 슬라이드에 노출되지 않음 — 'slides' 컬렉션에 등록된 항목만 노출
+      _slideSources = [...fixedSourceItems];
     } catch(e) {
       _slideSources = [];
     }
