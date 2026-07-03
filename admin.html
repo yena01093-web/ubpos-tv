@@ -1060,6 +1060,7 @@
         </div>
         <div style="text-align:right">
           <div style="font-size:12px;font-weight:700;color:${col};padding:3px 10px;background:${col}22;border:1px solid ${col}44;border-radius:6px;display:inline-block">${RES_STATUS_LABEL[r.status]||r.status}</div>
+          ${r.status==='checkedout'&&r.keyReturned===false?`<div style="font-size:11px;font-weight:700;color:#EF4444;margin-top:3px">🔑 키 미회수</div>`:''}
           <div style="font-size:13px;color:#C8A45A;margin-top:4px">${(r.price||0).toLocaleString()}원</div>
         </div>
       </div>`;
@@ -1082,7 +1083,8 @@
       ${row('조식', r.breakfastType==='korean'?'🍚 한식':r.breakfastType==='western'?'🍳 양식':'신청 안함')}
       ${r.note?row('메모',r.note):''}
       <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:16px;font-weight:700;color:#C8A45A"><span>결제금액</span><span>${(r.price||0).toLocaleString()}원</span></div>
-      <div style="text-align:center;margin-top:4px"><span style="font-size:12px;font-weight:700;color:${col};padding:4px 14px;background:${col}22;border:1px solid ${col}44;border-radius:8px">${RES_STATUS_LABEL[r.status]||r.status}</span></div>`;
+      <div style="text-align:center;margin-top:4px"><span style="font-size:12px;font-weight:700;color:${col};padding:4px 14px;background:${col}22;border:1px solid ${col}44;border-radius:8px">${RES_STATUS_LABEL[r.status]||r.status}</span>${r.autoCheckout?` <span style="font-size:11px;color:#4A6A82">(자동 체크아웃)</span>`:''}</div>
+      ${r.status==='checkedout' && r.keyReturned===false?`<div style="text-align:center;margin-top:8px"><span style="font-size:12px;font-weight:700;color:#EF4444;padding:4px 14px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:8px">🔑 키 미회수</span></div>`:''}`;
     const acts=document.getElementById('res-modal-actions');
     acts.innerHTML='';
     if(r.status==='booked'){
@@ -1093,10 +1095,21 @@
       acts.appendChild(btn);
     }
     if(r.status==='checkedin'){
+      const keyWrap=document.createElement('label');
+      keyWrap.style.cssText='display:flex;align-items:center;gap:8px;font-size:13px;color:#e2e8f0;padding:2px 0 4px;cursor:pointer';
+      keyWrap.innerHTML='<input type="checkbox" id="res-key-returned" checked style="accent-color:#C8A45A;width:16px;height:16px">🔑 키 회수 완료';
+      acts.appendChild(keyWrap);
       const btn=document.createElement('button');
       btn.style.cssText='background:rgba(245,158,11,.15);color:#F59E0B;border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit';
       btn.textContent='🚪 체크아웃 처리';
-      btn.onclick=()=>doResCheckout(id);
+      btn.onclick=()=>doResCheckout(id, document.getElementById('res-key-returned').checked);
+      acts.appendChild(btn);
+    }
+    if(r.status==='checkedout' && r.keyReturned===false){
+      const btn=document.createElement('button');
+      btn.style.cssText='background:rgba(200,164,90,.12);color:#C8A45A;border:1px solid rgba(200,164,90,.35);border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-family:inherit';
+      btn.textContent='🔑 키 회수 확인';
+      btn.onclick=()=>markKeyReturned(id);
       acts.appendChild(btn);
     }
     if(r.status!=='cancelled'&&r.status!=='checkedout'){
@@ -1119,13 +1132,40 @@
       closeResModal(); toast('✅ 체크인 처리 완료 — 객실 룸서비스 활성화됨');
     }catch(e){ toast('체크인 오류: '+e.message); }
   }
-  async function doResCheckout(id){
+  async function doResCheckout(id, keyReturned=true){
     try{
       const r = reservations.find(x=>x.id===id);
-      await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedout',checkoutAt:serverTimestamp()});
+      await updateDoc(doc(db,'hotel_reservations',id),{status:'checkedout',checkoutAt:serverTimestamp(),keyReturned,autoCheckout:false});
       if(r?.roomId) await setDoc(doc(db,'rooms',r.roomId),{active:false,totalAmount:0,lastCheckout:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
-      closeResModal(); toast('🚪 체크아웃 처리 완료 — 객실 룸서비스 비활성화 + 정산됨');
+      closeResModal(); toast(keyReturned?'🚪 체크아웃 처리 완료 — 객실 룸서비스 비활성화 + 정산됨':'🚪 체크아웃 완료 (🔑 키 미회수로 표시됨)');
     }catch(e){ toast('체크아웃 오류: '+e.message); }
+  }
+
+  window.markKeyReturned = async id=>{
+    try{
+      await updateDoc(doc(db,'hotel_reservations',id),{keyReturned:true});
+      closeResModal(); toast('🔑 키 회수 확인 완료');
+    }catch(e){ toast('오류: '+e.message); }
+  };
+
+  // ── 자동 체크아웃 ──────────────────────────────────────
+  // 설정에 저장된 체크아웃 시간이 지나면 체크인 상태이면서 오늘이 체크아웃일인 예약을 자동 처리.
+  // 직원이 직접 확인한 게 아니므로 키 회수는 항상 "미회수"로 남겨 후속 확인이 필요함을 표시.
+  async function runAutoCheckout(){
+    try{
+      const snap = await getDoc(doc(db,'settings','global'));
+      const checkoutTime = snap.exists() ? (snap.data().checkoutTime || '11:00') : '11:00';
+      const [ch, cm] = checkoutTime.split(':').map(Number);
+      const now = new Date();
+      const cutoff = new Date(now); cutoff.setHours(ch, cm, 0, 0);
+      if (now < cutoff) return;
+      const today = todayStr();
+      const due = reservations.filter(r => r.status==='checkedin' && r.checkout===today);
+      for (const r of due) {
+        await updateDoc(doc(db,'hotel_reservations',r.id), { status:'checkedout', checkoutAt:serverTimestamp(), keyReturned:false, autoCheckout:true });
+        if (r.roomId) await setDoc(doc(db,'rooms',r.roomId), { active:false, totalAmount:0, lastCheckout:serverTimestamp(), updatedAt:serverTimestamp() }, { merge:true });
+      }
+    }catch(e){ console.error('자동 체크아웃 오류:', e); }
   }
   async function doResCancel(id){
     if(!confirm('예약을 취소하시겠습니까?')) return;
@@ -2126,6 +2166,9 @@
   initReservationTab();
   // 자정이 지나면 조식 목록이 자동으로 오늘 날짜로 갱신되도록 주기적으로 확인
   setInterval(initBreakfastTab, 60000);
+  // 설정된 체크아웃 시간이 지나면 자동 체크아웃 처리 (이 페이지가 열려 있는 동안만 동작)
+  setTimeout(runAutoCheckout, 3000);
+  setInterval(runAutoCheckout, 60000);
 </script>
 </body>
 </html>
