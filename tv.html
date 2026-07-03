@@ -132,7 +132,9 @@
   .spots-grid.strip .spot-card-body { padding: 7px 10px; }
   .spots-grid.strip .spot-card-name { font-size: 12px; margin-bottom: 0; }
   .spots-grid.strip .spot-card-desc, .spots-grid.strip .spot-card-dist, .spots-grid.strip .spot-card-region { display: none; }
-  .spot-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(200,164,90,0.1); border-radius: 14px; overflow: hidden; transition: border-color 0.3s; }
+  .spot-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(200,164,90,0.1); border-radius: 14px; overflow: hidden; transition: border-color 0.3s; position: relative; }
+  .spot-card.has-video { cursor: pointer; }
+  .spot-card-play { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; background: rgba(10,22,40,0.7); border: 1px solid rgba(200,164,90,0.5); color: #C8A45A; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 2; }
   .spot-card.playing { border-color: #C8A45A; box-shadow: 0 0 0 1px rgba(200,164,90,0.5); }
   .spot-card-img { width: 100%; height: 150px; object-fit: cover; display: block; }
   .spot-card-img-ph { width: 100%; height: 150px; background: #0A1628; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
@@ -870,7 +872,7 @@
     if (region === 'all') {
       stopSpotsVideo();
     } else {
-      const videos = _spotsData.filter(s => s.region === region && s.videoId).map(s => ({ videoId: s.videoId, name: s.name, region: s.region }));
+      const videos = _spotsData.filter(s => s.region === region && s.videoId).map(s => ({ videoId: s.videoId, name: s.name, region: s.region, id: s.id }));
       if (videos.length) {
         document.getElementById('spots-video-wrap').classList.add('active');
         document.getElementById('spots-grid').classList.add('strip');
@@ -897,7 +899,7 @@
       if (!list.length) { grid.innerHTML=`<div style="color:#4A6A82;padding:60px;grid-column:1/-1;text-align:center;font-size:15px;">${t('noSpots')}</div>`; return; }
       grid.innerHTML = list.map(s => {
         const img = s.imageUrl ? `<img class="spot-card-img" src="${s.imageUrl}" onerror="this.outerHTML='<div class=spot-card-img-ph>${s.emoji||'📍'}</div>'">` : `<div class="spot-card-img-ph">${s.emoji||'📍'}</div>`;
-        return `<div class="spot-card">${img}<div class="spot-card-body">
+        return `<div class="spot-card${s.videoId?' has-video':''}" data-spot-id="${s.id}" ${s.videoId?`onclick="playSpotVideo('${s.id}')"`:''}>${s.videoId?'<div class="spot-card-play">▶</div>':''}${img}<div class="spot-card-body">
           ${s.region?`<div class="spot-card-region">${regionLabel(s.region)}</div>`:''}
           <div class="spot-card-name">${menuName(s)}</div>
           ${s.desc?`<div class="spot-card-desc">${menuDesc(s)}</div>`:''}
@@ -987,18 +989,32 @@
   let spotsVideoTimer = null;
   const SPOTS_VIDEO_DURATION = 90000; // 90초
 
-  function startSpotsVideos(videos) {
+  // 관광지 영상 재생 중에는 배경음악을 잠시 음소거 (사용자가 직접 음소거한 경우는 그대로 유지)
+  let _musicDuckedForVideo = false;
+  function duckMusicForVideo() {
+    if (!ytPlayer || musicMuted) return;
+    try { ytPlayer.mute(); } catch(_) {}
+    _musicDuckedForVideo = true;
+  }
+  function restoreMusicAfterVideo() {
+    if (!_musicDuckedForVideo) return;
+    _musicDuckedForVideo = false;
+    if (!musicMuted) { try { ytPlayer.unMute(); ytPlayer.setVolume(25); } catch(_) {} }
+  }
+
+  function startSpotsVideos(videos, startIdx=0) {
+    duckMusicForVideo();
     spotsVideos = videos;
-    spotsVideoIdx = 0;
+    spotsVideoIdx = startIdx;
     updateSpotsVideoInfo();
     _onYtReady(() => {
       if (spotsYtPlayer) {
-        spotsYtPlayer.loadVideoById(videos[0].videoId);
+        spotsYtPlayer.loadVideoById(videos[startIdx].videoId);
         scheduleNextSpotsVideo();
         return;
       }
       spotsYtPlayer = new YT.Player('spots-yt-el', {
-        videoId: videos[0].videoId,
+        videoId: videos[startIdx].videoId,
         playerVars: { autoplay:1, controls:0, rel:0, iv_load_policy:3, disablekb:1, modestbranding:1, mute:1 },
         events: {
           onReady(e) {
@@ -1027,12 +1043,23 @@
     scheduleNextSpotsVideo();
   };
 
+  // 관광지 카드를 직접 눌렀을 때 그 영상을 바로 재생
+  window.playSpotVideo = (spotId) => {
+    const list = _spotsFilter==='all' ? _spotsData : _spotsData.filter(s=>s.region===_spotsFilter);
+    const videos = list.filter(s=>s.videoId).map(s=>({ videoId:s.videoId, name:s.name, region:s.region, id:s.id }));
+    const idx = videos.findIndex(v => v.id === spotId);
+    if (idx === -1) return;
+    document.getElementById('spots-video-wrap').classList.add('active');
+    document.getElementById('spots-grid').classList.add('strip');
+    startSpotsVideos(videos, idx);
+  };
+
   function updateSpotsVideoInfo() {
     const v = spotsVideos[spotsVideoIdx];
     if (!v) return;
     document.getElementById('spots-video-title').textContent = v.name;
     document.getElementById('spots-video-meta').textContent = `${regionLabel(v.region)} · ${spotsVideoIdx + 1} / ${spotsVideos.length}`;
-    document.querySelectorAll('.spot-card').forEach((c, i) => c.classList.toggle('playing', i === spotsVideoIdx));
+    document.querySelectorAll('.spot-card').forEach(c => c.classList.toggle('playing', v.id && c.dataset.spotId === v.id));
   }
 
   function stopSpotsVideo() {
@@ -1040,6 +1067,7 @@
     try { spotsYtPlayer?.stopVideo(); } catch(_) {}
     document.getElementById('spots-video-wrap').classList.remove('active');
     document.getElementById('spots-grid').classList.remove('strip');
+    restoreMusicAfterVideo();
   }
 
   function updateMusicBtn() {
