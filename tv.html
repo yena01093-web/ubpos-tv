@@ -749,19 +749,9 @@
         });
         CATS.forEach(cat => { allMenus[cat].sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); });
       }
-      const spotSnap = await getDocs(query(collection(db,'spots'), orderBy('createdAt','asc')));
       const menuSourceItems = [...allMenus.drink, ...allMenus.food].slice(0,2).map(m => ({
         kind:'menu', menu:m, price:m.price?`₩ ${Number(m.price).toLocaleString()}`:"", emoji:m.emoji||'🍽️', imageUrl:m.imageUrl||''
       }));
-      const spotSlotSnap = await getDocs(collection(db,'spot_slots'));
-      const fixedSpotItems = spotSlotSnap.docs
-        .map(d => d.data())
-        .filter(s => s.active !== false && s.name)
-        .sort((a,b) => a.slotId - b.slotId)
-        .map(s => ({ kind:'named', eyebrow:'JECHEON TOUR', name:s.name, name_en:s.name_en, name_zh:s.name_zh, name_ja:s.name_ja, emoji:'📍', imageUrl:s.imageUrl||'' }));
-
-      const spotSourceItems = fixedSpotItems.length ? fixedSpotItems
-        : spotSnap.docs.map(d => { const s=d.data(); return { kind:'namedDesc', eyebrow:'JECHEON TOUR', name:s.name, name_en:s.name_en, name_zh:s.name_zh, name_ja:s.name_ja, desc:s.desc, desc_en:s.desc_en, desc_zh:s.desc_zh, desc_ja:s.desc_ja, sub:s.distance||'', emoji:s.emoji||'📍', imageUrl:s.imageUrl||'' }; });
 
       const catEyebrow = { '추천안주':'RECOMMENDED', '주류':'ROOM SERVICE', '관광지':'JECHEON TOUR', '기타':'SPECIAL' };
       const slideSnap = await getDocs(collection(db,'slides'));
@@ -771,7 +761,8 @@
         .sort((a,b) => a.slotId - b.slotId)
         .map(s => ({ kind:'named', eyebrow: catEyebrow[s.category]||'SPECIAL', name:s.name, name_en:s.name_en, name_zh:s.name_zh, name_ja:s.name_ja, emoji:'✨', imageUrl:s.imageUrl||'' }));
 
-      _slideSources = [...fixedSourceItems, ...menuSourceItems, ...spotSourceItems];
+      // 관광지(spots/spot_slots)는 메인 슬라이드에 노출하지 않고 "관광지" 전용 화면에서만 표시
+      _slideSources = [...fixedSourceItems, ...menuSourceItems];
     } catch(e) {
       _slideSources = [];
     }
