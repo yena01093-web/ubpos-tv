@@ -183,21 +183,29 @@
   .qr-fixed .qr-eyebrow { font-size: 9px; letter-spacing: 0.3em; color: #C8A45A; text-transform: uppercase; }
   .qr-fixed .qr-title { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.25; }
   .qr-fixed .qr-sub { font-size: 10px; color: #7A8FA6; }
+
+  /* WiFi QR — 나가기 버튼(bottom:28px, 높이~28px) 바로 위, 작은 크기로 좌측 고정 */
+  .qr-fixed.wifi-mini { position: fixed; left: 28px; bottom: 64px; z-index: 205; gap: 8px; padding: 6px 10px 6px 6px; border-radius: 12px; }
+  .qr-fixed.wifi-mini .qr-img { width: 38px; height: 38px; padding: 3px; border-radius: 6px; }
+  .qr-fixed.wifi-mini .qr-text { gap: 1px; }
+  .qr-fixed.wifi-mini .qr-eyebrow { font-size: 7px; letter-spacing: 0.25em; }
+  .qr-fixed.wifi-mini .qr-title { font-size: 11px; }
+  .qr-fixed.wifi-mini .qr-sub { font-size: 8px; }
 </style>
 </head>
 <body tabindex="0">
 
-<div class="qr-stack">
-  <!-- WiFi QR 고정 -->
-  <div class="qr-fixed" id="wifi-qr-card" style="display:none;">
-    <img class="qr-img" id="wifi-qr-img" alt="WiFi QR" src="">
-    <div class="qr-text">
-      <div class="qr-eyebrow" style="color:#4ADE80;">FREE WI-FI</div>
-      <div class="qr-title" id="wifi-ssid-display">Wi-Fi</div>
-      <div class="qr-sub" data-i18n="wifiScanConnect">스캔하면 자동 연결</div>
-    </div>
+<!-- WiFi QR 고정 (나가기 버튼 위, 좌측) -->
+<div class="qr-fixed wifi-mini" id="wifi-qr-card" style="display:none;">
+  <img class="qr-img" id="wifi-qr-img" alt="WiFi QR" src="">
+  <div class="qr-text">
+    <div class="qr-eyebrow" style="color:#4ADE80;">FREE WI-FI</div>
+    <div class="qr-title" id="wifi-ssid-display">Wi-Fi</div>
+    <div class="qr-sub" data-i18n="wifiScanConnect">스캔하면 자동 연결</div>
   </div>
+</div>
 
+<div class="qr-stack">
   <!-- QR 고정 -->
   <div class="qr-fixed">
     <img class="qr-img" id="room-qr-img" alt="주문 QR" src="">
