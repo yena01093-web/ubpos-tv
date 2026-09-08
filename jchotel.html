@@ -1,581 +1,988 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>제천 다온호텔 — 제천 시내 호텔</title>
+<title>제천 JC호텔 (제천관광호텔) — 제천 시내 호텔</title>
+<meta name="description" content="제천 JC호텔(제천관광호텔). 충북 제천 시내 중심, 2024년 9월 그랜드오픈. 45개 객실, 제천 예술의전당까지 도보 1분. 제천 조식 맛집. 네이버 예약으로 바로 예약하세요.">
+
+<!-- ── 교체 대상 ────────────────────────────────────────────────
+     1) 사진: .ph 클래스가 붙은 블록 = 실제 사진 들어갈 자리
+     2) 네이버 예약: data-naver 값 (지금은 네이버 지도 검색으로 임시 연결)
+     3) 주소 / 전화 / 객실 타입명: [ ] 표시된 곳
+   ───────────────────────────────────────────────────────────── -->
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Hotel",
+  "name": "제천 JC호텔",
+  "legalName": "JC호텔",
+  "alternateName": ["JC호텔", "제천관광호텔", "제천 JC HOTEL", "Jecheon JC Hotel"],
+  "description": "충북 제천 시내에 있는 호텔. 2024년 9월 개관, 45개 객실. 제천 예술의전당까지 도보 1분.",
+  "numberOfRooms": 45,
+  "priceRange": "80,000원 ~ 380,000원",
+  "potentialAction": {
+    "@type": "ReserveAction",
+    "target": "https://booking.naver.com/booking/3/bizes/1224681"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "KR",
+    "addressRegion": "충청북도",
+    "addressLocality": "제천시",
+    "streetAddress": "의병대로13길 10"
+  },
+  "telephone": "",
+  "url": "https://yena01093-web.github.io/ubpos-tv/jchotel.html",
+  "amenityFeature": [
+    {"@type": "LocationFeatureSpecification", "name": "주차장", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "조식", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "비즈니스 룸", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "24시간 프런트", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "무료 와이파이", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "전 객실 금연", "value": true},
+    {"@type": "LocationFeatureSpecification", "name": "온돌 객실", "value": true}
+  ]
+}
+</script>
+<!-- [교체] 위 streetAddress · telephone · url 을 실제 값으로 채우면 네이버·구글이 두 이름을 같은 호텔로 인식합니다 -->
+
+<!-- ── 검색 · 공유 최적화 ─────────────────────────────
+     [교체] 도메인이 정해지면 아래 https://choikiho20-cyber.github.io/jc-hotel 를 실제 주소로 일괄 치환
+   ───────────────────────────────────────────────── -->
+<link rel="canonical" href="https://yena01093-web.github.io/ubpos-tv/jchotel.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="제천 JC호텔">
+<meta property="og:title" content="제천 JC호텔 (제천관광호텔) — 제천 시내 호텔">
+<meta property="og:description" content="제천 예술의전당 도보 1분. 45개 객실, 소문난 조식. 2024년 9월 전 객실 리뉴얼.">
+<meta property="og:image" content="https://choikiho20-cyber.github.io/jc-hotel/images/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://choikiho20-cyber.github.io/jc-hotel/">
+<meta property="og:locale" content="ko_KR">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="제천 JC호텔 (제천관광호텔)">
+<meta name="twitter:description" content="제천 예술의전당 도보 1분. 45개 객실, 소문난 조식.">
+<meta name="twitter:image" content="https://choikiho20-cyber.github.io/jc-hotel/images/og-cover.jpg">
+
+<!-- [교체] 서치콘솔 소유확인 — 등록 후 content 값만 채우면 됩니다 -->
+<meta name="google-site-verification" content="">
+<meta name="naver-site-verification" content="">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Pretendard-Regular&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Italiana&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
 <style>
-  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css');
+:root{
+  --ink:#0E1C1B;
+  --deep:#15302D;
+  --water:#2E5C57;
+  --mist:#DDE4E1;
+  --paper:#F4F6F4;
+  --brass:#C0A062;
+  --brass-d:#8A7040;
+  --line:rgba(192,160,98,.28);
 
-  :root{
-    --night:#0f151c;
-    --night-2:#161f28;
-    --panel:#1b2530;
-    --hairline:#2b3846;
-    --cream:#ece6d9;
-    --cream-dim:#a9b4bd;
-    --amber:#d7a35c;
-    --amber-bright:#f0c987;
-  }
+  --disp:'Gowun Batang', serif;
+  --lat:'Italiana', serif;
+  --body:'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
 
-  *{box-sizing:border-box; margin:0; padding:0;}
+  --bar:78px;
+  --pad:clamp(20px,5vw,72px);
+}
 
-  html{scroll-behavior:smooth;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ink); color:var(--mist);
+  font-family:var(--body); font-size:16px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:rgba(192,160,98,.2);
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 
-  body{
-    background:var(--night);
-    color:var(--cream);
-    font-family:'Pretendard Variable','Pretendard',-apple-system,sans-serif;
-    line-height:1.6;
-    font-size:16px;
-  }
+/* ── 타이포 ─────────────────────────────────── */
+.eyebrow{
+  font-family:var(--lat); font-size:13px; letter-spacing:.34em;
+  text-transform:uppercase; color:var(--brass); margin:0 0 18px;
+}
+.eyebrow.ko{font-family:var(--body);font-size:12px;letter-spacing:.22em}
+.eyebrow.en{
+  font-family:var(--body); font-weight:500;
+  font-size:clamp(13px,1.45vw,17px); letter-spacing:.18em; line-height:1.85;
+  text-transform:uppercase; color:rgba(255,255,255,.95); margin-bottom:22px;
+  text-shadow:0 1px 10px rgba(0,0,0,.7);
+}
+h2{
+  font-family:var(--disp); font-weight:700;
+  font-size:clamp(28px,4.2vw,50px); line-height:1.32;
+  margin:0 0 22px; letter-spacing:-.01em;
+}
+h3{font-family:var(--disp);font-weight:700;font-size:clamp(20px,2.4vw,27px);line-height:1.4;margin:0 0 12px}
+p{margin:0 0 16px;color:rgba(221,228,225,.74)}
+.lead{font-size:clamp(16px,1.6vw,19px);line-height:1.85}
 
-  h1,h2,h3,.serif{
-    font-family:'Noto Serif KR', serif;
-    font-weight:700;
-    letter-spacing:-0.01em;
-  }
+/* ── 사진 자리 ───────────────────────────────── */
+.ph{
+  position:relative; overflow:hidden; background:
+    radial-gradient(120% 90% at 25% 15%, rgba(46,92,87,.55), transparent 60%),
+    linear-gradient(155deg,#1B3A36 0%,#122927 55%,#0D1F1E 100%);
+}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph::after{
+  content:attr(data-label);
+  position:absolute; left:12px; bottom:12px; z-index:2;
+  font-size:10px; letter-spacing:.14em; padding:4px 9px;
+  background:rgba(14,28,27,.72); border:1px solid var(--line);
+  color:rgba(192,160,98,.9);
+}
+.figcap{
+  position:absolute; right:14px; bottom:14px; z-index:2; max-width:62%;
+  text-align:right; font-size:13px; line-height:1.5;
+  color:rgba(255,255,255,.9); text-shadow:0 1px 12px rgba(0,0,0,.8);
+}
+.wide{position:relative;margin-top:46px;aspect-ratio:21/8;border:1px solid var(--line)}
+@media(max-width:700px){.wide{aspect-ratio:4/3}}
 
-  a{color:inherit; text-decoration:none;}
-  img{display:block; max-width:100%;}
+/* ── 네비 ───────────────────────────────────── */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:60;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:22px var(--pad);
+  transition:background .4s, padding .4s, border-color .4s;
+  border-bottom:1px solid transparent;
+}
+.nav{background:rgba(14,28,27,.72); backdrop-filter:blur(12px)}
+.nav.solid{
+  background:rgba(14,28,27,.9); backdrop-filter:blur(14px);
+  padding:14px var(--pad); border-bottom-color:var(--line);
+}
+.brand{font-family:var(--lat);font-size:clamp(28px,3.2vw,40px);letter-spacing:.24em;color:var(--mist);line-height:1;text-shadow:0 1px 14px rgba(0,0,0,.5)}
+.brand small{display:block;font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.42em;color:var(--brass);margin-top:5px}
+.menu{display:flex;gap:32px;font-size:15.5px;font-weight:500;letter-spacing:.02em}
+.menu a{color:rgba(232,238,235,.92);transition:color .25s;position:relative;padding:4px 0}
+.menu a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--brass);transition:width .3s}
+.menu a:hover{color:var(--mist)}
+.menu a:hover::after{width:100%}
+.nav-tel{display:inline-block;padding:8px 0;font-family:var(--lat);font-size:18px;letter-spacing:.12em;color:#D9BC80}
+.mnav{display:none}
+.mnav summary{list-style:none;cursor:pointer;width:34px;height:34px;display:grid;align-content:center;gap:6px}
+.mnav summary::-webkit-details-marker{display:none}
+.mnav summary i{display:block;height:1px;background:var(--mist);transition:transform .3s}
+.mnav[open] summary i:first-child{transform:translateY(3.5px) rotate(45deg)}
+.mnav[open] summary i:last-child{transform:translateY(-3.5px) rotate(-45deg)}
+.mnav-panel{
+  position:fixed; left:0; right:0; top:64px; z-index:59;
+  background:rgba(14,28,27,.97); backdrop-filter:blur(18px);
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  padding:8px var(--pad) 20px;
+}
+.mnav-panel a{display:block;padding:15px 0;font-size:16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.mnav-panel a:last-child{border-bottom:0}
+@media(max-width:900px){.menu,.nav-tel{display:none}.mnav{display:block}}
 
-  .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+/* ── 히어로: 좌 텍스트 패널 / 우 사진 ─────────── */
+.hero{
+  display:grid; grid-template-columns:34% 66%;
+  height:100svh; min-height:620px; overflow:hidden;
+}
+.hero-panel{
+  position:relative; z-index:3; background:var(--ink);
+  display:flex; flex-direction:column; justify-content:center;
+  padding:clamp(128px,14vh,168px) clamp(24px,2.8vw,48px) calc(var(--bar) + 34px);
+}
+.scene{position:relative; overflow:hidden}
+.track{display:flex;height:100%;transition:transform 1.1s cubic-bezier(.65,0,.35,1)}
+.slide{flex:0 0 100%;height:100%;overflow:hidden}
+.scene img{width:100%;height:100%;object-fit:cover;display:block}
+.slide img{animation:kb 22s ease-in-out infinite alternate;transform-origin:52% 58%}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.08)}}
+/* 사진은 그대로 두고 아래쪽만 예약바와 이어지게 눌러 준다 */
+.shade{
+  position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg,transparent 62%,rgba(14,28,27,.55) 100%);
+}
 
-  /* ---------- header ---------- */
-  header{
-    position:sticky; top:0; z-index:50;
-    background:rgba(15,21,28,0.86);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--hairline);
-  }
-  .nav{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:18px 28px;
-    max-width:1180px; margin:0 auto;
-  }
-  .brand{font-family:'Noto Serif KR',serif; font-size:1.15rem; font-weight:700; color:var(--amber-bright);}
-  .brand span{color:var(--cream);}
-  nav.links{display:flex; gap:30px; font-size:0.92rem; color:var(--cream-dim);}
-  nav.links a:hover{color:var(--amber-bright);}
-  .nav-cta{
-    border:1px solid var(--amber); color:var(--amber-bright);
-    padding:9px 18px; border-radius:2px; font-size:0.88rem;
-    transition:background .2s, color .2s;
-  }
-  .nav-cta:hover{background:var(--amber); color:var(--night);}
-  .nav-mobile{display:none;}
+.hero-copy{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:none}
+.hero-copy > *{
+  transition:opacity .75s cubic-bezier(.22,.68,.24,1), transform .75s cubic-bezier(.22,.68,.24,1);
+}
+.hero-copy h1{transition-delay:.08s}
+.hero-copy .sub{transition-delay:.16s}
+.hero-copy.out > *{opacity:0;transform:translateX(-34px)}
+.hero-copy.enter > *{opacity:0;transform:translateX(34px)}
+.hero-copy.nofx > *{transition:none}
 
-  /* ---------- hero ---------- */
-  .hero{
-    position:relative;
-    min-height:92vh;
-    display:flex; align-items:flex-end;
-    background:
-      linear-gradient(180deg, rgba(15,21,28,0.15) 0%, rgba(15,21,28,0.55) 55%, rgba(15,21,28,0.96) 100%),
-      url('https://choikiho20-cyber.github.io/jc-hotel/images/exterior.jpg') center/cover no-repeat;
-  }
-  .hero-inner{padding:0 28px 72px; max-width:1180px; margin:0 auto; width:100%;}
-  .hero-eyebrow{
-    color:var(--amber); font-size:0.95rem; letter-spacing:0.02em; margin-bottom:18px;
-  }
-  .hero h1{
-    font-size:clamp(2.3rem, 5.4vw, 4.1rem);
-    color:var(--cream);
-    max-width:14ch;
-    line-height:1.22;
-  }
-  .hero h1 em{
-    font-style:normal; color:var(--amber-bright);
-  }
-  .hero p{
-    margin-top:22px; color:var(--cream-dim); font-size:1.05rem; max-width:46ch;
-  }
+.hero h1{
+  font-family:var(--disp); font-weight:700;
+  font-size:clamp(30px,3.3vw,52px); line-height:1.28;
+  margin:0 0 22px; letter-spacing:-.02em; color:#fff;
+}
+.hero .sub{
+  font-size:clamp(15px,1.15vw,17px); line-height:1.75;
+  color:rgba(221,228,225,.78); margin:0;
+}
+.eyebrow.en{
+  font-family:var(--body); font-weight:500;
+  font-size:clamp(12px,.95vw,14px); letter-spacing:.2em; line-height:1.9;
+  text-transform:uppercase; color:var(--brass); margin:0 0 20px;
+}
 
-  /* booking bar */
-  .booking-bar{
-    margin-top:44px;
-    background:var(--panel);
-    border:1px solid var(--hairline);
-    border-radius:4px;
-    display:flex; flex-wrap:wrap;
-    overflow:hidden;
-  }
-  .booking-field{
-    flex:1 1 150px;
-    padding:16px 22px;
-    border-right:1px solid var(--hairline);
-  }
-  .booking-field:last-of-type{border-right:none;}
-  .booking-field label{display:block; font-size:0.72rem; color:var(--cream-dim); margin-bottom:6px;}
-  .booking-field select, .booking-field input{
-    background:none; border:none; color:var(--cream); font-size:0.95rem; width:100%;
-    font-family:inherit;
-  }
-  .booking-go{
-    display:flex; align-items:center; justify-content:center;
-    background:var(--amber); color:var(--night);
-    font-weight:700; padding:0 34px; font-size:0.95rem;
-    flex:0 0 auto;
-  }
-  .booking-go:hover{background:var(--amber-bright);}
+/* 사진 이름 + 인디케이터 — 패널 하단 */
+.slabel{margin-top:auto; padding-top:30px}
+.slabel span{
+  display:block; margin-bottom:14px; font-size:13px; font-weight:500;
+  letter-spacing:.1em; color:rgba(221,228,225,.55);
+}
+.sdots{display:flex; gap:10px}
+.sdots button{
+  width:30px; height:2px; padding:14px 0; background:rgba(221,228,225,.22);
+  background-clip:content-box; box-sizing:content-box; transition:background .4s;
+}
+.sdots button[aria-current="true"]{background:var(--brass);background-clip:content-box}
 
-  /* ---------- section shell ---------- */
-  section{padding:110px 0;}
-  .section-head{margin-bottom:56px; max-width:640px;}
-  .section-tag{color:var(--amber); font-size:0.9rem; margin-bottom:14px;}
-  .section-head h2{font-size:clamp(1.7rem,3vw,2.4rem); color:var(--cream); line-height:1.35;}
-  .section-head p{margin-top:16px; color:var(--cream-dim); max-width:56ch;}
+/* 프로모션 카드 — 사진 위 우하단 */
+.promo{
+  position:absolute; right:clamp(20px,2.4vw,40px); bottom:calc(var(--bar) + 34px); z-index:4;
+  width:min(310px,58%); padding:20px 22px;
+  background:rgba(14,28,27,.78); backdrop-filter:blur(16px);
+  border:1px solid var(--line); border-left:2px solid var(--brass);
+}
+.promo b{display:block;font-family:var(--disp);font-size:17px;font-weight:700;color:#fff;margin-bottom:6px}
+.promo span{font-size:13px;color:rgba(221,228,225,.72);line-height:1.6}
 
-  /* ---------- intro / stats ---------- */
-  .intro{
-    display:grid; grid-template-columns:1.1fr 0.9fr; gap:70px; align-items:center;
+@media(max-width:960px){
+  .hero{grid-template-columns:1fr; grid-template-rows:46svh auto; height:auto; min-height:0}
+  .hero-panel{
+    order:2; justify-content:flex-start;
+    padding:32px var(--pad) calc(var(--bar) + 26px);
   }
-  .intro-copy p{color:var(--cream-dim); font-size:1.02rem; margin-bottom:16px; max-width:48ch;}
-  .stat-row{display:flex; gap:44px; margin-top:36px;}
-  .stat{border-top:1px solid var(--hairline); padding-top:14px;}
-  .stat .num{font-family:'Noto Serif KR',serif; font-size:2rem; color:var(--amber-bright); font-weight:700;}
-  .stat .label{color:var(--cream-dim); font-size:0.85rem; margin-top:4px;}
-  .intro-img{position:relative;}
-  .intro-img img{border-radius:2px; width:100%; height:520px; object-fit:cover;}
+  .scene{order:1}
+  .hero-copy{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:none}
+  .hero h1{font-size:clamp(30px,7.4vw,44px)}
+  .hero .sub{font-size:15px}
+  .slabel{order:-1; margin-top:0; padding:0 0 22px}
+  .slabel span{margin-bottom:10px}
+  .promo{display:none}
+  .shade{background:linear-gradient(180deg,transparent 70%,rgba(14,28,27,.4) 100%)}
+}
 
-  /* ---------- rooms ---------- */
-  .room-tier{margin-bottom:64px;}
-  .room-tier-name{
-    color:var(--amber); font-size:0.95rem; margin-bottom:22px;
-    border-bottom:1px solid var(--hairline); padding-bottom:14px;
-  }
-  .room-grid{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr));
-    gap:1px; background:var(--hairline);
-  }
-  .room-card{
-    background:var(--night); padding:30px 26px;
-    display:flex; flex-direction:column; gap:10px;
-  }
-  .room-card h3{font-size:1.25rem; color:var(--cream);}
-  .room-card .desc{color:var(--cream-dim); font-size:0.88rem;}
-  .room-card .meta{color:var(--cream-dim); font-size:0.82rem; margin-top:6px;}
-  .room-card .price{
-    margin-top:auto; padding-top:16px; font-size:1.05rem; color:var(--amber-bright);
-    font-family:'Noto Serif KR',serif;
-  }
-  .room-card .price small{color:var(--cream-dim); font-size:0.72rem; font-family:'Pretendard Variable',sans-serif;}
-  .room-card .book-link{
-    margin-top:14px; font-size:0.85rem; color:var(--cream);
-    border:1px solid var(--hairline); text-align:center; padding:10px;
-    transition:border-color .2s, color .2s;
-  }
-  .room-card .book-link:hover{border-color:var(--amber); color:var(--amber-bright);}
+/* ── 예약바 ─────────────────────────────────── */
+.bookbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:70;
+  background:rgba(14,28,27,.94); backdrop-filter:blur(18px);
+  border-top:1px solid var(--line);
+  display:flex; align-items:stretch; gap:0;
+  padding:0 var(--pad);
+}
+.bf{display:flex;flex-direction:column;justify-content:center;gap:3px;padding:14px 26px 14px 0;flex:1;min-width:0;border-right:1px solid rgba(255,255,255,.07)}
+.bf:first-child{padding-left:0}
+.bf label{font-family:var(--lat);font-size:10px;letter-spacing:.22em;color:var(--brass);text-transform:uppercase}
+.bf input,.bf select{
+  background:none;border:0;color:var(--mist);font-family:var(--body);
+  font-size:15px;padding:0;width:100%;cursor:pointer;
+}
+.bf select option{background:var(--deep);color:var(--mist)}
+.bf input::-webkit-calendar-picker-indicator{filter:invert(.8) sepia(1) saturate(3) hue-rotate(5deg);cursor:pointer}
+.call-btn{
+  align-self:center; margin-left:26px; flex:0 0 auto;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  border:1px solid var(--brass); color:var(--brass);
+  font-size:15px; font-weight:500; padding:14px 26px; letter-spacing:.03em;
+  transition:background .25s, color .25s;
+}
+.call-btn:hover{background:var(--brass);color:var(--ink)}
+.call-ico{font-size:14px;line-height:1}
+.book-btn{
+  align-self:center; margin-left:12px; flex:0 0 auto;
+  display:inline-flex; align-items:center; justify-content:center; text-align:center;
+  background:var(--brass); color:#0E1C1B; font-weight:700; font-size:15px;
+  padding:15px 34px; letter-spacing:.04em; transition:background .25s,transform .25s;
+}
+.book-btn:hover{background:#D4B478;transform:translateY(-1px)}
+@media(max-width:900px){
+  :root{--bar:64px}
+  .hero-copy{padding-bottom:calc(var(--bar) + 20px)}
+    .bookbar{padding:9px 14px;gap:8px}
+  .bf{display:none}
+  .call-btn{margin:0;flex:0 0 40%;padding:14px 8px;font-size:14.5px;gap:6px}
+  .book-btn{margin:0;flex:1;padding:14px 8px;font-size:14.5px}
+}
 
-  /* ---------- walk / location steps ---------- */
-  .walk{
-    display:grid; grid-template-columns:0.85fr 1.15fr; gap:70px; align-items:start;
-  }
-  .walk-img img{width:100%; height:460px; object-fit:cover; border-radius:2px;}
-  .step{
-    display:grid; grid-template-columns:64px 1fr; gap:20px;
-    padding:26px 0; border-bottom:1px solid var(--hairline);
-  }
-  .step:first-child{padding-top:0;}
-  .step-time{color:var(--amber-bright); font-family:'Noto Serif KR',serif; font-size:1.15rem;}
-  .step h3{font-size:1.1rem; color:var(--cream); margin-bottom:6px;}
-  .step p{color:var(--cream-dim); font-size:0.92rem;}
+/* ── 섹션 공통 ──────────────────────────────── */
+section{padding:clamp(80px,11vw,150px) var(--pad)}
+.wrap{max-width:1240px;margin:0 auto}
+.rise{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.3,1),transform .9s cubic-bezier(.2,.7,.3,1)}
+.rise.in{opacity:1;transform:none}
 
-  /* ---------- trust banner ---------- */
-  .trust{
-    background:var(--panel); border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline);
-    padding:70px 0;
-  }
-  .trust-inner{display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center;}
-  .trust-inner img{width:100%; height:280px; object-fit:cover; border-radius:2px;}
-  .trust h2{font-size:1.7rem; color:var(--cream); line-height:1.4;}
-  .trust p{color:var(--cream-dim); margin-top:14px;}
+/* ── 인트로 ─────────────────────────────────── */
+.intro{background:var(--deep);border-top:1px solid rgba(255,255,255,.05)}
+.intro .wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(32px,6vw,90px);align-items:center}
+.stats{display:flex;gap:38px;margin-top:34px;flex-wrap:wrap}
+.stat b{display:block;font-family:var(--lat);font-size:clamp(30px,4vw,46px);color:var(--brass);line-height:1}
+.stat span{font-size:13px;color:rgba(221,228,225,.6);letter-spacing:.04em}
+@media(max-width:860px){.intro .wrap{grid-template-columns:1fr}}
 
-  /* ---------- breakfast ---------- */
-  .bf-gallery{
-    display:grid; grid-template-columns:repeat(4, 1fr); grid-auto-rows:150px; gap:10px; margin-bottom:44px;
-  }
-  .bf-gallery img{width:100%; height:100%; object-fit:cover; border-radius:2px;}
-  .bf-gallery > div:nth-child(1){grid-column:span 2; grid-row:span 2;}
-  .bf-facts{display:flex; gap:50px; flex-wrap:wrap;}
-  .bf-fact .k{color:var(--amber); font-size:0.78rem; margin-bottom:6px;}
-  .bf-fact .v{font-family:'Noto Serif KR',serif; font-size:1.2rem; color:var(--cream);}
+/* ── 객실 ───────────────────────────────────── */
+.grade{margin-top:clamp(44px,5vw,68px)}
+.grade-head{display:flex;align-items:baseline;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.grade-en{font-family:var(--lat);font-size:clamp(20px,2.2vw,27px);letter-spacing:.16em;color:var(--brass)}
+.grade-ko{font-size:13px;letter-spacing:.1em;color:rgba(221,228,225,.5)}
+.rmgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:1px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09);border-top:0}
+.rm{background:var(--ink);padding:clamp(20px,5vw,26px) clamp(18px,4.5vw,24px) 22px;display:flex;flex-direction:column;transition:background .3s}
+.rm:hover{background:var(--deep)}
+.rm h3{font-family:var(--lat);font-size:20px;letter-spacing:.08em;color:#fff;margin:0 0 4px;line-height:1.3}
+.rm-badge{display:inline-block;margin-left:8px;font-family:var(--body);font-size:11px;letter-spacing:.08em;padding:3px 8px;border:1px solid var(--line);color:var(--brass);vertical-align:middle}
+.rm-ko{font-size:14px;color:rgba(221,228,225,.62);margin:0 0 16px}
+.rm-people{font-size:13px;color:var(--brass);margin:0 0 4px;letter-spacing:.02em}
+.rm-spec{font-size:13px;color:rgba(221,228,225,.5);margin:0 0 20px;line-height:1.6}
+.rm-price{font-family:var(--lat);font-size:19px;letter-spacing:.06em;color:#fff;margin:auto 0 16px}
+.rm-price em{font-family:var(--body);font-style:normal;font-size:13px;color:rgba(221,228,225,.55);margin-left:3px}
+.rm-book{
+  align-self:flex-start;font-size:13px;letter-spacing:.06em;
+  padding:9px 20px;border:1px solid var(--line);color:var(--brass);
+  transition:background .25s,color .25s;
+}
+.rm-book:hover{background:var(--brass);color:var(--ink)}
+.rm-note{margin-top:36px;font-size:13px;color:rgba(221,228,225,.45)}
+.rmvids{margin-top:clamp(48px,6vw,76px)}
+.rmvids-t{font-family:var(--lat);font-size:clamp(19px,2.2vw,26px);letter-spacing:.14em;color:var(--brass);margin:0 0 22px}
+.rmvids-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.rmvid{margin:0;position:relative;overflow:hidden;aspect-ratio:16/10;background:var(--deep)}
+.rmvid video{width:100%;height:100%;object-fit:cover;display:block}
+.rmvid-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(14,28,27,.6);border:1px solid var(--brass);color:var(--brass);
+  font-size:15px;line-height:1;transition:background .25s,color .25s,opacity .3s;
+}
+.rmvid-play:hover{background:var(--brass);color:var(--ink)}
+.rmvid.playing .rmvid-play{opacity:0;pointer-events:none}
+.rmvid figcaption{
+  position:absolute;left:0;right:0;bottom:0;padding:24px 14px 11px;
+  background:linear-gradient(transparent,rgba(14,28,27,.9));
+  font-size:12.5px;color:rgba(255,255,255,.85);
+}
+.rmvid figcaption b{color:#fff;font-weight:600;margin-right:5px}
+@media(max-width:860px){.rmvids-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.rmgrid{grid-template-columns:1fr}}
 
-  /* ---------- facilities ---------- */
-  .fac-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--hairline);
-  }
-  .fac-card{background:var(--night);}
-  .fac-card img{width:100%; height:210px; object-fit:cover;}
-  .fac-card .body{padding:22px 24px;}
-  .fac-card h3{font-size:1.02rem; color:var(--cream); margin-bottom:6px;}
-  .fac-card p{color:var(--cream-dim); font-size:0.85rem;}
+.spec{background:var(--deep)}
+.walk{list-style:none;margin:48px 0 0;padding:0;border-left:1px solid var(--line)}
+.walk li{position:relative;display:grid;grid-template-columns:150px 1fr;gap:clamp(14px,3vw,44px);padding:0 0 42px 34px}
+.walk li:last-child{padding-bottom:0}
+.walk li::before{content:'';position:absolute;left:-5px;top:10px;width:9px;height:9px;border-radius:50%;background:var(--brass)}
+.walk .t{font-family:var(--disp);font-weight:700;font-size:clamp(17px,2vw,23px);color:var(--brass);line-height:1.4}
+.walk h3{margin:0 0 8px}
+.walk p{margin:0;font-size:15px}
+@media(max-width:700px){.walk li{grid-template-columns:1fr;gap:6px;padding-bottom:34px}}
 
-  /* ---------- around ---------- */
-  .around-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
-  .around-card img{width:100%; height:190px; object-fit:cover; border-radius:2px; margin-bottom:14px;}
-  .around-card h3{font-size:1.02rem; color:var(--cream); margin-bottom:4px;}
-  .around-card p{color:var(--cream-dim); font-size:0.85rem;}
+/* ── 선수단 숙소 ─────────────────────────────── */
+.proofsec{padding-top:0}
+.proof{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4.5vw,68px);align-items:center}
+.proof-img{margin:0;overflow:hidden;border:1px solid var(--line)}
+.proof-img img{width:100%;height:100%;object-fit:cover;display:block;aspect-ratio:3/2}
+.proof-txt h2{font-size:clamp(24px,3.1vw,38px);margin-bottom:18px}
+.proof-txt p{font-size:15px;max-width:38ch}
+@media(max-width:860px){.proof{grid-template-columns:1fr}}
 
-  /* ---------- footer ---------- */
-  footer{border-top:1px solid var(--hairline); padding:64px 0 40px;}
-  .foot-grid{
-    display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:50px; margin-bottom:50px;
-  }
-  .foot-brand{font-family:'Noto Serif KR',serif; font-size:1.3rem; color:var(--amber-bright); margin-bottom:16px;}
-  .foot-col h4{font-size:0.85rem; color:var(--amber); margin-bottom:14px;}
-  .foot-col p, .foot-col a{display:block; color:var(--cream-dim); font-size:0.9rem; margin-bottom:8px;}
-  .foot-col a:hover{color:var(--amber-bright);}
-  .foot-bottom{
-    border-top:1px solid var(--hairline); padding-top:24px;
-    color:var(--cream-dim); font-size:0.78rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
-  }
+/* ── 조식 ───────────────────────────────────── */
+.bfsec{background:var(--deep)}
+.bfgrid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+  margin-top:clamp(36px,4.5vw,56px);
+}
+.bfshot{margin:0;position:relative;overflow:hidden;aspect-ratio:1/1;background:var(--ink)}
+.bfshot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s cubic-bezier(.2,.7,.3,1)}
+.bfshot:hover img{transform:scale(1.05)}
+.bfshot-lg{grid-column:span 2;grid-row:span 2}
+.bfinfo{
+  display:flex; flex-wrap:wrap; gap:1px; margin-top:2px;
+  background:rgba(255,255,255,.09);
+}
+.bfinfo div{
+  flex:1 1 180px; background:var(--deep); padding:24px 26px;
+}
+.bfinfo span{display:block;font-size:12px;letter-spacing:.14em;color:var(--brass);margin-bottom:8px}
+.bfinfo b{font-family:var(--lat);font-size:clamp(19px,2.1vw,25px);letter-spacing:.06em;color:#fff;font-weight:400}
+@media(max-width:820px){
+  .bfgrid{grid-template-columns:repeat(2,1fr)}
+  .bfshot-lg{grid-column:span 2;grid-row:span 1;aspect-ratio:16/10}
+  .bfinfo div{padding:18px 20px}
+}
 
-  @media (max-width: 860px){
-    nav.links{display:none;}
-    .intro, .walk, .trust-inner{grid-template-columns:1fr;}
-    .intro-img img, .walk-img img{height:320px;}
-    .bf-gallery{grid-template-columns:repeat(2,1fr);}
-    .bf-gallery > div:nth-child(1){grid-column:span 2;}
-    .fac-grid, .around-grid{grid-template-columns:repeat(2,1fr);}
-    .foot-grid{grid-template-columns:1fr;}
-    section{padding:70px 0;}
-  }
+/* ── 시설 ───────────────────────────────────── */
+.facshots{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:clamp(36px,4.5vw,56px)}
+.facshots figure{margin:0;position:relative;overflow:hidden;aspect-ratio:16/10;background:var(--deep)}
+.facshots img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s cubic-bezier(.2,.7,.3,1)}
+.facshots figure:hover img{transform:scale(1.05)}
+.facshots figcaption{
+  position:absolute;left:0;right:0;bottom:0;padding:26px 16px 12px;
+  background:linear-gradient(transparent,rgba(14,28,27,.9));
+  font-size:13px;font-weight:500;color:#fff;
+}
+@media(max-width:760px){.facshots{grid-template-columns:repeat(2,1fr)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:1px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09);margin-top:44px}
+.cell{background:var(--ink);padding:clamp(20px,4.5vw,34px) clamp(16px,3.6vw,28px);transition:background .3s}
+.cell:hover{background:var(--deep)}
+.cell b{display:block;font-family:var(--disp);font-size:clamp(17px,4vw,19px);font-weight:700;color:#fff;margin-bottom:8px}
+.cell span{display:block;font-size:14px;color:rgba(221,228,225,.62);line-height:1.7}
+.cell .free{display:inline-block;width:auto;margin-top:12px;font-family:var(--lat);font-size:11px;letter-spacing:.2em;color:var(--brass);border:1px solid var(--line);padding:3px 9px}
 
-  @media (prefers-reduced-motion: reduce){
-    html{scroll-behavior:auto;}
-  }
+/* ── 제천 ───────────────────────────────────── */
+.jc{background:var(--deep)}
+.places{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(12px,3vw,22px);margin-top:46px}
+.place .ph{aspect-ratio:3/4}
+.place h3{margin:18px 0 4px;font-size:19px}
+.place span{font-size:13px;color:rgba(221,228,225,.55)}
 
-  a:focus-visible, button:focus-visible, select:focus-visible{
-    outline:2px solid var(--amber-bright); outline-offset:2px;
-  }
+/* ── 푸터 ───────────────────────────────────── */
+footer{padding:clamp(64px,8vw,100px) var(--pad) calc(var(--bar) + 48px);border-top:1px solid var(--line)}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:44px;max-width:1240px;margin:0 auto}
+footer .brand{margin-bottom:20px}
+.biz{font-size:14px;margin:0 0 6px;max-width:36ch}
+.biz b{color:rgba(221,228,225,.9);font-weight:400}
+.biz span{color:rgba(221,228,225,.45)}
+.fcol h4{font-family:var(--lat);font-size:12px;letter-spacing:.26em;color:var(--brass);margin:0 0 16px;text-transform:uppercase}
+.fcol p{font-size:14px;margin:0 0 8px}
+.fcol p a{display:inline-block;padding:6px 0}
+.maps{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.maps a{
+  display:inline-block; font-size:13px; letter-spacing:.02em;
+  padding:10px 14px; border:1px solid var(--line); color:var(--brass);
+  transition:background .25s, color .25s;
+}
+.maps a:hover{background:var(--brass);color:var(--ink)}
+.copy{max-width:1240px;margin:56px auto 0;padding-top:26px;border-top:1px solid rgba(255,255,255,.07);font-size:12px;color:rgba(221,228,225,.4)}
+@media(max-width:860px){.fgrid{grid-template-columns:1fr;gap:34px}}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="nav">
-    <div class="brand">다온<span>호텔 · 제천</span></div>
-    <nav class="links">
+<nav class="nav" id="nav">
+  <a class="brand" href="#top">JC HOTEL<small>제천</small></a>
+  <div class="menu">
+    <a href="#rooms">객실</a>
+    <a href="#walk">위치</a>
+    <a href="#breakfast">조식</a>
+    <a href="#facility">시설</a>
+    <a href="#jecheon">제천 여행</a>
+    <a href="#access">오시는 길</a>
+    <a href="blog.html">소식</a>
+  </div>
+  <a class="nav-tel" href="tel:043-000-0000">043-000-0000</a><!-- [전화번호] -->
+  <details class="mnav">
+    <summary aria-label="메뉴 열기"><i></i><i></i></summary>
+    <div class="mnav-panel">
       <a href="#rooms">객실</a>
       <a href="#walk">위치</a>
       <a href="#breakfast">조식</a>
+    <a href="#breakfast">조식</a>
       <a href="#facility">시설</a>
-      <a href="#around">제천 여행</a>
-    </nav>
-    <a href="https://booking.naver.com/booking/3/bizes/1224681" class="nav-cta" target="_blank" rel="noopener">네이버 예약</a>
+      <a href="#jecheon">제천 여행</a>
+      <a href="#access">오시는 길</a>
+      <a href="blog.html">소식</a>
+      <a href="tel:043-000-0000" style="color:var(--brass)">043-000-0000 전화 예약</a>
+    </div>
+  </details>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-panel">
+    <div class="hero-copy">
+      <p class="eyebrow en">Lighting up<br>the night of Jecheon.</p>
+      <h1>제천의 밤을<br>밝힙니다.</h1>
+      <p class="sub">제천 예술의전당 도보 1분. 45개 객실, 그리고 소문난 조식.</p>
+    </div>
+    <div class="slabel">
+      <span id="scap">호텔 외관</span>
+      <div class="sdots" id="sdots">
+        <button aria-label="호텔 외관" aria-current="true"></button>
+        <button aria-label="로비"></button>
+        <button aria-label="객실"></button>
+        <button aria-label="청풍호 · 청풍대교"></button>
+        <button aria-label="의림지 용추폭포"></button>
+      </div>
+    </div>
   </div>
+
+  <div class="scene">
+    <div class="track" id="track">
+      <!-- JC호텔 외관 야경 -->
+      <div class="slide" data-shade="dark" data-cap="호텔 외관" data-en="Lighting up<br>the night of Jecheon." data-ko="제천의 밤을<br>밝힙니다."><img src="images/exterior.jpg" alt="밤에 조명이 켜진 JC호텔 건물 외관"></div>
+      <!-- 1층 로비. 프런트 데스크와 대기 소파가 보이는 정면 컷 -->
+      <div class="slide" data-cap="로비" data-en="Where Jecheon<br>welcomes you." data-ko="제천이<br>맞이하는 자리."><img loading="lazy" src="images/lobby.jpg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1743273291499-e2c1da988688?auto=format&fit=crop&w=1600&q=80'" alt="프런트 데스크와 소파가 있는 JC호텔 1층 로비"></div>
+      <!-- 트윈 객실. 침구와 조명이 밝게 나온 컷 -->
+      <div class="slide" data-cap="객실" data-en="The deepest sleep<br>in Jecheon." data-ko="제천에서<br>가장 깊은 밤."><img loading="lazy" src="images/room.jpg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?auto=format&fit=crop&w=1600&q=80'" alt="침대 두 개와 간접 조명이 있는 JC호텔 트윈 객실"></div>
+      <!-- 청풍대교 항공 촬영. 벚꽃길과 호수가 함께 보이는 컷 -->
+      <div class="slide" data-cap="청풍호 · 청풍대교" data-en="The lake,<br>come morning." data-ko="아침이면,<br>호수가 곁에."><img loading="lazy" src="images/cheongpung-bridge.jpg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1784762011540-6c387cb76bf5?auto=format&fit=crop&w=1600&q=80'" alt="청풍호를 가로지르는 청풍대교 항공 사진"></div>
+      <!-- 의림지 용추폭포 전망대 항공 촬영. 유리 전망대와 폭포가 함께 보이는 컷 -->
+      <div class="slide" data-cap="의림지 용추폭포" data-en="Jecheon<br>begins here." data-ko="제천은<br>여기서 시작됩니다."><img loading="lazy" src="images/uirimji.jpg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1603852452515-2dc92bd9c6f1?auto=format&fit=crop&w=1600&q=80'" alt="의림지 용추폭포와 유리 전망대 항공 사진"></div>
+    </div>
+    <div class="shade"></div>
+  </div>
+
+  <aside class="promo">
+    <b>예술의전당 도보 1분</b>
+    <span>2026 제천국제음악영화제가 열린 공연장이 호텔 앞에 있습니다.</span>
+  </aside>
 </header>
 
-<section class="hero" id="top">
-  <div class="hero-inner">
-    <div class="hero-eyebrow">제천 시내 · 2025년 개관</div>
-    <h1>제천역에서 <em>십 분</em>,<br>불 꺼지지 않는 방.</h1>
-    <p>시내 중심에서 하루를 마감하는 곳. 42개 객실과 이른 아침의 조식, 걸어서 닿는 저녁 식당까지.</p>
-
-    <div class="booking-bar" id="booking">
-      <div class="booking-field">
-        <label>체크인</label>
-        <input type="date">
-      </div>
-      <div class="booking-field">
-        <label>체크아웃</label>
-        <input type="date">
-      </div>
-      <div class="booking-field">
-        <label>인원</label>
-        <select>
-          <option>성인 2명</option>
-          <option>성인 1명</option>
-          <option>성인 2명 · 아동 1명</option>
-          <option>성인 4명</option>
-        </select>
-      </div>
-      <a href="#rooms" class="booking-go">객실 보기</a>
-    </div>
+<!-- ── 예약바 ─────────────────────────────────── -->
+<div class="bookbar">
+  <div class="bf">
+    <label for="ci">Check in</label>
+    <input type="date" id="ci">
   </div>
-</section>
-
-<section class="intro">
-  <div class="wrap intro">
-    <div class="intro-copy">
-      <div class="section-tag">다온호텔 제천</div>
-      <h2>걸어서 다니는 하루를 위해.</h2>
-      <p>차를 세워두고 시내를 걸어 다닐 수 있는 자리에 문을 열었습니다. 저녁 식당도, 다음 날 아침의 커피도 모두 도보 거리 안에 있습니다.</p>
-      <p>객실은 42개, 1인실부터 온돌 가족실까지 아홉 가지로 나눴습니다. 늦은 체크인을 위해 프런트는 24시간 자리를 지킵니다.</p>
-      <div class="stat-row">
-        <div class="stat"><div class="num">42</div><div class="label">객실</div></div>
-        <div class="stat"><div class="num">24H</div><div class="label">프런트 운영</div></div>
-        <div class="stat"><div class="num">2025</div><div class="label">개관</div></div>
-      </div>
-    </div>
-    <div class="intro-img">
-      <img src="https://choikiho20-cyber.github.io/jc-hotel/images/lobby.jpg" alt="호텔 로비">
-    </div>
+  <div class="bf">
+    <label for="co">Check out</label>
+    <input type="date" id="co">
   </div>
-</section>
-
-<section id="rooms">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Rooms</div>
-      <h2>아홉 가지 객실, 필요한 만큼.</h2>
-      <p>혼자 오시는 분부터 여덟 분이 함께 오시는 분까지. 침대방과 온돌방을 모두 두었습니다.</p>
-    </div>
-
-    <div class="room-tier">
-      <div class="room-tier-name">Standard</div>
-      <div class="room-grid">
-        <div class="room-card">
-          <h3>스탠다드</h3>
-          <div class="desc">기준 2인 · 최대 2인</div>
-          <div class="meta">침실 1 · 침대 1 · 욕실 1</div>
-          <div class="price">75,000 ~ 110,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="room-tier">
-      <div class="room-tier-name">Superior</div>
-      <div class="room-grid">
-        <div class="room-card">
-          <h3>슈페리어</h3>
-          <div class="desc">기준 2인 · 최대 2인</div>
-          <div class="meta">침실 1 · 침대 1 · 욕실 1</div>
-          <div class="price">95,000 ~ 130,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-        <div class="room-card">
-          <h3>슈페리어 트윈</h3>
-          <div class="desc">기준 2인 · 최대 2인</div>
-          <div class="meta">침실 1 · 침대 2 · 욕실 1</div>
-          <div class="price">105,000 ~ 140,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="room-tier">
-      <div class="room-tier-name">Deluxe</div>
-      <div class="room-grid">
-        <div class="room-card">
-          <h3>디럭스</h3>
-          <div class="desc">기준 2인 · 최대 3인</div>
-          <div class="meta">침실 1 · 침대 1 · 소파베드 1 · 욕실 1</div>
-          <div class="price">115,000 ~ 150,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-        <div class="room-card">
-          <h3>디럭스 트윈</h3>
-          <div class="desc">기준 2인 · 최대 3인</div>
-          <div class="meta">침실 1 · 침대 2 · 욕실 1</div>
-          <div class="price">150,000 ~ 195,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-        <div class="room-card">
-          <h3>디럭스 온돌</h3>
-          <div class="desc">기준 4인 · 최대 5인</div>
-          <div class="meta">침실 1 · 이불 4 · 욕실 1</div>
-          <div class="price">150,000 ~ 185,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="room-tier">
-      <div class="room-tier-name">Executive</div>
-      <div class="room-grid">
-        <div class="room-card">
-          <h3>이그제큐티브 트윈</h3>
-          <div class="desc">기준 2인 · 최대 3인</div>
-          <div class="meta">침실 1 · 침대 2 · 욕실 1</div>
-          <div class="price">185,000 ~ 225,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-        <div class="room-card">
-          <h3>이그제큐티브 온돌</h3>
-          <div class="desc">기준 8인 · 최대 10인</div>
-          <div class="meta">침실 1 · 이불 8 · 욕실 2</div>
-          <div class="price">260,000 ~ 350,000<small>원 / 박</small></div>
-          <a href="https://booking.naver.com/booking/3/bizes/1224681" class="book-link" target="_blank" rel="noopener">네이버 예약</a>
-        </div>
-      </div>
-    </div>
+  <div class="bf">
+    <label for="pax">Guests</label>
+    <select id="pax">
+      <option>성인 1명</option>
+      <option selected>성인 2명</option>
+      <option>성인 2명 · 아동 1명</option>
+      <option>성인 3명</option>
+      <option>성인 4명</option>
+    </select>
   </div>
-</section>
-
-<section id="walk">
-  <div class="wrap walk">
-    <div class="walk-img">
-      <img src="https://choikiho20-cyber.github.io/jc-hotel/images/room.jpg" alt="호텔 객실">
-    </div>
-    <div>
-      <div class="section-tag">From the door</div>
-      <h2 style="font-size:clamp(1.7rem,3vw,2.4rem); margin-bottom:36px;">문을 나서면 시내입니다.</h2>
-
-      <div class="step">
-        <div class="step-time">0분</div>
-        <div>
-          <h3>1층 식당가</h3>
-          <p>저녁 한 끼를 위해 차를 뺄 필요가 없습니다. 건물 1층에 식당이 있습니다.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-time">3분</div>
-        <div>
-          <h3>제천 중앙시장</h3>
-          <p>아침저녁으로 걸어서 오갈 수 있는 재래시장입니다.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-time">도보권</div>
-        <div>
-          <h3>제천 시내</h3>
-          <p>카페와 식당, 편의시설이 걸어서 닿는 거리에 모여 있습니다.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-time">차로</div>
-        <div>
-          <h3>청풍호 · 의림지</h3>
-          <p>차로 20~30분. 아침에 출발하면 하루 안에 다 돌아볼 수 있습니다.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="trust">
-  <div class="wrap trust-inner">
-    <img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/lobby-banner.jpg" alt="로비 현수막">
-    <div>
-      <h2>단체 손님도 편하게 묵을 수 있는 방을 갖췄습니다.</h2>
-      <p>같은 기간에 여러 팀을 함께 받은 경험이 있습니다. 조식 메뉴판에 영문을 함께 적어 두는 것도 그래서입니다.</p>
-    </div>
-  </div>
+  <a class="call-btn" href="tel:043-000-0000"><span class="call-ico" aria-hidden="true">☎</span>전화 예약</a>
+  <!-- 네이버 예약 -->
+  <a class="book-btn" id="book"
+     data-naver="https://booking.naver.com/booking/3/bizes/1224681"
+     href="#" target="_blank" rel="noopener">네이버 예약</a>
 </div>
 
-<section id="breakfast">
+<!-- ── 인트로 ─────────────────────────────────── -->
+<section class="intro">
   <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Breakfast</div>
-      <h2>아침 한 끼 때문에 다시 오십니다.</h2>
-      <p>매일 아침 뷔페로 차립니다. 한식 반찬과 국, 양식 조리대와 빵, 과일과 원두커피를 한자리에 냅니다.</p>
+    <div class="rise">
+      <p class="eyebrow ko">제천 JC호텔</p>
+      <h2>도시 한가운데<br>묵는다는 것.</h2>
     </div>
-
-    <div class="bf-gallery">
-      <div><img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/namul-bap.jpg" alt="나물밥"></div>
-      <div><img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/salad.jpg" alt="샐러드"></div>
-      <div><img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/fruit.jpg" alt="과일"></div>
-      <div><img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/bread.jpg" alt="빵"></div>
-      <div><img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/coffee.jpg" alt="커피"></div>
-      <div><img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/caprese.jpg" alt="카프레제"></div>
-    </div>
-
-    <div class="bf-facts">
-      <div class="bf-fact"><div class="k">운영 시간</div><div class="v">07:00 – 08:30</div></div>
-      <div class="bf-fact"><div class="k">형식</div><div class="v">뷔페</div></div>
-      <div class="bf-fact"><div class="k">구성</div><div class="v">한식 · 양식</div></div>
+    <div class="rise">
+      <p class="lead">제천 JC호텔은 시내 한가운데 있습니다. 공연장까지 걸어서 1분, 저녁은 옆 건물. 차를 세워두고 도시를 걸어 다닐 수 있는 자리입니다.</p>
+      <p class="lead">2024년 9월, 전 객실을 새로 단장해 문을 열었습니다. 아침 조식은 제천에서 이름이 났고, 출장 손님을 위해 1층에 비즈니스 룸을 두었습니다.</p>
+      <div class="stats">
+        <div class="stat"><b>45</b><span>객실</span></div>
+        <div class="stat"><b>1분</b><span>예술의전당까지 도보</span></div>
+        <div class="stat"><b>2024</b><span>전 객실 리뉴얼</span></div>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- ── 객실 ───────────────────────────────────── -->
+<section id="rooms">
+  <div class="wrap">
+    <div class="rise">
+      <p class="eyebrow">Rooms</p>
+      <h2>객실</h2>
+      <p class="lead" style="max-width:56ch">45개 객실을 아홉 가지로 나눴습니다. 혼자 오시는 분부터 여덟 분이 함께 오시는 분까지, 침대방과 온돌방을 모두 두었습니다.</p>
+    </div>
+
+    <div class="grade rise">
+      <div class="grade-head">
+        <span class="grade-en">Standard</span>
+        <span class="grade-ko">스탠다드</span>
+      </div>
+      <div class="rmgrid">
+        <article class="rm">
+          <h3>Standard</h3>
+          <p class="rm-ko">스탠다드 일반실</p>
+          <p class="rm-people">기준 2인 · 최대 2인</p>
+          <p class="rm-spec">침실 1 · 침대 1 · 욕실 1</p>
+          <p class="rm-price">80,000 ~ 120,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+      </div>
+    </div>
+
+    <div class="grade rise">
+      <div class="grade-head">
+        <span class="grade-en">Superior</span>
+        <span class="grade-ko">슈페리어</span>
+      </div>
+      <div class="rmgrid">
+        <article class="rm">
+          <h3>Superior</h3>
+          <p class="rm-ko">프리미엄 일반실</p>
+          <p class="rm-people">기준 2인 · 최대 2인</p>
+          <p class="rm-spec">침실 1 · 침대 1 · 욕실 1</p>
+          <p class="rm-price">100,000 ~ 140,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+        <article class="rm">
+          <h3>Superior Twin</h3>
+          <p class="rm-ko">트윈 일반실</p>
+          <p class="rm-people">기준 2인 · 최대 2인</p>
+          <p class="rm-spec">침실 1 · 침대 2 · 욕실 1</p>
+          <p class="rm-price">110,000 ~ 150,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+      </div>
+    </div>
+
+    <div class="grade rise">
+      <div class="grade-head">
+        <span class="grade-en">Deluxe</span>
+        <span class="grade-ko">디럭스</span>
+      </div>
+      <div class="rmgrid">
+        <article class="rm">
+          <h3>Deluxe</h3>
+          <p class="rm-ko">준특실</p>
+          <p class="rm-people">기준 2인 · 최대 3인</p>
+          <p class="rm-spec">침실 1 · 침대 1 · 소파베드 1 · 욕실 1</p>
+          <p class="rm-price">120,000 ~ 160,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+        <article class="rm">
+          <h3>Deluxe 2PC<span class="rm-badge">PC 2대</span></h3>
+          <p class="rm-ko">PC룸</p>
+          <p class="rm-people">기준 2인 · 최대 2인</p>
+          <p class="rm-spec">침실 1 · 침대 1 · 욕실 1</p>
+          <p class="rm-price">120,000 ~ 160,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+        <article class="rm">
+          <h3>Deluxe Twin</h3>
+          <p class="rm-ko">준특 트윈룸</p>
+          <p class="rm-people">기준 2인 · 최대 3인</p>
+          <p class="rm-spec">침실 1 · 침대 2 · 욕실 1</p>
+          <p class="rm-price">160,000 ~ 210,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+        <article class="rm">
+          <h3>Deluxe Family<span class="rm-badge">온돌</span></h3>
+          <p class="rm-ko">한실 4인</p>
+          <p class="rm-people">기준 4인 · 최대 5인</p>
+          <p class="rm-spec">침실 1 · 이불 4 · 욕실 1</p>
+          <p class="rm-price">160,000 ~ 200,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+      </div>
+    </div>
+
+    <div class="grade rise">
+      <div class="grade-head">
+        <span class="grade-en">Executive</span>
+        <span class="grade-ko">이그제큐티브</span>
+      </div>
+      <div class="rmgrid">
+        <article class="rm">
+          <h3>Executive Twin</h3>
+          <p class="rm-ko">특실 트윈</p>
+          <p class="rm-people">기준 2인 · 최대 3인</p>
+          <p class="rm-spec">침실 1 · 침대 2 · 욕실 1</p>
+          <p class="rm-price">200,000 ~ 240,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+        <article class="rm">
+          <h3>Executive Family<span class="rm-badge">온돌</span></h3>
+          <p class="rm-ko">한실 8인</p>
+          <p class="rm-people">기준 8인 · 최대 10인</p>
+          <p class="rm-spec">침실 1 · 이불 8 · 욕실 2</p>
+          <p class="rm-price">280,000 ~ 380,000<em>원</em></p>
+          <a class="rm-book" href="https://booking.naver.com/booking/3/bizes/1224681" target="_blank" rel="noopener">예약</a>
+        </article>
+      </div>
+    </div>
+
+
+    <div class="rmvids rise">
+      <p class="rmvids-t">실제 객실 영상</p>
+      <div class="rmvids-grid">
+        <figure class="rmvid">
+          <video preload="none" muted loop playsinline poster="images/room-402-poster.jpg" data-src="video/room-402.mp4" aria-label="402호 침대 두 개를 둔 객실 영상"></video>
+          <button class="rmvid-play" aria-label="402호 침대 두 개를 둔 객실 영상 재생">▶</button>
+          <figcaption><b>402호</b> 침대 두 개를 둔 객실</figcaption>
+        </figure>
+        <figure class="rmvid">
+          <video preload="none" muted loop playsinline poster="images/room-416-poster.jpg" data-src="video/room-416.mp4" aria-label="416호 트윈 객실 전체 영상"></video>
+          <button class="rmvid-play" aria-label="416호 트윈 객실 전체 영상 재생">▶</button>
+          <figcaption><b>416호</b> 트윈 객실 전체</figcaption>
+        </figure>
+        <figure class="rmvid">
+          <video preload="none" muted loop playsinline poster="images/room-502-massage-poster.jpg" data-src="video/room-502-massage.mp4" aria-label="502호 안마의자 영상"></video>
+          <button class="rmvid-play" aria-label="502호 안마의자 영상 재생">▶</button>
+          <figcaption><b>502호</b> 안마의자</figcaption>
+        </figure>
+        <figure class="rmvid">
+          <video preload="none" muted loop playsinline poster="images/room-502-bath-poster.jpg" data-src="video/room-502-bath.mp4" aria-label="502호 월풀 욕조 영상"></video>
+          <button class="rmvid-play" aria-label="502호 월풀 욕조 영상 재생">▶</button>
+          <figcaption><b>502호</b> 월풀 욕조</figcaption>
+        </figure>
+      </div>
+      <p class="rm-note" style="margin-top:20px">촬영한 객실의 호수입니다. 타입별 배정은 예약 시 확인해 주세요.</p>
+    </div>
+
+    <p class="rm-note rise">요금은 날짜와 시즌에 따라 달라집니다. 실제 잔여 객실과 확정 요금은 네이버 예약에서 확인하실 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- ── 시그니처: 객실 사양 핫스팟 ───────────────── -->
+<section class="spec" id="walk">
+  <div class="wrap">
+    <div class="rise">
+      <p class="eyebrow">From the door</p>
+      <h2>문을 나서면<br>1분 안에 공연장입니다.</h2>
+      <p class="lead" style="max-width:54ch">호텔 문 앞에서부터 걸어서 재봤습니다.</p>
+    </div>
+
+    <!-- [교체] 제천 예술의전당 실사진 -->
+    <figure class="wide ph rise" data-label="임시 이미지" style="margin:0">
+      <img loading="lazy" src="https://images.unsplash.com/photo-1722321974501-059dff03e970?auto=format&fit=crop&w=1600&q=80" alt="객석과 무대가 있는 공연장 내부">
+      <figcaption class="figcap">호텔에서 걸어서 1분, 제천 예술의전당</figcaption>
+    </figure>
+
+    <ol class="walk rise">
+      <li>
+        <span class="t">바로 옆</span>
+        <div>
+          <h3>고기로</h3>
+          <p>저녁 한 끼를 위해 차를 뺄 필요가 없습니다. 호텔 옆 건물입니다.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">도보 1분</span>
+        <div>
+          <h3>제천 예술의전당</h3>
+          <p>2026 제천국제음악영화제가 열린 공연장입니다. 상영이 늦게 끝나도 방까지 1분이면 돌아옵니다.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">도보권</span>
+        <div>
+          <h3>제천 시내</h3>
+          <p>식당과 카페, 편의시설이 걸어서 닿는 거리에 모여 있습니다.</p>
+        </div>
+      </li>
+      <li>
+        <span class="t">차로 이동</span>
+        <div>
+          <h3>청풍호 · 의림지 · 월악산</h3>
+          <p>차로 ○○분. 아침에 출발하면 하루 안에 다 돌아볼 수 있습니다.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ── 선수단 숙소 ─────────────────────────────── -->
+<section class="proofsec">
+  <div class="wrap proof rise">
+    <figure class="proof-img">
+      <img loading="lazy" src="images/breakfast/lobby-banner.jpg" alt="2025 기계체조 아시아 선수권대회 선수단 환영 현수막이 걸린 JC호텔 로비">
+    </figure>
+    <div class="proof-txt">
+      <p class="eyebrow">Trusted</p>
+      <h2>2025 기계체조<br>아시아 선수권대회<br>선수단이 묵었습니다.</h2>
+      <p>여러 나라 선수단을 같은 기간에 받았습니다. 조식 메뉴판에 영문을 함께 적어 두는 것도 그래서입니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 조식 ───────────────────────────────────── -->
+<section class="bfsec" id="breakfast">
+  <div class="wrap">
+    <div class="rise">
+      <p class="eyebrow">Breakfast</p>
+      <h2>아침 한 끼 때문에<br>다시 오십니다.</h2>
+      <p class="lead" style="max-width:56ch">매일 아침 뷔페로 차립니다. 한식 반찬과 국, 양식 조리대와 빵, 과일과 원두커피를 한자리에 냅니다.</p>
+    </div>
+
+    <div class="bfgrid rise">
+      <figure class="bfshot bfshot-lg"><img loading="lazy" src="images/breakfast/caprese.jpg" alt="토마토와 모짜렐라를 번갈아 담고 발사믹을 두른 카프레제"></figure>
+      <figure class="bfshot "><img loading="lazy" src="images/breakfast/salad.jpg" alt="루꼴라와 병아리콩, 방울토마토를 담은 샐러드"></figure>
+      <figure class="bfshot "><img loading="lazy" src="images/breakfast/namul-bap.jpg" alt="나물을 섞어 담아낸 나물밥"></figure>
+      <figure class="bfshot "><img loading="lazy" src="images/breakfast/fruit.jpg" alt="토마토와 배, 복숭아를 부채꼴로 담은 과일 접시"></figure>
+      <figure class="bfshot "><img loading="lazy" src="images/breakfast/egg-jorim.jpg" alt="간장에 조린 메추리알"></figure>
+      <figure class="bfshot "><img loading="lazy" src="images/breakfast/boiled-egg.jpg" alt="Boiled 명패가 놓인 삶은 달걀 바구니"></figure>
+      <figure class="bfshot "><img loading="lazy" src="images/breakfast/bread.jpg" alt="접시에 담긴 식빵과 바게트"></figure>
+      <figure class="bfshot "><img loading="lazy" src="images/breakfast/coffee.jpg" alt="원두커피와 찻잔이 놓인 음료 코너"></figure>
+    </div>
+
+    <div class="bfinfo rise">
+      <div><span>운영 시간</span><b>07:00 – 08:30</b></div>
+      <div><span>형식</span><b>뷔페</b></div>
+      <div><span>구성</span><b>한식 · 양식</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 시설 ───────────────────────────────────── -->
 <section id="facility">
   <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Facilities</div>
-      <h2>머무는 동안 필요한 것들.</h2>
+    <div class="rise">
+      <p class="eyebrow">Facilities</p>
+      <h2>머무는 동안<br>필요한 것들.</h2>
+    </div>
+    <div class="facshots rise">
+      <figure><img loading="lazy" src="images/breakfast/business.jpg" alt="게이밍 의자와 듀얼 모니터가 놓인 1층 비즈니스 룸"><figcaption>비즈니스 룸</figcaption></figure>
+      <figure><img loading="lazy" src="images/facility/meeting.jpg" alt="긴 대리석 테이블과 의자가 놓인 회의실"><figcaption>회의실</figcaption></figure>
+      <figure><img loading="lazy" src="images/facility/cafe.jpg" alt="헤링본 바닥과 디자인 의자가 놓인 카페테리아"><figcaption>카페테리아</figcaption></figure>
+      <figure><img loading="lazy" src="images/facility/whirlpool.jpg" alt="객실 월풀 욕조와 샤워기"><figcaption>월풀 욕조</figcaption></figure>
+      <figure><img loading="lazy" src="images/facility/laundry.jpg" alt="세탁기와 건조기가 놓인 세탁실"><figcaption>세탁실</figcaption></figure>
+      <figure><img loading="lazy" src="images/facility/parking.jpg" alt="호텔 전용 주차장"><figcaption>전용 주차장</figcaption></figure>
     </div>
 
-    <div class="fac-grid">
-      <div class="fac-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/breakfast/business.jpg" alt="비즈니스 룸">
-        <div class="body"><h3>비즈니스 룸</h3><p>1층에 업무용 PC와 프린터를 갖췄습니다.</p></div>
-      </div>
-      <div class="fac-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/facility/meeting.jpg" alt="회의실">
-        <div class="body"><h3>회의실</h3><p>열 명 넘게 앉는 미팅룸입니다. 문의는 프런트로.</p></div>
-      </div>
-      <div class="fac-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/facility/cafe.jpg" alt="카페테리아">
-        <div class="body"><h3>카페테리아</h3><p>1층 라운지. 체크인 전후에도 머무를 수 있습니다.</p></div>
-      </div>
-      <div class="fac-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/facility/laundry.jpg" alt="세탁실">
-        <div class="body"><h3>세탁실</h3><p>세탁기와 건조기를 두었습니다. 긴 일정에.</p></div>
-      </div>
-      <div class="fac-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/facility/parking.jpg" alt="주차장">
-        <div class="body"><h3>전용 주차장</h3><p>호텔 전용 주차장이 있습니다.</p></div>
-      </div>
-      <div class="fac-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/facility/whirlpool.jpg" alt="월풀 욕조">
-        <div class="body"><h3>월풀 욕조</h3><p>일부 객실에 월풀 욕조가 있습니다.</p></div>
-      </div>
+    <div class="grid rise">
+      <div class="cell"><b>비즈니스 룸</b><span>1층에 고사양 PC를 모았습니다. 게이밍 의자와 듀얼 모니터를 갖췄습니다.</span><span class="free">1F</span></div>
+      <div class="cell"><b>회의실</b><span>긴 테이블에 열 명 넘게 앉는 미팅룸입니다. 문의는 프런트로.</span></div>
+      <div class="cell"><b>카페테리아</b><span>커피머신을 둔 1층 라운지. 체크인 전후에도 머무를 수 있습니다.</span></div>
+      <div class="cell"><b>세탁실</b><span>세탁기와 건조기를 두었습니다. 오래 묵는 일정에.</span></div>
+      <div class="cell"><b>월풀 욕조</b><span>일부 객실에 월풀 욕조가 있습니다.</span><span class="free">객실</span></div>
+      <div class="cell"><b>전용 주차장</b><span>호텔 전용 주차장이 있습니다. 발렛파킹은 운영하지 않습니다.</span></div>
+      <div class="cell"><b>24시간 프런트</b><span>늦은 도착도 괜찮습니다.</span></div>
+      <div class="cell"><b>전 객실 금연</b><span>공기청정기가 전 객실에 있습니다.</span></div>
     </div>
   </div>
 </section>
 
-<section id="around">
+<!-- ── 제천 여행 ──────────────────────────────── -->
+<section class="jc" id="jecheon">
   <div class="wrap">
-    <div class="section-head">
-      <div class="section-tag">Around Jecheon</div>
-      <h2>하루면 충분한 제천의 명소들.</h2>
+    <div class="rise">
+      <p class="eyebrow">Around Jecheon</p>
+      <h2>하루면 충분한<br>제천의 명소들.</h2>
     </div>
-    <div class="around-grid">
-      <div class="around-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/cheongpungho.jpg" alt="청풍호">
-        <h3>청풍호</h3>
-        <p>호반 드라이브와 케이블카</p>
-      </div>
-      <div class="around-card">
-        <img src="https://choikiho20-cyber.github.io/jc-hotel/images/uirimji.jpg" alt="의림지">
-        <h3>의림지</h3>
-        <p>삼한시대부터의 저수지</p>
-      </div>
-      <div class="around-card">
-        <img src="https://picsum.photos/seed/around-3/500/400" alt="배론성지">
-        <h3>배론성지</h3>
-        <p>고요한 산중 순례길</p>
-      </div>
-      <div class="around-card">
-        <img src="https://picsum.photos/seed/around-4/500/400" alt="월악산">
-        <h3>월악산</h3>
-        <p>계절이 가장 선명한 산</p>
-      </div>
+    <div class="places rise">
+      <div class="place"><div class="ph" data-label="임시"><img loading="lazy" src="images/cheongpungho.jpg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1689692992143-5826c267e5c7?auto=format&fit=crop&w=800&q=80'" alt="유람선이 지나는 청풍호"></div><h3>청풍호</h3><span>호반 드라이브와 케이블카</span></div>
+      <div class="place"><div class="ph" data-label="임시"><img loading="lazy" src="images/uirimji.jpg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1603852452515-2dc92bd9c6f1?auto=format&fit=crop&w=800&q=80'" alt="의림지 용추폭포와 유리 전망대"></div><h3>의림지</h3><span>삼한시대부터의 저수지</span></div>
+      <div class="place"><div class="ph" data-label="임시"><img loading="lazy" src="https://images.unsplash.com/photo-1673265771901-5ddf13bde2d0?auto=format&fit=crop&w=800&q=80" alt="숲속의 돌길"></div><h3>배론성지</h3><span>고요한 산중 순례길</span></div>
+      <div class="place"><div class="ph" data-label="임시"><img loading="lazy" src="https://images.unsplash.com/photo-1716328435733-093551d38a1b?auto=format&fit=crop&w=800&q=80" alt="가을 산의 능선"></div><h3>월악산</h3><span>계절이 가장 선명한 산</span></div>
     </div>
   </div>
 </section>
 
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <div class="foot-brand">다온호텔 · 제천</div>
-        <p style="color:var(--cream-dim); font-size:0.9rem; max-width:32ch;">충청북도 제천시 의병대로13길 10, 시내 중심에서 걸어서 다니는 하루를 위한 호텔.</p>
-      </div>
-      <div class="foot-col">
-        <h4>Reservation</h4>
-        <a href="tel:043-000-0000">043-000-0000</a>
-        <p>24시간 프런트 데스크</p>
-      </div>
-      <div class="foot-col">
-        <h4>Directions</h4>
-        <p>충청북도 제천시 의병대로13길 10</p>
-        <p>제천역에서 차로 10분</p>
-        <p>중앙고속도로 제천IC 15분</p>
-        <p>호텔 전용 주차장</p>
-      </div>
+<!-- ── 푸터 ───────────────────────────────────── -->
+<footer id="access">
+  <div class="fgrid">
+    <div>
+      <a class="brand" href="#top">JC HOTEL<small>제천</small></a>
+      <p class="biz">상호 <b>JC호텔</b> <span>(제천 JC호텔 · 제천관광호텔)</span></p>
+      <p class="biz">대표 ○○○</p>
+      <p class="biz">사업자등록번호 000-00-00000</p>
+      <p class="biz">충청북도 제천시 의병대로13길 10</p>
     </div>
-    <div class="foot-bottom">
-      <span>© 2026 다온호텔 제천. 본 페이지는 시안이며 사진·객실 정보는 실제 자료로 교체됩니다.</span>
-      <span>사업자등록번호 000-00-00000</span>
+    <div class="fcol">
+      <h4>Reservation</h4>
+      <p><a href="tel:043-000-0000">043-000-0000</a></p>
+      <p>24시간 프런트 데스크</p>
+      <p><a href="blog.html" style="border-bottom:1px solid rgba(255,255,255,.12)">소식 · 제천 여행 정보 →</a></p>
+      <p style="margin-top:14px"><a href="#" id="book2" style="color:var(--brass);border-bottom:1px solid var(--line)">네이버 예약 →</a></p>
+    </div>
+    <div class="fcol">
+      <h4>Directions</h4>
+      <p>제천역에서 차로 ○○분</p>
+      <p>중앙고속도로 제천IC ○○분</p>
+      <p>호텔 주차장 (발렛 없음)</p>
+      <div class="maps">
+        <a href="https://map.naver.com/p/search/%EC%A0%9C%EC%B2%9C%20JC%ED%98%B8%ED%85%94" target="_blank" rel="noopener">네이버 지도</a>
+        <a href="https://map.kakao.com/?q=%EC%A0%9C%EC%B2%9C%20JC%ED%98%B8%ED%85%94" target="_blank" rel="noopener">카카오맵</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=%EC%A0%9C%EC%B2%9C%20JC%ED%98%B8%ED%85%94" target="_blank" rel="noopener">구글 지도</a>
+      </div>
     </div>
   </div>
+  <p class="copy">© 2026 제천 JC호텔. 본 페이지는 시안이며 사진·객실 정보는 실제 자료로 교체됩니다.</p>
 </footer>
 
+<script>
+// 네비 배경
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), {passive:true});
+
+// 등장 애니메이션
+const io = new IntersectionObserver((es) => {
+  es.forEach(e => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target)));
+}, {threshold:.12});
+document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+// 히어로 슬라이드
+const track = document.getElementById('track'), sdots = [...document.getElementById('sdots').children];
+const slides = [...track.children], scap = document.getElementById('scap');
+const heroCopy = document.querySelector('.hero-copy'),
+      heroEn = heroCopy.querySelector('.eyebrow'),
+      heroKo = heroCopy.querySelector('h1');
+let si = 0, timer;
+const goTo = n => {
+  si = (n + sdots.length) % sdots.length;
+  track.style.transform = `translateX(-${si * 100}%)`;
+  sdots.forEach((d, x) => d.setAttribute('aria-current', x === si));
+  const d = slides[si].dataset;
+  if (d.ko && heroKo.innerHTML !== d.ko) {
+    heroCopy.classList.add('out');
+    setTimeout(() => {
+      heroEn.innerHTML = d.en;
+      heroKo.innerHTML = d.ko;
+      scap.textContent = d.cap;
+      heroCopy.classList.add('nofx');
+      heroCopy.classList.replace('out', 'enter');
+      void heroCopy.offsetWidth;          // 위치를 즉시 반영시킨 뒤 애니메이션 재개
+      heroCopy.classList.remove('nofx');
+      setTimeout(() => heroCopy.classList.remove('enter'), 30);
+    }, 560);
+  }
+};
+const play = () => { clearInterval(timer); timer = setInterval(() => goTo(si + 1), 6000); };
+sdots.forEach((d, x) => d.addEventListener('click', () => { goTo(x); play(); }));
+const canPlay = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (canPlay()) play();
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) clearInterval(timer);
+  else if (canPlay()) play();
+});
+
+// 객실 영상 — 누를 때 불러온다 (자동 재생하지 않아 데이터를 아낀다)
+document.querySelectorAll('.rmvid').forEach(fig => {
+  const v = fig.querySelector('video');
+  fig.querySelector('.rmvid-play').addEventListener('click', () => {
+    if (!v.src) v.src = v.dataset.src;
+    v.play().then(() => fig.classList.add('playing')).catch(() => {});
+  });
+  v.addEventListener('click', () => {
+    if (!v.paused) { v.pause(); fig.classList.remove('playing'); }
+  });
+});
+
+// 날짜 기본값: 오늘 / 내일
+const iso = d => d.toISOString().slice(0,10);
+const ci = document.getElementById('ci'), co = document.getElementById('co');
+const today = new Date(), tmr = new Date(Date.now() + 864e5);
+ci.value = iso(today); ci.min = iso(today);
+co.value = iso(tmr);   co.min = iso(tmr);
+ci.addEventListener('change', () => {
+  const next = new Date(new Date(ci.value).getTime() + 864e5);
+  co.min = iso(next);
+  if (co.value <= ci.value) co.value = iso(next);
+});
+
+// 예약 버튼 → 네이버
+const go = e => {
+  e.preventDefault();
+  open(document.getElementById('book').dataset.naver, '_blank', 'noopener');
+};
+document.getElementById('book').addEventListener('click', go);
+document.getElementById('book2').addEventListener('click', go);
+</script>
 </body>
 </html>
