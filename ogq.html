@@ -1,1 +1,752 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OGQ 이모티콘 스튜디오</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Do+Hyeon&family=Black+Han+Sans&family=Gaegu:wght@700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#6c4cf1;--p2:#efeaff;--ink:#1f1b2e;--mut:#6b6780;--line:#e4e0f2;--ok:#1a9f5b;--warn:#d98a00;--err:#d6334a}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans KR",system-ui,sans-serif;color:var(--ink);background:#f7f5fd;line-height:1.5}
+header{padding:22px 16px 8px;max-width:980px;margin:0 auto}
+header h1{margin:0;font-size:22px}
+header p{margin:4px 0 0;color:var(--mut);font-size:14px}
+main{max-width:980px;margin:0 auto;padding:8px 12px 80px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.card h2{margin:0 0 4px;font-size:17px}
+.card .sub{margin:0 0 12px;color:var(--mut);font-size:13px}
+label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}
+input[type=text],input[type=password],input[type=number],textarea,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:14px;background:#fff}
+textarea{resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+button{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:10px 14px;background:var(--p);color:#fff;cursor:pointer}
+button.sec{background:var(--p2);color:var(--p)}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.row>button{flex:1;min-width:110px}
+.mini{font-size:12px;color:var(--mut)}
+details summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--p)}
+.cands{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.cand{border:2px solid var(--line);border-radius:12px;overflow:hidden;background:#fafafa;position:relative;min-height:120px}
+.cand.sel{border-color:var(--p)}
+.cand img{width:100%;display:block}
+.cand button{position:absolute;left:8px;right:8px;bottom:8px}
+.cand .ph{padding:40px 8px;text-align:center;color:var(--mut);font-size:13px}
+.bar{height:10px;background:var(--p2);border-radius:6px;overflow:hidden;margin-top:12px}
+.bar i{display:block;height:100%;width:0;background:var(--p);transition:width .3s}
+.cuts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+@media(min-width:700px){.cuts{grid-template-columns:repeat(4,1fr)}.cands{grid-template-columns:repeat(4,1fr)}}
+.cut{border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+.cvwrap{position:relative;border-radius:8px;overflow:hidden;background:conic-gradient(#eee 25%,#fff 0 50%,#eee 0 75%,#fff 0) 0 0/16px 16px}
+.cvwrap canvas{width:100%;display:block}
+.badge{position:absolute;top:4px;right:4px;font-size:11px;font-weight:700;padding:2px 6px;border-radius:8px;background:#fff;border:1px solid var(--line)}
+.cut input.txt{margin-top:6px;padding:7px;font-size:13px}
+.cut textarea{font-size:12px;padding:6px;margin-top:6px}
+.cut .row button{padding:6px 8px;font-size:12px;min-width:0}
+.st{font-size:11px;color:var(--mut);margin-top:4px;min-height:16px;word-break:break-all}
+.st.ok{color:var(--ok)}.st.err{color:var(--err)}
+.rep{list-style:none;padding:0;margin:10px 0 0;font-size:13px}
+.rep li{padding:6px 0;border-bottom:1px dashed var(--line)}
+.rep .ok::before{content:"✅ "}.rep .warn::before{content:"⚠️ "}.rep .bad::before{content:"❌ "}
+.metabox{background:#faf9ff;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;white-space:pre-wrap;margin-top:10px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;z-index:9}
+#toast.on{opacity:.95}
+.note{background:#fff8e6;border:1px solid #f3dfa4;border-radius:10px;padding:10px;font-size:12.5px;color:#6b5200;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>OGQ 이모티콘 스튜디오</h1>
+  <p>그림 없이 24종 · 캐릭터 일관성 검사 · 투명 배경/흰 테두리 · 제출용 ZIP까지</p>
+</header>
+<main>
+ 
+<section class="card" id="sec0">
+  <h2>0. 설정</h2>
+  <p class="sub">API 키는 이 브라우저에만 저장되고, 구글 서버로만 전송돼요.</p>
+  <label>Gemini API 키 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="mini">(발급받기)</a></label>
+  <input type="password" id="apiKey" data-set="key" placeholder="AIza..." autocomplete="off">
+  <details style="margin-top:10px"><summary>고급 설정 (모델·규격·옵션)</summary>
+    <div class="grid2">
+      <div><label>이미지 모델</label><input type="text" data-set="imgModel"></div>
+      <div><label>텍스트 모델 (검사·기획용)</label><input type="text" data-set="txtModel"></div>
+    </div>
+    <div class="grid3">
+      <div><label>스티커 가로</label><input type="number" data-set="sw"></div>
+      <div><label>스티커 세로</label><input type="number" data-set="sh"></div>
+      <div><label>흰 테두리(px)</label><input type="number" data-set="outline"></div>
+      <div><label>대표 가로</label><input type="number" data-set="mainW"></div>
+      <div><label>대표 세로</label><input type="number" data-set="mainH"></div>
+      <div><label>동시 생성 수</label><input type="number" data-set="conc" min="1" max="6"></div>
+      <div><label>탭 이미지 가로</label><input type="number" data-set="tabW"></div>
+      <div><label>탭 이미지 세로</label><input type="number" data-set="tabH"></div>
+      <div><label>검사 합격 점수(1~10)</label><input type="number" data-set="thr" min="1" max="10"></div>
+    </div>
+    <div class="grid2">
+      <div><label>배경 키 색 (캐릭터와 다른 색)</label>
+        <select data-set="keyColor"><option value="green">초록</option><option value="magenta">자홍</option><option value="blue">파랑</option></select></div>
+      <div><label>일관성 검사</label>
+        <select data-set="check"><option value="1">켜기 (미달 시 1회 자동 재생성)</option><option value="0">끄기 (더 빠름)</option></select></div>
+    </div>
+    <div class="note">스티커 740×640은 확인된 값이에요. 대표·탭 이미지 규격은 OGQ 크리에이터 스튜디오 업로드 화면 안내를 보고 위 칸에서 맞춰주세요.</div>
+  </details>
+</section>
+ 
+<section class="card" id="sec1">
+  <h2>1. 캐릭터 만들기</h2>
+  <p class="sub">한 줄 설명만 쓰거나, 참고 사진/그림을 올려도 돼요. 후보 4개 중 하나를 고르면 이후 24컷의 기준이 돼요.</p>
+  <label>캐릭터 설명</label>
+  <textarea id="charDesc" rows="3" placeholder="예) 동그란 몸에 볼이 통통한 아기 고슴도치, 노란 털, 작은 빨간 모자"></textarea>
+  <div class="grid2">
+    <div><label>그림체</label>
+      <select id="style">
+        <option>귀엽고 단순한 손그림 낙서체, 굵은 외곽선, 플랫 컬러</option>
+        <option>말랑말랑한 3D 느낌의 귀여운 캐릭터</option>
+        <option>얇은 선화와 파스텔 컬러의 감성 일러스트</option>
+        <option>수채화 느낌의 부드러운 캐릭터</option>
+        <option>픽셀아트 스타일</option>
+      </select></div>
+    <div><label>참고 이미지 (선택)</label><input type="file" id="refFile" accept="image/*"></div>
+  </div>
+  <label>추가 지시 (선택, 모든 컷에 적용)</label>
+  <input type="text" id="extra" placeholder="예) 항상 빨간 모자를 쓰고 있음, 눈은 점으로 표현">
+  <div class="row"><button id="btnCand">후보 4개 만들기</button></div>
+  <div class="cands" id="cands"></div>
+</section>
+ 
+<section class="card" id="sec2">
+  <h2>2. 24종 기획</h2>
+  <p class="sub">한 줄에 하나씩 <b>문구|동작</b> 형식이에요. 직접 고치거나 프리셋·AI 기획을 쓰세요.</p>
+  <div class="grid2">
+    <div><label>프리셋</label><select id="preset"></select></div>
+    <div><label>AI 기획용 주제 (선택)</label><input type="text" id="theme" placeholder="예) 카톡 단골 리액션, 장사하는 사장님"></div>
+  </div>
+  <div class="row"><button class="sec" id="btnPreset">프리셋 불러오기</button><button class="sec" id="btnPlan">AI로 24종 기획</button></div>
+  <label>목록 <span class="mini" id="cnt"></span></label>
+  <textarea id="plan" rows="12"></textarea>
+</section>
+ 
+<section class="card" id="sec3">
+  <h2>3. 24컷 생성과 수정</h2>
+  <p class="sub">같은 구도 반복을 막으려고 컷마다 다른 화각을 자동 배정해요. 글자는 AI가 아니라 직접 얹어서 오타가 없어요.</p>
+  <div class="grid3">
+    <div><label>글자 위치</label><select data-set="tpos"><option value="bottom">아래</option><option value="top">위</option></select></div>
+    <div><label>글꼴</label><select data-set="font"><option>Jua</option><option>Do Hyeon</option><option>Black Han Sans</option><option>Gaegu</option></select></div>
+    <div><label>글자 색</label><input type="color" data-set="color" style="width:100%;height:42px;border:1px solid var(--line);border-radius:10px"></div>
+  </div>
+  <label>글자 크기 <span class="mini">(이미지 높이 대비 %)</span></label>
+  <input type="number" data-set="tsize" min="8" max="30">
+  <div class="row"><button id="btnAll">전체 생성</button><button class="sec" id="btnMissing">빠진/실패한 컷만</button><button class="sec" id="btnStop">중지</button></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="mini" id="barTxt"></div>
+  <div class="cuts" id="cuts"></div>
+</section>
+ 
+<section class="card" id="sec4">
+  <h2>4. 검수 · 제출 패키지</h2>
+  <p class="sub">제목·설명·태그를 만들고, 규격을 검사한 뒤 ZIP으로 받으세요.</p>
+  <div class="row"><button class="sec" id="btnMeta">제목·설명·태그 만들기</button><button class="sec" id="btnVal">규격 검사</button><button id="btnZip">제출용 ZIP 받기</button></div>
+  <div class="metabox" id="meta" style="display:none"></div>
+  <ul class="rep" id="rep"></ul>
+  <div class="note">AI가 만든 이미지는 심사 기준이 그대로 적용돼요. 문구 가독성, 실존 인물·기존 캐릭터·로고가 닮았는지는 마지막에 직접 확인하세요. 승인은 보장되지 않아요.</div>
+</section>
+</main>
+<div id="toast"></div>
+ 
+<script>
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const pad2=n=>String(n).padStart(2,'0');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let toastT;
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),3200)}
+ 
+/* ---------- 프리셋 (문구|동작) ---------- */
+const PRESETS={
+'일상 대화':`안녕|손 흔들며 활짝 웃는 인사
+ㅋㅋㅋ|배를 잡고 크게 웃는 모습
+고마워|두 손 모아 고개 숙여 감사
+미안해|머리를 숙이고 땀 흘리며 사과
+좋아요|엄지를 척 올리기
+OK|양손으로 동그라미 OK 표시
+잘자|이불 덮고 졸린 눈으로 인사
+굿모닝|기지개 켜며 아침 인사
+배고파|배를 쓰다듬으며 입맛 다시는 모습
+뭐해?|고개를 갸웃하며 궁금한 표정
+기다려|손바닥을 앞으로 내밀며 멈춤
+사랑해|양손으로 큰 하트 만들기
+화났어|얼굴 붉히며 씩씩대는 모습
+슬퍼|눈물 흘리며 훌쩍이는 모습
+헉|눈 휘둥그레 입 벌리고 깜짝 놀람
+졸려|하품하며 눈 비비는 모습
+최고|양손 번쩍 들고 환호
+파이팅|주먹 불끈 쥐고 응원
+몰라용|어깨 으쓱하며 두 손 벌림
+쉿|검지를 입에 대고 조용히
+축하해|폭죽을 터뜨리며 축하
+당황|땀 뻘뻘 흘리며 어쩔 줄 모름
+부탁해|두 손 모아 간절히 부탁
+수고했어|손뼉 치며 격려`,
+'직장인':`출근|가방 메고 터덜터덜 걷는 모습
+퇴근!|가방 들고 신나게 달려가는 모습
+회의중|서류 들고 진지한 표정
+야근ㅠ|책상에 엎드려 지친 모습
+확인했어요|노트북 보며 고개 끄덕
+감사합니다|허리 숙여 공손히 인사
+죄송합니다|90도로 깊게 숙여 사과
+검토 중|돋보기로 서류를 살피는 모습
+보고드립니다|서류를 두 손으로 내미는 모습
+월급날|지폐를 날리며 춤추는 모습
+커피수혈|커피잔 들고 눈 풀린 모습
+점심 뭐먹지|턱 괴고 고민하는 모습
+넵!|씩씩하게 거수경례
+잠시만요|손을 들어 잠깐 멈춤 표시
+회식?|맥주잔 들고 신나는 모습
+멘붕|머리를 감싸 쥐고 영혼이 빠지는 모습
+승진가즈아|주먹 쥐고 로켓처럼 솟구침
+칼퇴|시계를 보며 의기양양
+메일 보냄|종이비행기를 날리는 모습
+읽씹ㅠ|휴대폰 보며 서운한 표정
+좋은 아침|커피 들고 활기찬 인사
+화이팅|넥타이 고쳐 매며 다짐
+수고하세요|손 흔들며 퇴근 인사
+주말이다|양팔 벌리고 자유를 만끽`,
+'연인·썸':`보고싶어|휴대폰을 안고 그리워하는 모습
+사랑해♥|하트 눈으로 하트 날리기
+오늘 뭐해?|수줍게 손가락 꼼지락
+잘자요|달 위에 누워 잠자는 모습
+삐졌어|볼 부풀리고 고개 돌림
+미안해ㅠ|두 손 모아 눈물 글썽
+안아줘|두 팔 벌려 안아달라는 모습
+뽀뽀|입술을 내밀며 뽀뽀
+데이트|꽃다발 들고 설레는 모습
+심쿵|가슴을 부여잡고 두근
+고백|편지를 내밀며 얼굴 빨개짐
+질투|눈 가늘게 뜨고 째려봄
+밥 먹었어?|숟가락 들고 챙기는 모습
+행복해|꽃밭에서 활짝 웃음
+기다릴게|시계 보며 설레며 기다림
+어디야?|지도 보며 두리번
+늦어서 미안|땀 흘리며 허겁지겁 달려옴
+귀여워|볼을 감싸 쥐고 감탄
+토닥토닥|손으로 머리를 쓰다듬기
+화해하자|손 내밀어 악수 청함
+생일 축하해|케이크 들고 축하
+기념일|선물상자 들고 기뻐함
+오늘도 사랑해|하트 풍선을 들고 웃음
+꿈에서 만나|구름 위에서 손 흔들기`,
+'가족':`엄마 사랑해|하트 들고 환하게 웃음
+아빠 힘내요|주먹 쥐고 응원
+밥 먹었니?|밥그릇 들고 챙겨주는 모습
+조심히 와|손 흔들며 배웅
+다녀왔습니다|가방 메고 들어오며 인사
+다녀오세요|문 앞에서 손 흔듦
+용돈 주세요|두 손 내밀고 애교
+건강하세요|허리 숙여 인사
+감사합니다|두 손 모아 정중히 인사
+보고싶어요|그리운 표정으로 손 모음
+잘 지내시죠?|안부 묻는 표정으로 손 흔들기
+생신 축하드려요|케이크와 폭죽
+새해 복 많이 받으세요|한복 입고 세배
+메리 크리스마스|산타 모자 쓰고 선물
+추석 잘 보내세요|보름달 보며 송편 들기
+맛있게 드세요|음식을 차려 내밀기
+사진 보냈어|휴대폰을 내밀며 보여주는 모습
+전화할게요|전화기를 귀에 대고 웃음
+걱정마세요|가슴을 탕 치며 든든한 모습
+알겠어요|고개 끄덕이며 대답
+최고예요|양손 엄지 척
+오늘도 화이팅|주먹 불끈
+따뜻하게 입어요|목도리 두르고 챙김
+편안한 밤|이불 덮고 인사`,
+'학생·공부':`공부중|책상에서 집중
+시험 망했다|책 위에 엎드려 영혼 이탈
+만점!|시험지 들고 환호
+졸려ㅠ|펜 쥐고 꾸벅꾸벅 졸기
+과제 언제해|머리 감싸고 한숨
+도서관|책을 쌓아놓고 읽기
+점심시간!|급식판 들고 신남
+쉬는시간|기지개 켜며 늘어짐
+출석체크|손 번쩍 들고 대답
+지각이다|가방 메고 헐레벌떡 달림
+방학이다|양팔 번쩍 만세
+개학ㅠ|가방 들고 터벅터벅 무기력
+벼락치기|밤새 책 보며 눈 충혈
+암기중|머리에서 연기 나며 외우기
+질문 있어요|손 들고 궁금한 표정
+스터디|친구와 노트 펴고 열공
+밤샘|커피 마시며 눈 반쯤 감김
+합격!|합격증 들고 눈물 환호
+불합격ㅠ|풀죽어 고개 숙임
+정답!|O 표지판 들고 기뻐함
+오답ㅠ|X 표지판 들고 당황
+도와줘|SOS 손짓
+노트필기|필기하며 집중
+수고했어|서로 손뼉을 마주침`,
+'먹방·카페':`맛있다|볼 가득 먹으며 행복
+치킨각|치킨 다리 들고 침 흘림
+라면 먹자|라면을 후루룩 먹는 모습
+커피 한잔|컵 들고 여유로운 모습
+커피 수혈|눈 풀리고 커피 원샷
+디저트 배|케이크를 보며 눈 반짝
+배불러|배를 두드리며 만족
+다이어트 내일부터|샐러드 보며 한숨
+야식 가자|밤에 치킨 들고 신남
+짠!|잔을 높이 들어 건배
+맥주 한잔|거품 가득 잔 들고 웃음
+떡볶이|떡볶이 먹으며 매워서 헉헉
+김치찌개|뚝배기 앞에서 군침
+삼겹살|고기를 굽는 모습
+피자|피자 한 조각을 늘이는 모습
+아이스크림|아이스크림이 녹아 흐름
+간식타임|과자봉지 안고 행복
+빵순이|빵을 안고 행복
+국밥|국밥을 후후 불며 먹기
+냠냠|입을 크게 벌려 먹기
+한입만|숟가락 내밀며 졸라댐
+맛없어ㅠ|찡그리며 숟가락 내려놓음
+계산할게|카드 내밀며 으쓱
+잘 먹었습니다|배 두드리며 인사`,
+'사장님·가게':`어서오세요|가게 문 열며 환영
+감사합니다|손님께 공손히 인사
+영업중|OPEN 간판 들기
+준비중|CLOSED 간판 들고 땀
+주문 도와드릴게요|메모지 들고 친절히
+잠시만요|손 들어 잠깐 대기
+포장 됩니다|포장 봉투 건네기
+재료소진|빈 상자 보며 난감
+오늘의 추천|메뉴판 가리키며 추천
+이벤트 중!|메가폰 들고 홍보
+단골 환영|하트 들고 반김
+매출 대박|지폐 날리며 환호
+손님 없네ㅠ|텅 빈 가게에서 한숨
+카드 됩니다|카드 단말기 내밀기
+현금영수증|영수증 내밀기
+배달 출발|오토바이 타고 출발
+배달 왔어요|상자 들고 문 앞에 선 모습
+리뷰 부탁드려요|별 다섯 개 들고 부탁
+서비스입니다|음식을 하나 더 얹어 윙크
+죄송합니다|허리 숙여 사과
+마감합니다|문 닫고 열쇠 돌리기
+오늘도 수고|땀 닦으며 뿌듯
+쉬는날|해변 의자에서 여유
+사장님 최고|엄지 척 올림`,
+'어른 안부':`좋은 아침입니다|꽃 들고 환한 인사
+오늘도 건강하세요|엄지 들고 미소
+행복한 하루|해바라기 들고 웃음
+감사합니다|두 손 모아 공손히
+수고 많으셨습니다|허리 숙여 인사
+사랑합니다|큰 하트 만들기
+늘 건강하세요|주먹으로 힘 불끈
+좋은 밤 되세요|달과 별 속에서 인사
+따뜻한 차 한잔|찻잔 들고 미소
+항상 응원합니다|응원봉 흔들기
+복 많이 받으세요|복주머니 들고
+축하드립니다|꽃다발 건네기
+고맙습니다|고개 숙여 정중히
+힘내세요|손으로 토닥토닥
+화이팅!|양주먹 불끈
+반갑습니다|악수하려 손 내밀기
+오늘도 웃어요|활짝 웃는 얼굴
+날씨 좋네요|햇살 아래 기지개
+조심히 가세요|손 흔들며 배웅
+식사하셨나요|밥그릇 들고 안부
+건강이 최고|운동복으로 힘차게
+보고 싶습니다|그리운 표정으로 손 모음
+좋은 하루 되세요|꽃길 걸으며 웃음
+평안하세요|두 손 모아 미소`
+};
+ 
+/* ---------- 화각 ---------- */
+const ANGLES=[
+['정면 상반신','front-facing upper-body shot'],['정면 전신','front-facing full-body shot'],
+['위에서 내려다본 시점','slightly high-angle view looking down at the character'],['아래에서 올려다본 시점','low-angle view looking up at the character'],
+['왼쪽 3/4 측면','three-quarter view turned to the left'],['오른쪽 3/4 측면','three-quarter view turned to the right'],
+['얼굴 대형 클로즈업','large close-up of the face'],['작게 보이는 와이드 샷','wide shot with the whole character smaller in frame'],
+['몸을 기울인 다이내믹','dynamic composition with the body tilted diagonally'],['뒤돌아보는 구도','character looking back over the shoulder'],
+['옆모습 전신','full-body side profile'],['점프하는 구도','character jumping in mid-air'],
+['앉은 구도','character sitting down'],['누운 구도','character lying down'],
+['화면 가득 확대','extreme zoom filling the frame, partly cropped'],['한쪽으로 치우친 비대칭','asymmetrical composition leaning to one side']
+];
+const KEYHEX={green:['pure green','#00FF00'],magenta:['pure magenta','#FF00FF'],blue:['pure blue','#0000FF']};
+ 
+/* ---------- 상태·설정 ---------- */
+const DEF={key:'',imgModel:'gemini-2.5-flash-image',txtModel:'gemini-2.5-flash',keyColor:'green',conc:3,sw:740,sh:640,mainW:740,mainH:640,tabW:74,tabH:74,outline:6,check:'1',thr:7,font:'Jua',color:'#2b2b2b',tsize:15,tpos:'bottom'};
+const S=Object.assign({},DEF,{base:null,cands:[],cuts:[],busy:false,stop:false,mainId:0,meta:null});
+try{const o=JSON.parse(localStorage.getItem('ogq_settings')||'{}');for(const k in DEF)if(k in o)S[k]=o[k]}catch(e){}
+function saveSettings(){try{const o={};for(const k in DEF)o[k]=S[k];localStorage.setItem('ogq_settings',JSON.stringify(o))}catch(e){}}
+const NUMKEYS=['conc','sw','sh','mainW','mainH','tabW','tabH','outline','thr','tsize'];
+const REPAINT=['font','color','tsize','tpos','sw','sh','outline'];
+$$('[data-set]').forEach(e=>{
+  const k=e.dataset.set; e.value=S[k];
+  e.addEventListener('change',()=>{S[k]=NUMKEYS.includes(k)?(+e.value||DEF[k]):e.value;saveSettings();if(REPAINT.includes(k))paintAllSoon()});
+});
+ 
+/* ---------- 유틸 ---------- */
+function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('이미지 로드 실패'));i.src=src})}
+const dataUrl=r=>`data:${r.mime};base64,${r.data}`;
+async function pool(items,n,fn){let i=0;const w=async()=>{while(i<items.length&&!S.stop){const k=i++;await fn(items[k],k)}};await Promise.all(Array.from({length:Math.max(1,n)},w))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function needKey(){if(!S.key.trim()){toast('먼저 0번에서 API 키를 입력하세요');$('#sec0').scrollIntoView({behavior:'smooth'});return false}return true}
+ 
+/* ---------- Gemini API ---------- */
+async function api(model,parts,cfg){
+  let last;
+  for(let a=0;a<4;a++){
+    let r;
+    try{
+      r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+        {method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':S.key.trim()},
+         body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:cfg||{}})});
+    }catch(e){last=new Error('네트워크 오류');await sleep(2500*(a+1));continue}
+    const j=await r.json().catch(()=>({}));
+    if(r.ok)return j;
+    last=new Error(j.error?.message||('HTTP '+r.status));
+    if(![429,500,503].includes(r.status))throw last;
+    await sleep(4000*(a+1));
+  }
+  throw last||new Error('요청 실패');
+}
+function inl(r){return {inlineData:{mimeType:r.mime,data:r.data}}}
+async function genImage(prompt,refs=[]){
+  const j=await api(S.imgModel,[...refs.map(inl),{text:prompt}],{responseModalities:['IMAGE']});
+  const parts=j.candidates?.[0]?.content?.parts||[];
+  for(const p of parts){const d=p.inlineData||p.inline_data;if(d?.data)return{mime:d.mimeType||d.mime_type||'image/png',data:d.data}}
+  const why=j.candidates?.[0]?.finishReason||j.promptFeedback?.blockReason||'이미지가 오지 않음';
+  const t=parts.map(p=>p.text).filter(Boolean).join(' ');
+  throw new Error('이미지 생성 실패: '+why+(t?' · '+t.slice(0,80):''));
+}
+async function genJSON(prompt,refs=[]){
+  const j=await api(S.txtModel,[...refs.map(inl),{text:prompt}],{responseMimeType:'application/json'});
+  const t=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').replace(/^```json\s*|```$/g,'').trim();
+  return JSON.parse(t);
+}
+ 
+/* ---------- 배경 제거 / 테두리 / 글자 ---------- */
+const KEYS={green:(r,g,b)=>g>130&&g-r>45&&g-b>45,magenta:(r,g,b)=>r>130&&b>130&&r-g>55&&b-g>55,blue:(r,g,b)=>b>140&&b-r>55&&b-g>30};
+const LOOSE={green:(r,g,b)=>g>r+18&&g>b+18,magenta:(r,g,b)=>r>g+25&&b>g+25,blue:(r,g,b)=>b>r+25&&b>g+10};
+function despill(d,p){
+  const k=S.keyColor;
+  if(k==='green')d[p+1]=Math.min(d[p+1],Math.max(d[p],d[p+2]));
+  else if(k==='blue')d[p+2]=Math.min(d[p+2],Math.max(d[p],d[p+1]));
+  else{const g=d[p+1];d[p]=Math.min(d[p],g+(d[p]-g)*0.5);d[p+2]=Math.min(d[p+2],g+(d[p+2]-g)*0.5)}
+}
+function keyOut(cv,keyName){
+  const key=keyName||S.keyColor, w=cv.width,h=cv.height, ctx=cv.getContext('2d',{willReadFrequently:true});
+  const im=ctx.getImageData(0,0,w,h), d=im.data, isK=KEYS[key], loose=LOOSE[key];
+  const vis=new Uint8Array(w*h), st=[];
+  const push=(x,y)=>{const i=y*w+x;if(vis[i])return;const p=i*4;if(isK(d[p],d[p+1],d[p+2])){vis[i]=1;st.push(i)}};
+  for(let x=0;x<w;x++){push(x,0);push(x,h-1)}
+  for(let y=0;y<h;y++){push(0,y);push(w-1,y)}
+  while(st.length){const i=st.pop(),x=i%w,y=(i-x)/w;if(x>0)push(x-1,y);if(x<w-1)push(x+1,y);if(y>0)push(x,y-1);if(y<h-1)push(x,y+1)}
+  for(let i=0;i<vis.length;i++)if(vis[i])d[i*4+3]=0;
+  for(let pass=0;pass<2;pass++){
+    const kill=[];
+    for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+      const p=(y*w+x)*4;if(d[p+3]===0)continue;
+      if(d[p-4+3]===0||d[p+4+3]===0||d[p-w*4+3]===0||d[p+w*4+3]===0){
+        if(loose(d[p],d[p+1],d[p+2]))kill.push(p);else despill(d,p);
+      }
+    }
+    for(const p of kill)d[p+3]=0;
+  }
+  ctx.putImageData(im,0,0);return cv;
+}
+function cropAlpha(cv){
+  const w=cv.width,h=cv.height,d=cv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,w,h).data;
+  let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>10){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return cv;
+  const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;
+  o.getContext('2d').drawImage(cv,x0,y0,o.width,o.height,0,0,o.width,o.height);return o;
+}
+async function makeKeyed(raw){
+  const im=await loadImg(dataUrl(raw));
+  const cv=document.createElement('canvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;
+  cv.getContext('2d').drawImage(im,0,0);
+  return cropAlpha(keyOut(cv));
+}
+function outlined(img,r){
+  const pad=r+2,w=img.width+pad*2,h=img.height+pad*2;
+  const sil=document.createElement('canvas');sil.width=w;sil.height=h;
+  const sc=sil.getContext('2d');sc.drawImage(img,pad,pad);sc.globalCompositeOperation='source-in';sc.fillStyle='#fff';sc.fillRect(0,0,w,h);
+  const out=document.createElement('canvas');out.width=w;out.height=h;const oc=out.getContext('2d');
+  for(let ring=1;ring<=2;ring++){const rr=r*ring/2;for(let a=0;a<28;a++){const t=a/28*Math.PI*2;oc.drawImage(sil,Math.cos(t)*rr,Math.sin(t)*rr)}}
+  oc.drawImage(img,pad,pad);return out;
+}
+function layoutText(ctx,text,W,H){
+  let size=Math.round(H*S.tsize/100);const maxW=W*0.92;
+  const fam=`"${S.font}","Jua","Noto Sans KR",sans-serif`;
+  const meas=(ls,sz)=>{ctx.font=`${sz}px ${fam}`;return Math.max(...ls.map(l=>ctx.measureText(l).width))};
+  let lines=[text];
+  if(meas(lines,size)>maxW&&text.length>4){
+    const sp=[...text].map((c,i)=>c===' '?i:-1).filter(i=>i>=0),mid=text.length/2;
+    if(sp.length){const cut=sp.reduce((a,b)=>Math.abs(b-mid)<Math.abs(a-mid)?b:a);lines=[text.slice(0,cut),text.slice(cut+1)]}
+    else{const cut=Math.ceil(mid);lines=[text.slice(0,cut),text.slice(cut)]}
+  }
+  while(meas(lines,size)>maxW&&size>16)size-=2;
+  return{lines,size,fam,blockH:lines.length*size*1.15};
+}
+function drawText(ctx,tl,W,H,m){
+  const tb=tl.blockH+m*0.8,yc=S.tpos==='top'?tb/2:H-tb/2;
+  ctx.font=`${tl.size}px ${tl.fam}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.miterLimit=2;
+  tl.lines.forEach((ln,i)=>{
+    const y=yc+(i-(tl.lines.length-1)/2)*tl.size*1.15;
+    ctx.lineWidth=tl.size*0.28;ctx.strokeStyle='#fff';ctx.strokeText(ln,W/2,y);
+    ctx.fillStyle=S.color;ctx.fillText(ln,W/2,y);
+  });
+}
+async function renderFinal(c,W,H,withText=true){
+  const out=document.createElement('canvas');out.width=W;out.height=H;const ctx=out.getContext('2d');
+  if(!c.keyed)return out;
+  if(withText&&c.text){try{await document.fonts.load(`40px "${S.font}"`,c.text)}catch(e){}}
+  const m=Math.round(Math.min(W,H)*0.05),r=Math.max(2,Math.round(Math.min(W,H)*S.outline/640));
+  let tl=null,tb=0;
+  if(withText&&c.text){tl=layoutText(ctx,c.text,W,H);tb=tl.blockH+m*0.8}
+  const ay0=(S.tpos==='top'?tb:0)+m,ay1=H-(S.tpos==='bottom'?tb:0)-m;
+  const aw=W-2*m-2*r-4,ah=ay1-ay0-2*r-4;
+  const k=Math.min(aw/c.keyed.width,ah/c.keyed.height,2);
+  const sw=Math.max(1,Math.round(c.keyed.width*k)),sh=Math.max(1,Math.round(c.keyed.height*k));
+  const sc=document.createElement('canvas');sc.width=sw;sc.height=sh;
+  const x=sc.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(c.keyed,0,0,sw,sh);
+  const ol=outlined(sc,r);
+  ctx.drawImage(ol,Math.round((W-ol.width)/2),Math.round(ay0+(ay1-ay0-ol.height)/2));
+  if(tl)drawText(ctx,tl,W,H,m);
+  return out;
+}
+ 
+/* ---------- 1. 캐릭터 ---------- */
+let refImg=null;
+$('#refFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f){refImg=null;return}
+  const im=await loadImg(URL.createObjectURL(f));const k=Math.min(1,1024/Math.max(im.naturalWidth,im.naturalHeight));
+  const cv=document.createElement('canvas');cv.width=Math.round(im.naturalWidth*k);cv.height=Math.round(im.naturalHeight*k);
+  const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(im,0,0,cv.width,cv.height);
+  refImg={mime:'image/jpeg',data:cv.toDataURL('image/jpeg',.9).split(',')[1]};toast('참고 이미지를 불러왔어요');
+});
+function bgText(){const[n,h]=KEYHEX[S.keyColor];return `flat solid ${n} (${h}) background, no shadow, no floor, no text, no letters, no watermark`}
+function baseExtra(){return $('#extra').value.trim()}
+function renderCands(){
+  $('#cands').innerHTML=S.cands.map((c,i)=>`<div class="cand ${c.sel?'sel':''}">${c.raw?`<img src="${dataUrl(c.raw)}" alt="후보 ${i+1}"><button data-pick="${i}">이 캐릭터로 확정</button>`:`<div class="ph">${esc(c.msg||'생성 중…')}</div>`}</div>`).join('');
+}
+$('#cands').addEventListener('click',e=>{
+  const b=e.target.closest('[data-pick]');if(!b)return;
+  const i=+b.dataset.pick;S.cands.forEach((c,k)=>c.sel=k===i);S.base=S.cands[i].raw;renderCands();toast('캐릭터를 확정했어요');
+});
+$('#btnCand').onclick=async()=>{
+  if(!needKey())return;const desc=$('#charDesc').value.trim();
+  if(!desc&&!refImg){toast('캐릭터 설명을 쓰거나 참고 이미지를 올려주세요');return}
+  const btn=$('#btnCand');btn.disabled=true;S.base=null;
+  S.cands=[0,1,2,3].map(()=>({raw:null,msg:'생성 중…'}));renderCands();
+  const prompt=`Create ONE original, cute character design for a messenger sticker set.${desc?` Character: ${desc}.`:''}${refImg?' Use the attached image as the reference for the character.':''}
+Art style: ${$('#style').value}. Centered, upper body or full body, simple clean shapes, consistent line weight, readable at small size, expressive friendly face. Do NOT imitate any existing copyrighted character. ${baseExtra()}
+${bgText()}.`;
+  let fatal=false;
+  await Promise.all(S.cands.map(async c=>{
+    try{c.raw=await genImage(prompt,refImg?[refImg]:[])}
+    catch(e){c.msg='실패: '+e.message;if(/API key|permission|PERMISSION|credential/i.test(e.message))fatal=true}
+    renderCands();
+  }));
+  if(fatal)toast('API 키를 확인하세요');
+  btn.disabled=false;
+};
+ 
+/* ---------- 2. 기획 ---------- */
+$('#preset').innerHTML=Object.keys(PRESETS).map(k=>`<option>${esc(k)}</option>`).join('');
+function updCnt(){const n=parseLines().length;$('#cnt').textContent=`(${n}종${n===24?' ✓':' — OGQ는 24종'})`}
+function parseLines(){return $('#plan').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const i=l.indexOf('|');return i<0?{text:l,pose:l}:{text:l.slice(0,i).trim(),pose:l.slice(i+1).trim()||l.slice(0,i).trim()}})}
+$('#plan').addEventListener('input',updCnt);
+$('#btnPreset').onclick=()=>{$('#plan').value=PRESETS[$('#preset').value];updCnt()};
+$('#btnPlan').onclick=async()=>{
+  if(!needKey())return;const btn=$('#btnPlan');btn.disabled=true;btn.textContent='기획 중…';
+  try{
+    const desc=$('#charDesc').value.trim()||'a cute character';const theme=$('#theme').value.trim()||'자주 쓰는 카톡 리액션과 일상 표현';
+    const arr=await genJSON(`Plan a set of exactly 24 messenger sticker items for this character: ${desc}. Theme: ${theme}.
+Each item: "text" = a short Korean phrase people really use in chat (max 8 characters, natural, no duplicates), "pose" = a Korean description of the character's pose and expression that clearly conveys the text.
+Mix greetings, reactions, emotions, requests, daily situations. Every item must look visibly different. Return a JSON array of 24 objects {"text":"","pose":""}.`);
+    $('#plan').value=arr.slice(0,24).map(o=>`${o.text}|${o.pose}`).join('\n');updCnt();toast('24종 기획이 완성됐어요');
+  }catch(e){toast('기획 실패: '+e.message)}
+  btn.disabled=false;btn.textContent='AI로 24종 기획';
+};
+$('#plan').value=PRESETS['일상 대화'];updCnt();
+ 
+/* ---------- 3. 생성 ---------- */
+function cutPrompt(c){
+  return `Draw the SAME character as the attached reference image: identical face, proportions, colors, outfit, line weight and art style. Only the pose and expression change.
+Pose / expression: ${c.pose}. The sticker's message is "${c.text}" — express that feeling through body language, but do NOT draw any text or letters.
+Composition: ${c.angleEn}.
+Make the character large, filling most of the frame. ${bgText()}. No floating objects in the background. ${baseExtra()}`;
+}
+function cardHTML(c){
+  return `<div class="cut" id="cut${c.id}"><div class="cvwrap"><canvas id="cv${c.id}" width="${S.sw}" height="${S.sh}"></canvas><span class="badge" id="bd${c.id}">${c.id+1}</span></div>
+<input class="txt" data-i="${c.id}" data-f="text" value="${esc(c.text)}" placeholder="문구">
+<details><summary>동작·구도</summary><textarea data-i="${c.id}" data-f="pose" rows="3">${esc(c.pose)}</textarea><div class="mini">구도: ${esc(c.angleKo)}</div></details>
+<div class="row"><button data-act="regen" data-i="${c.id}">다시 생성</button><button class="sec" data-act="main" data-i="${c.id}">대표</button></div>
+<div class="st" id="st${c.id}"></div></div>`;
+}
+function initCuts(){
+  const lines=parseLines();if(!lines.length){toast('2번에서 목록을 만들어주세요');return false}
+  const order=shuffle([...ANGLES.keys()]);
+  S.cuts=lines.map((l,i)=>{const a=ANGLES[order[i%order.length]];return{id:i,text:l.text,pose:l.pose,angleKo:a[0],angleEn:a[1],raw:null,keyed:null,qa:null,err:null}});
+  S.mainId=0;$('#cuts').innerHTML=S.cuts.map(cardHTML).join('');return true;
+}
+function setSt(c,t,cls=''){const e=$('#st'+c.id);if(e){e.textContent=t;e.className='st '+cls}}
+function badge(c){
+  const e=$('#bd'+c.id);if(!e)return;
+  if(c.qa){const s=c.qa.same_character,bad=s<S.thr||c.qa.ip_risk||c.qa.text_in_image;e.textContent=`${c.id+1} · ${s}/10${c.qa.ip_risk?' ⚠IP':''}`;e.style.color=bad?'var(--warn)':'var(--ok)'}
+  else e.textContent=c.id+1;
+}
+async function paint(c){
+  const cv=$('#cv'+c.id);if(!cv)return;
+  const out=await renderFinal(c,S.sw,S.sh);cv.width=S.sw;cv.height=S.sh;cv.getContext('2d').drawImage(out,0,0);
+}
+let paintT;function paintAllSoon(){clearTimeout(paintT);paintT=setTimeout(()=>S.cuts.forEach(c=>c.keyed&&paint(c)),250)}
+async function checkCut(c){
+  const r=await genJSON(`You are a strict QA reviewer for messenger sticker sets. Image 1 is the reference character. Image 2 is a new sticker candidate.
+Return JSON only: {"same_character": integer 1-10 (identity, face, colors, outfit, proportions and art style match the reference), "background_clean": boolean (flat solid single-color background, no extra objects or shadows), "text_in_image": boolean (any letters or words drawn in the image), "ip_risk": boolean (looks like a known copyrighted character, a logo, or a real person), "comment": "짧은 한국어 한 문장"}`,[S.base,c.raw]);
+  r.same_character=Number(r.same_character)||0;return r;
+}
+async function generateCut(c){
+  for(let t=0;t<2;t++){
+    setSt(c,t?'재생성 중…':'생성 중…');
+    c.raw=await genImage(cutPrompt(c),[S.base]);
+    c.keyed=await makeKeyed(c.raw);await paint(c);
+    if(String(S.check)!=='1'){c.qa=null;badge(c);break}
+    setSt(c,'일관성 검사 중…');
+    let res=null;try{res=await checkCut(c)}catch(e){}
+    c.qa=res;badge(c);if(!res)break;
+    const bad=res.same_character<S.thr||res.text_in_image||res.ip_risk;
+    if(!bad||t===1)break;
+  }
+  const warn=c.qa&&(c.qa.same_character<S.thr||c.qa.ip_risk||c.qa.text_in_image);
+  setSt(c,warn?'⚠ 확인 필요: '+(c.qa.comment||''):'완료'+(c.qa?.comment?' · '+c.qa.comment:''),warn?'':'ok');
+}
+function progress(){
+  const n=S.cuts.length,d=S.cuts.filter(c=>c.keyed).length;
+  $('#bar').style.width=(n?d/n*100:0)+'%';$('#barTxt').textContent=n?`${d} / ${n} 완료`:'';
+}
+async function runCuts(onlyMissing){
+  if(S.busy){toast('이미 생성 중이에요');return}
+  if(!needKey())return;
+  if(!S.base){toast('1번에서 캐릭터를 먼저 확정하세요');$('#sec1').scrollIntoView({behavior:'smooth'});return}
+  if(!onlyMissing||!S.cuts.length){if(!initCuts())return}
+  S.busy=true;S.stop=false;
+  const todo=S.cuts.filter(c=>!onlyMissing||!c.keyed);
+  let fatal=false;
+  await pool(todo,S.conc,async c=>{
+    if(fatal)return;
+    try{c.err=null;await generateCut(c)}
+    catch(e){c.err=e.message;setSt(c,'실패: '+e.message,'err');if(/API key|PERMISSION|permission|credential/i.test(e.message)){fatal=true;S.stop=true}}
+    progress();
+  });
+  S.busy=false;progress();
+  toast(S.stop?'중지했어요':'생성이 끝났어요 — 어긋난 컷은 "다시 생성"을 누르세요');
+}
+$('#btnAll').onclick=()=>runCuts(false);
+$('#btnMissing').onclick=()=>runCuts(true);
+$('#btnStop').onclick=()=>{S.stop=true;toast('진행 중인 컷까지만 마치고 멈춰요')};
+let edT;
+$('#cuts').addEventListener('input',e=>{
+  const t=e.target,i=t.dataset.i;if(i==null)return;const c=S.cuts[+i];c[t.dataset.f]=t.value;
+  if(t.dataset.f==='text'){clearTimeout(edT);edT=setTimeout(()=>paint(c),250)}
+});
+$('#cuts').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const c=S.cuts[+b.dataset.i];
+  if(b.dataset.act==='main'){S.mainId=c.id;toast(`${c.id+1}번을 대표 이미지로 정했어요`);return}
+  if(b.dataset.act==='regen'){
+    if(!needKey()||!S.base)return;b.disabled=true;
+    try{await generateCut(c)}catch(err){setSt(c,'실패: '+err.message,'err')}
+    b.disabled=false;progress();
+  }
+});
+ 
+/* ---------- 4. 검수·ZIP ---------- */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function makeZip(files){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  for(const f of files){
+    const name=enc.encode(f.name),crc=crc32(f.data),sz=f.data.length;
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(10,0,true);lh.setUint16(12,0x21,true);
+    lh.setUint32(14,crc,true);lh.setUint32(18,sz,true);lh.setUint32(22,sz,true);lh.setUint16(26,name.length,true);
+    parts.push(new Uint8Array(lh.buffer),name,f.data);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(12,0,true);ch.setUint16(14,0x21,true);
+    ch.setUint32(16,crc,true);ch.setUint32(20,sz,true);ch.setUint32(24,sz,true);ch.setUint16(28,name.length,true);ch.setUint32(42,off,true);
+    cen.push(new Uint8Array(ch.buffer),name);
+    off+=30+name.length+sz;
+  }
+  let cs=0;cen.forEach(p=>cs+=p.length);
+  const e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/zip'});
+}
+const toBytes=cv=>new Promise(res=>cv.toBlob(async b=>res(new Uint8Array(await b.arrayBuffer())),'image/png'));
+function cornersClear(cv){const d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data,w=cv.width,h=cv.height;return[0,(w-1)*4,(h-1)*w*4,((h-1)*w+w-1)*4].every(p=>d[p+3]===0)}
+ 
+async function buildFiles(){
+  const files=[],rep=[];
+  const done=S.cuts.filter(c=>c.keyed);
+  rep.push([S.cuts.length===24?'ok':'warn',`스티커 개수 ${S.cuts.length}종 (OGQ 기준 24종)`]);
+  rep.push([done.length===S.cuts.length&&S.cuts.length?'ok':'bad',`생성 완료 ${done.length} / ${S.cuts.length}`]);
+  let bigKB=0,badCorner=0;
+  for(const c of done){
+    const cv=await renderFinal(c,S.sw,S.sh),bytes=await toBytes(cv);
+    files.push({name:`${pad2(c.id+1)}.png`,data:bytes});bigKB=Math.max(bigKB,bytes.length/1024);
+    if(!cornersClear(cv))badCorner++;
+  }
+  rep.push([badCorner?'bad':'ok',`투명 배경 ${badCorner?badCorner+'컷 모서리가 투명하지 않음':'모든 컷 투명'}`]);
+  rep.push(['ok',`스티커 크기 ${S.sw}×${S.sh}, 파일 중 최대 ${Math.round(bigKB)}KB`]);
+  const m=S.cuts[S.mainId]&&S.cuts[S.mainId].keyed?S.cuts[S.mainId]:done[0];
+  if(m){files.push({name:'main.png',data:await toBytes(await renderFinal(m,S.mainW,S.mainH))});rep.push(['ok',`대표 이미지 ${S.mainW}×${S.mainH} (${m.id+1}번 컷)`])}
+  if(S.base){const bk=await makeKeyed(S.base);files.push({name:'tab.png',data:await toBytes(await renderFinal({keyed:bk,text:''},S.tabW,S.tabH,false))});rep.push(['ok',`탭 이미지 ${S.tabW}×${S.tabH}`])}
+  const texts=S.cuts.map(c=>c.text.trim());
+  rep.push([new Set(texts).size===texts.length&&texts.every(Boolean)?'ok':'warn','문구 중복·빈 문구 '+(new Set(texts).size===texts.length&&texts.every(Boolean)?'없음':'있음')]);
+  const rep2=S.cuts.filter(c=>c.qa&&(c.qa.same_character<S.thr)).map(c=>c.id+1);
+  rep.push([rep2.length?'warn':'ok',rep2.length?`일관성 점수 낮은 컷: ${rep2.join(', ')}번`:'일관성 점수 미달 컷 없음']);
+  const ip=S.cuts.filter(c=>c.qa&&c.qa.ip_risk).map(c=>c.id+1);
+  rep.push([ip.length?'bad':'ok',ip.length?`기존 캐릭터·로고·실존 인물 의심: ${ip.join(', ')}번 — 다시 생성하세요`:'저작권 의심 컷 없음']);
+  rep.push(['warn','문구 글자 크기·가독성, 규격(대표/탭 크기, 용량)은 OGQ 업로드 화면에서 최종 확인하세요']);
+  return{files,rep};
+}
+function showRep(rep){$('#rep').innerHTML=rep.map(([k,t])=>`<li class="${k}">${esc(t)}</li>`).join('')}
+$('#btnVal').onclick=async()=>{
+  if(!S.cuts.length){toast('먼저 24컷을 생성하세요');return}
+  const b=$('#btnVal');b.disabled=true;b.textContent='검사 중…';
+  try{showRep((await buildFiles()).rep)}catch(e){toast('검사 실패: '+e.message)}
+  b.disabled=false;b.textContent='규격 검사';
+};
+$('#btnMeta').onclick=async()=>{
+  if(!needKey())return;const b=$('#btnMeta');b.disabled=true;b.textContent='작성 중…';
+  try{
+    const list=(S.cuts.length?S.cuts.map(c=>c.text):parseLines().map(l=>l.text)).join(', ');
+    const j=await genJSON(`네이버 OGQ 마켓에 올릴 스티커 세트의 판매 정보를 한국어로 작성하세요. 캐릭터: ${$('#charDesc').value||'귀여운 캐릭터'}. 포함된 문구: ${list}.
+JSON으로만 답하세요: {"titles":["제목 후보 3개(짧고 검색에 잘 걸리게, 20자 이내)"],"description":"세트 소개 2~3문장","tags":["검색 태그 10개"]}`);
+    S.meta=j;const m=$('#meta');m.style.display='block';
+    m.textContent=`제목 후보\n- ${(j.titles||[]).join('\n- ')}\n\n설명\n${j.description||''}\n\n태그\n${(j.tags||[]).map(t=>'#'+String(t).replace(/^#/,'')).join(' ')}`;
+  }catch(e){toast('작성 실패: '+e.message)}
+  b.disabled=false;b.textContent='제목·설명·태그 만들기';
+};
+$('#btnZip').onclick=async()=>{
+  if(!S.cuts.some(c=>c.keyed)){toast('먼저 24컷을 생성하세요');return}
+  const b=$('#btnZip');b.disabled=true;b.textContent='만드는 중…';
+  try{
+    const{files,rep}=await buildFiles();showRep(rep);
+    const mt=S.meta?`제목 후보\n- ${(S.meta.titles||[]).join('\n- ')}\n\n설명\n${S.meta.description||''}\n\n태그\n${(S.meta.tags||[]).map(t=>'#'+String(t).replace(/^#/,'')).join(' ')}\n\n`:'';
+    files.push({name:'README.txt',data:new TextEncoder().encode(`OGQ 스티커 제출 파일\n\n- 01~${pad2(S.cuts.length)}.png : 스티커 ${S.sw}x${S.sh}, 투명 배경, 흰 외곽선\n- main.png : 대표 이미지 ${S.mainW}x${S.mainH}\n- tab.png : 탭 이미지 ${S.tabW}x${S.tabH}\n\n${mt}※ 대표·탭 이미지 규격과 용량 제한은 OGQ 크리에이터 스튜디오 업로드 화면에서 최종 확인하세요.\n`)});
+    const blob=makeZip(files),a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='ogq_emoticon_set.zip';document.body.appendChild(a);a.click();a.remove();
+    toast('ZIP을 만들었어요');
+  }catch(e){toast('ZIP 실패: '+e.message)}
+  b.disabled=false;b.textContent='제출용 ZIP 받기';
+};
+</script>
+</body>
+</html>
+ 
