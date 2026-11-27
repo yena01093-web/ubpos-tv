@@ -136,9 +136,15 @@ details summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--p)}
   <p class="sub">같은 구도 반복을 막으려고 컷마다 다른 화각을 자동 배정해요. 글자는 AI가 아니라 직접 얹어서 오타가 없어요.</p>
   <div class="grid3">
     <div><label>글자 위치</label><select data-set="tpos"><option value="bottom">아래</option><option value="top">위</option></select></div>
-    <div><label>글꼴</label><select data-set="font"><option>Jua</option><option>Do Hyeon</option><option>Black Han Sans</option><option>Gaegu</option></select></div>
-    <div><label>글자 색</label><input type="color" data-set="color" style="width:100%;height:42px;border:1px solid var(--line);border-radius:10px"></div>
+    <div><label>글꼴</label><select data-set="font"><option value="Jua">배민 주아체 (추천)</option><option value="Do Hyeon">도현체</option><option value="Black Han Sans">검은고딕</option><option value="Gaegu">개구체</option></select></div>
+    <div><label>기본 글씨 색</label><input type="color" data-set="color" style="width:100%;height:42px;border:1px solid var(--line);border-radius:10px"></div>
   </div>
+  <div class="grid3">
+    <div><label>강조 글씨 색</label><input type="color" data-set="color2" style="width:100%;height:42px;border:1px solid var(--line);border-radius:10px"></div>
+    <div><label>포인트 색</label><input type="color" data-set="color3" style="width:100%;height:42px;border:1px solid var(--line);border-radius:10px"></div>
+    <div><label>내 글꼴 파일 (잘난체·써라운드 등)</label><input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2"></div>
+  </div>
+  <div class="mini">문구에서 [단어]는 강조(빨강), {단어}는 포인트(노랑)로 칠해져요. 예) 사랑[해] · 외곽선은 항상 흰색이에요.</div>
   <label>글자 크기 <span class="mini">(이미지 높이 대비 %)</span></label>
   <input type="number" data-set="tsize" min="8" max="30">
   <div class="row"><button id="btnAll">전체 생성</button><button class="sec" id="btnMissing">빠진/실패한 컷만</button><button class="sec" id="btnStop">중지</button></div>
@@ -377,12 +383,12 @@ const ANGLES=[
 const KEYHEX={green:['pure green','#00FF00'],magenta:['pure magenta','#FF00FF'],blue:['pure blue','#0000FF']};
  
 /* ---------- 상태·설정 ---------- */
-const DEF={key:'',imgModel:'gemini-2.5-flash-image',txtModel:'gemini-2.5-flash',keyColor:'green',conc:3,sw:740,sh:640,mainW:740,mainH:640,tabW:74,tabH:74,outline:6,check:'1',thr:7,font:'Jua',color:'#2b2b2b',tsize:15,tpos:'bottom'};
+const DEF={key:'',imgModel:'gemini-2.5-flash-image',txtModel:'gemini-3.8-flash',keyColor:'green',conc:3,sw:740,sh:640,mainW:740,mainH:640,tabW:74,tabH:74,outline:6,check:'1',thr:7,font:'Jua',color:'#432820',color2:'#EF382D',color3:'#FFD447',tsize:15,tpos:'bottom'};
 const S=Object.assign({},DEF,{base:null,cands:[],cuts:[],busy:false,stop:false,mainId:0,meta:null});
-try{const o=JSON.parse(localStorage.getItem('ogq_settings')||'{}');for(const k in DEF)if(k in o)S[k]=o[k]}catch(e){}
+try{const o=JSON.parse(localStorage.getItem('ogq_settings')||'{}');for(const k in DEF)if(k in o)S[k]=o[k];if(S.txtModel==='gemini-2.5-flash')S.txtModel=DEF.txtModel;if(S.color==='#2b2b2b')S.color=DEF.color;if(S.font==='MyFont')S.font='Jua'}catch(e){}
 function saveSettings(){try{const o={};for(const k in DEF)o[k]=S[k];localStorage.setItem('ogq_settings',JSON.stringify(o))}catch(e){}}
 const NUMKEYS=['conc','sw','sh','mainW','mainH','tabW','tabH','outline','thr','tsize'];
-const REPAINT=['font','color','tsize','tpos','sw','sh','outline'];
+const REPAINT=['font','color','color2','color3','tsize','tpos','sw','sh','outline'];
 $$('[data-set]').forEach(e=>{
   const k=e.dataset.set; e.value=S[k];
   e.addEventListener('change',()=>{S[k]=NUMKEYS.includes(k)?(+e.value||DEF[k]):e.value;saveSettings();if(REPAINT.includes(k))paintAllSoon()});
@@ -484,26 +490,40 @@ function outlined(img,r){
   for(let ring=1;ring<=2;ring++){const rr=r*ring/2;for(let a=0;a<28;a++){const t=a/28*Math.PI*2;oc.drawImage(sil,Math.cos(t)*rr,Math.sin(t)*rr)}}
   oc.drawImage(img,pad,pad);return out;
 }
+function parseRuns(text){
+  const chars=[],re=/\[([^\]]+)\]|\{([^}]+)\}|([^\[\{]+|[\[\{])/g;let m;
+  while((m=re.exec(text))){
+    if(m[1]!=null)for(const ch of m[1])chars.push({ch,col:S.color2});
+    else if(m[2]!=null)for(const ch of m[2])chars.push({ch,col:S.color3});
+    else for(const ch of m[3])chars.push({ch,col:S.color});
+  }
+  return chars;
+}
 function layoutText(ctx,text,W,H){
+  const chars=parseRuns(text),plain=chars.map(c=>c.ch).join('');
   let size=Math.round(H*S.tsize/100);const maxW=W*0.92;
   const fam=`"${S.font}","Jua","Noto Sans KR",sans-serif`;
   const meas=(ls,sz)=>{ctx.font=`${sz}px ${fam}`;return Math.max(...ls.map(l=>ctx.measureText(l).width))};
-  let lines=[text];
-  if(meas(lines,size)>maxW&&text.length>4){
-    const sp=[...text].map((c,i)=>c===' '?i:-1).filter(i=>i>=0),mid=text.length/2;
-    if(sp.length){const cut=sp.reduce((a,b)=>Math.abs(b-mid)<Math.abs(a-mid)?b:a);lines=[text.slice(0,cut),text.slice(cut+1)]}
-    else{const cut=Math.ceil(mid);lines=[text.slice(0,cut),text.slice(cut)]}
+  let ranges=[[0,plain.length]];
+  if(meas([plain],size)>maxW&&plain.length>4){
+    const sp=[...plain].map((c,i)=>c===' '?i:-1).filter(i=>i>=0),mid=plain.length/2;
+    if(sp.length){const cut=sp.reduce((x,y)=>Math.abs(y-mid)<Math.abs(x-mid)?y:x);ranges=[[0,cut],[cut+1,plain.length]]}
+    else{const cut=Math.ceil(mid);ranges=[[0,cut],[cut,plain.length]]}
   }
-  while(meas(lines,size)>maxW&&size>16)size-=2;
-  return{lines,size,fam,blockH:lines.length*size*1.15};
+  while(meas(ranges.map(([x,y])=>plain.slice(x,y)),size)>maxW&&size>16)size-=2;
+  return{lines:ranges.map(([x,y])=>chars.slice(x,y)),size,fam,blockH:ranges.length*size*1.15};
 }
 function drawText(ctx,tl,W,H,m){
   const tb=tl.blockH+m*0.8,yc=S.tpos==='top'?tb/2:H-tb/2;
-  ctx.font=`${tl.size}px ${tl.fam}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.miterLimit=2;
-  tl.lines.forEach((ln,i)=>{
-    const y=yc+(i-(tl.lines.length-1)/2)*tl.size*1.15;
-    ctx.lineWidth=tl.size*0.28;ctx.strokeStyle='#fff';ctx.strokeText(ln,W/2,y);
-    ctx.fillStyle=S.color;ctx.fillText(ln,W/2,y);
+  ctx.font=`${tl.size}px ${tl.fam}`;ctx.textAlign='left';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.miterLimit=2;
+  tl.lines.forEach((line,i)=>{
+    const y=yc+(i-(tl.lines.length-1)/2)*tl.size*1.15,runs=[];
+    for(const c of line){const l=runs[runs.length-1];if(l&&l.col===c.col)l.t+=c.ch;else runs.push({t:c.ch,col:c.col})}
+    let total=0;for(const r of runs){r.w=ctx.measureText(r.t).width;total+=r.w}
+    let x=W/2-total/2;
+    ctx.lineWidth=tl.size*0.28;ctx.strokeStyle='#FFFFFF';
+    for(const r of runs){ctx.strokeText(r.t,x,y);r.x=x;x+=r.w}
+    for(const r of runs){ctx.fillStyle=r.col;ctx.fillText(r.t,r.x,y)}
   });
 }
 async function renderFinal(c,W,H,withText=true){
@@ -524,6 +544,15 @@ async function renderFinal(c,W,H,withText=true){
   if(tl)drawText(ctx,tl,W,H,m);
   return out;
 }
+ 
+$('#fontFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const ff=new FontFace('MyFont',await f.arrayBuffer());await ff.load();document.fonts.add(ff);
+    const sel=$('[data-set="font"]');if(![...sel.options].some(o=>o.value==='MyFont'))sel.add(new Option('내 글꼴 ('+f.name+')','MyFont'));
+    sel.value='MyFont';S.font='MyFont';saveSettings();paintAllSoon();toast('글꼴을 적용했어요');
+  }catch(err){toast('글꼴을 불러오지 못했어요')}
+});
  
 /* ---------- 1. 캐릭터 ---------- */
 let refImg=null;
@@ -760,5 +789,6 @@ $('#btnZip').onclick=async()=>{
 </script>
 </body>
 </html>
+ 
  
  
