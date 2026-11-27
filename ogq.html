@@ -104,6 +104,7 @@ details summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--p)}
   <div class="grid2">
     <div><label>그림체</label>
       <select id="style">
+        <option>참고 이미지 그림체 그대로 (그림을 올렸을 때)</option>
         <option>귀엽고 단순한 손그림 낙서체, 굵은 외곽선, 플랫 컬러</option>
         <option>말랑말랑한 3D 느낌의 귀여운 캐릭터</option>
         <option>얇은 선화와 파스텔 컬러의 감성 일러스트</option>
@@ -414,6 +415,10 @@ async function api(model,parts,cfg){
 }
 function inl(r){return {inlineData:{mimeType:r.mime,data:r.data}}}
 async function genImage(prompt,refs=[]){
+  try{return await genImage1(prompt,refs)}
+  catch(e){if(/NO_IMAGE|이미지가 오지 않음/.test(e.message))return await genImage1(prompt,refs);throw e}
+}
+async function genImage1(prompt,refs=[]){
   const j=await api(S.imgModel,[...refs.map(inl),{text:prompt}],{responseModalities:['IMAGE']});
   const parts=j.candidates?.[0]?.content?.parts||[];
   for(const p of parts){const d=p.inlineData||p.inline_data;if(d?.data)return{mime:d.mimeType||d.mime_type||'image/png',data:d.data}}
@@ -527,7 +532,7 @@ $('#refFile').addEventListener('change',async e=>{
   const im=await loadImg(URL.createObjectURL(f));const k=Math.min(1,1024/Math.max(im.naturalWidth,im.naturalHeight));
   const cv=document.createElement('canvas');cv.width=Math.round(im.naturalWidth*k);cv.height=Math.round(im.naturalHeight*k);
   const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(im,0,0,cv.width,cv.height);
-  refImg={mime:'image/jpeg',data:cv.toDataURL('image/jpeg',.9).split(',')[1]};toast('참고 이미지를 불러왔어요');
+  refImg={mime:'image/jpeg',data:cv.toDataURL('image/jpeg',.9).split(',')[1]};$('#style').selectedIndex=0;toast('참고 이미지를 불러왔어요');
 });
 function bgText(){const[n,h]=KEYHEX[S.keyColor];return `flat solid ${n} (${h}) background, no shadow, no floor, no text, no letters, no watermark`}
 function baseExtra(){return $('#extra').value.trim()}
@@ -543,8 +548,14 @@ $('#btnCand').onclick=async()=>{
   if(!desc&&!refImg){toast('캐릭터 설명을 쓰거나 참고 이미지를 올려주세요');return}
   const btn=$('#btnCand');btn.disabled=true;S.base=null;
   S.cands=[0,1,2,3].map(()=>({raw:null,msg:'생성 중…'}));renderCands();
-  const prompt=`Create ONE original, cute character design for a messenger sticker set.${desc?` Character: ${desc}.`:''}${refImg?' Use the attached image as the reference for the character.':''}
-Art style: ${$('#style').value}. Centered, upper body or full body, simple clean shapes, consistent line weight, readable at small size, expressive friendly face. Do NOT imitate any existing copyrighted character. ${baseExtra()}
+  const keepStyle=$('#style').selectedIndex===0;
+  const styleTxt=keepStyle?'keep the exact art style, line quality and colors of the attached image':$('#style').value;
+  const prompt=refImg
+    ?`Redraw the attached character as the base character for a messenger sticker set. KEEP THE DESIGN EXACTLY: same animal or species, face, colors, outfit, accessories, props and proportions. Do NOT replace it with a different character and do NOT invent new features. Only clean it up: centered, sharp, flat-colored, consistent outlines, readable at small size.${desc?` Extra notes: ${desc}.`:''}
+Art style: ${styleTxt}. ${baseExtra()}
+${bgText()}.`
+    :`Create ONE original, cute character design for a messenger sticker set. Character: ${desc}.
+Art style: ${styleTxt}. Centered, upper body or full body, simple clean shapes, consistent line weight, readable at small size, expressive friendly face. Do NOT imitate any existing copyrighted character. ${baseExtra()}
 ${bgText()}.`;
   let fatal=false;
   await Promise.all(S.cands.map(async c=>{
@@ -749,4 +760,5 @@ $('#btnZip').onclick=async()=>{
 </script>
 </body>
 </html>
+ 
  
